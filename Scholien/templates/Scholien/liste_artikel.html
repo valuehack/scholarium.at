@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltungen">
+  {% for artikel in liste_artikel %}
+    <div class="veranstaltung">
+      <h1><a href='{{ artikel.slug }}'>{{ artikel.bezeichnung|safe }}</a></h1>
+      <div>
+        {{ artikel.datum_publizieren | date:"l, d. F Y" }}
+      </div>      
+      <p>{{ artikel.inhalt|safe|truncatewords:64 }}<a href='{{ artikel.slug }}'> [Weiterlesen]</a></p>
+      <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+    </div>
+    {% endfor %}
+  </article>
+  {% include "paginationsleiste.html" %}
+{% endblock content %}

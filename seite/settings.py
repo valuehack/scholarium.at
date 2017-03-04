@@ -35,9 +35,8 @@ INSTALLED_APPS = [
     'Grundgeruest',
     'Veranstaltungen',
     'Produkte',
-#    'Bibliothek',
-#    'Scholien', 
-#    'accounts',
+    'Bibliothek',
+    'Scholien', 
 
     'django.contrib.admin',
     'django.contrib.auth',

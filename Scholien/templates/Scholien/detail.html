@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltung">
+    <h1>{{ scholie.bezeichnung|safe }}</h1>
+    <div>
+      {{ scholie.datum_publizieren | date:"l, d. F Y" }}
+    </div>
+  </div>
+  <div class="salon_content">
+    {{ scholie.inhalt|safe }}
+    {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
+    <p style="text-align: right;">
+      <a href="{% url 'Scholien:liste_artikel' %}">zurück zu den Scholienartikeln</a>
+    </p>
+  </div>
+{% endblock content %}
