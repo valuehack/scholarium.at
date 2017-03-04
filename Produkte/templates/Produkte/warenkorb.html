@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <h1>Ihr Warenkorb</h1>
+  <p>
+    {{ cart.item_count }} Artikel zu {{ cart.total_price }} 
+    <img class='dropdown_coin' src="{% static 'img/coin.png' %}">
+  </p><hr>
+  {% for item in cart.list_items %}
+  <div>
+    {{ item.quantity }} x {{ item.obj.bezeichnung }} zu je {{ item.price }} -> {{ item.total }}
+  </div>
+  {% endfor %}
+
+<form action="{% url 'Produkte:kaufen' %}" method="post">
+  {% csrf_token %}
+  <input type="submit" value="Auschecken!" />
+</form>
+<form action="{% url 'Produkte:cart-empty' %}" method="post">
+  {% csrf_token %}
+  <input type="submit" value="Warenkorb leeren!" />
+</form>
+
+{% endblock content %}

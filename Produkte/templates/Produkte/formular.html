@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2> Produkte zum Warenkorb hinzufügen </h2>
+
+<p>Gib die id und die Anzahl ein</p>
+<form action="{% url 'Warenkorb:cart-add' %}" method="post">
+
+{% csrf_token %}
+
+<table>
+<tr>
+    <td style="color:black;">Produkt-id:</td>
+    <td style="color:black;"><input type="text" name="pk" id="1" value="" /></td>
+</tr>
+<tr>
+    <td style="color:black;">Menge hinzuzufügen:</td>
+    <td style="color:black;"><input type="text" name="quantity" id="2" value="" /></td>
+</tr>
+</table>
+
+<input type="submit" value="Hinzufügen!" />
+
+</form>
+
+{% lorem 1 p random %}
+<h3>Es folgt eine Liste der Produkte </h3>
+<table>
+<th>
+    <td style="color:black;">id</td>
+    <td style="color:black;">Bezeichnung</td>
+</th>
+{% for produkt in produkte %}
+<tr>
+    <td style="color:black;">{{ produkt.id }}</td>
+    <td style="color:black;">{{ produkt }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

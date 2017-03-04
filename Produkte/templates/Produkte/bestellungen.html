@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% load humanize %} {% block content %}
+
+
+<h1> Übersicht über Bestellungen</h1>
+<div class="separator">
+    <h2>Ihre Veranstaltungen</h2></div>
+<div class="container">
+
+    <table>
+        <tr>
+            <th/>
+            <th>Status</th>
+            <th>Plätze</th>
+        </tr>
+        {% for kauf in veranstaltungen %}
+        <tr>
+            <td>{{ kauf.zeit|naturaltime }}</td>
+            <td>{{ kauf.produkt }}</td>
+            <td>{{ kauf.menge }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="separator">
+    <h2>Ihre Schriften und Medien</h2></div>
+<div class="container">
+
+    <table>
+        <tr>
+            <th/>
+            <th/>
+            <th>Download</th>
+        </tr>
+        {% for kauf in medien %}
+        <tr>
+            <td>{{ kauf.zeit|naturaltime }}</td>
+            <td>{{ kauf.produkt }}</td>
+            <td> Preis später </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="separator">
+    <h2>Ihre Spenden und Programme</h2></div>
+<div class="container">
+    <h2>Spenden</h2>
+
+    <table>
+        <tr>
+            <th/>
+            <th>Ihre Spende</th>
+            <th>Status</th>
+        </tr>
+        {% for kauf in medien %}
+        <tr>
+            <td>{{ kauf.zeit|naturaltime }}</td>
+            <td>{{ kauf.produkt }}</td>
+            <td> Preis später </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Programme</h2>
+
+    <table>
+        <tr>
+            <th/>
+            <th>Plätze</th>
+            <th>Status</th>
+        </tr>
+        {% for kauf in medien %}
+        <tr>
+            <td>{{ kauf.zeit|naturaltime }}</td>
+            <td>{{ kauf.produkt }}</td>
+            <td> Preis später </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}
