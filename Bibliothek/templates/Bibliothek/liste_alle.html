@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <ul>
+  {% for buch in buecher %}
+    <li>{{ buch }}</li>
+  {% endfor %}
+  </ul>
+{% endblock content %}
