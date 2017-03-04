@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+	<article class="blog">
+		<div class="blog_text">
+			<p>Mit Scholion bezeichnete man urspr&uuml;nglich eine Randnotiz, die Gelehrte in den B&uuml;chern anbrachten, die ihre st&auml;ndigen Wegbegleiter waren. Heute sind die Scholien die Randnotizen von Rahim Taghizadegan, die Erkenntnisgewinne im Rahmen des <i>scholarium</i> dokumentieren: der tiefgehenden Reflexion und praktischen &Uuml;berpr&uuml;fung der M&ouml;glichkeiten, unter erschwerten Bedingungen noch Werte zu schaffen, Realit&auml;t von Illusion zu unterscheiden und Sinn zu finden.</p>
+			<p>Das scholarium ist ein lernendes Unternehmen, in dem aus der Spannung zwischen mu&szlig;evoll-theoretischer Reflexion und praktisch-unternehmerischem Schaffen Erkenntnis gewonnen wird. Die Sp&auml;ne, die bei dieser Erkenntnissuche abfallen, teilt Rahim Taghizadegan an dieser Stelle mit Seelenverwandten. Die Scholien sind daher pers&ouml;nlich und frei von der Leber geschrieben &ndash; ohne Blatt vor dem Mund.</p>
+			<p>Themen: Unternehmerische Herausforderungen auf verzerrten M&auml;rkten, Werte und Wirtschaft, Theorie und Praxis des guten Lebens, Freiheit und Ordnung, Erkenntnis, Dynamiken und Hintergr&uuml;nde der Gegenwart und Vergangenheit, Ideengeschichte, Alternativen und Traditionen, Aktuelles und Zeitloses, Strategie und Einstellung, Sprache und Symbole, Spirituelles und Materielles, Fragen und Antworten, hilfreiche Hinweise und Ratschl&auml;ge, Kunst und Kultur.</p>
+			<p>Die Scholien sind eine Anregung f&uuml;r Vielleser, aber vielmehr noch eine Dienstleistung f&uuml;r Wenigleser &ndash; insbesondere f&uuml;r Praktiker, die es auch unter schwierigsten Bedingungen nicht aufgeben, Werte zu schaffen und zu wahren, und f&uuml;r Erkenntnis- und Sinnsucher in Zeiten inflation&auml;rer Desinformation.</p>
+
+<p>Wenn Sie sich angesprochen f&uuml;hlen, treten Sie doch bitte zun&auml;chst einen Schritt weit aus der Anonymit&auml;t und tragen Sie hier kostenlos Ihre E-Mail-Adresse ein, Sie k&ouml;nnen dann die letzten Scholien-Beitr&auml;ge anlesen.</p>		
+		</div>
+		<div style="text-align: center;">
+			<div class="blog_subscribe">
+				<form method="post" action="/scholien/index.php" name="registerform">
+        			<input class="inputfield" type="email" placeholder=" E-Mail-Adresse" name="user_email" autocomplete="off" required>
+        			<input type=hidden name="first_reg" value="scholien">
+        			<input class="inputbutton" type="submit" name="eintragen_submit" value="Kostenlos eintragen">
+      			</form>	
+			</div>
+		</div>
+		<p class="linie"><img src="{% static 'img/linie.png' %}" alt=""></p>
+		
+    </article>
+{% endblock content %}

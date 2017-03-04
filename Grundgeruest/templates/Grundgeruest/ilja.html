@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html5>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Willkommen | Schölarium{% endblock %}</title>
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'ilja.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="{% static 'warenkorb/skripte_warenkorb.js' %}"></script> 
+  </head>
+  <body>
+    <header class="header">
+    {% block kopfleiste %}
+      <div style="background-color: red; height: 30px; margin-bottom: -30px; text-align: right">hallo</div>
+    {% endblock kopfleiste %}
+    <div class="logo">
+      <a href="/">
+        <img class="logo_img" src="{% static 'img/scholarium_logo_w.png' %}" onclick="cart.add(1, 2)" alt="scholarium" name="Home">
+      </a>                 
+    </div>
+    {% block menueleiste %}
+      <div style="background-color: blue; height: 30px"></div>
+    {% endblock menueleiste %}
+    </header>
+    <div class="inhalt">
+      {% block content %}
+        <div style="padding: 0 25%; align-content: center;">{% lorem 7 p %}</div>
+      {% endblock content %}
+    </div>
+    {% include "Grundgeruest/footer_inhalt.html" %}
+  </body>
+</html>

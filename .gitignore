@@ -2,3 +2,5 @@
 *.html~
 /venv/
 /static/
+/media/
+db.sqlite3

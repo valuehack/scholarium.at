@@ -1,0 +1,23 @@
+{% extends "Grundgeruest/ilja.html" %}
+
+
+{% block kopfleiste %}
+  <div class="login">
+  {% if request.user.is_authenticated %}
+    {% include "Grundgeruest/kopfleiste_nutzer.html" %}
+  {% else %}
+    {% include "Grundgeruest/kopfleiste_gast.html" %}
+  {% endif %}
+  </div>
+{% endblock kopfleiste %}
+
+
+{% block menueleiste %}
+  <div class="menueleiste">
+    <div>
+      <ul>
+        {% include "Grundgeruest/menueleiste.html" with liste_menue=liste_menue %}
+      </ul>
+    </div>
+  </div>
+{% endblock menueleiste %}

@@ -1,0 +1,24 @@
+{% load static %}
+<!doctype html5>
+<html lang="de">
+	<head>
+    	<meta charset="utf-8">
+		<title>Willkommen | Schölarium</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+    	<link rel="stylesheet" type="text/css" href="{% static 'w3.css' %}"> 
+    	<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+        {% include "zeug_in_head.html" %}
+	</head>
+    <body>
+        <header class="header">
+        {% include "zeug_in_header.html" %}
+        {% include "Grundgeruest/menueleiste.html" with liste_menue=liste_menue %}
+        </header>
+        <div class="content">
+            {% block content %}
+                {% lorem 7 p %}
+            {% endblock content %}
+        </div>
+        {% include "zeug_in_footer.html" %}
+    </body>
+</html>

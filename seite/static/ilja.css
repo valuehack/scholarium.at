@@ -1,0 +1,857 @@
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_regular.otf') format('opentype');
+	}
+
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_italic.otf') format('opentype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_bold.otf') format('opentype');
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_semibold.otf') format('opentype');
+	font-weight: 500;
+}
+
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_italic.otf') format('opentype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_bold-italic.otf') format('opentype');
+	font-weight: bold;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Garamond';
+	src: url('font/garamond_semibold-italic.otf') format('opentype');
+	font-weight: 500;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Futura Book';
+	src: url('font/futura_regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Futura Book';
+	src: url('font/futura_italic.ttf') format('truetype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Futura Book';
+	src: url('font/futura_bold.ttf') format('truetype');
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'Futura Book';
+	src: url('font/futura_bold-italic.ttf') format('truetype');
+	font-style: italic;
+	font-weight: bold;
+}
+
+/*==================================
+ * CSS Reset
+ ===================================*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+u, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+   margin: 0;
+   padding: 0;
+   border: 0;
+   font-size: 100%;
+   font: inherit;
+   vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+   display: block;
+}
+body {
+   line-height: 1;
+}
+ul {
+   list-style: none;
+}
+ol {
+	list-style-position: inside;
+}
+blockquote, q {
+   quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+   content: '';
+   content: none;
+}
+table {
+   border-collapse: collapse;
+   border-spacing: 0;
+}
+
+/*=========================================*/
+
+
+/*==================================================*/
+/*                  General		                    */
+/*==================================================*/
+
+body {
+}
+
+p {
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	text-align: justify;
+}
+
+ul, ol {
+	font-family: "Futura Book", Helvetica, Arial, serif;
+	letter-spacing: 0.5px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Futura Book", Helvetica, Arial, serif;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+h1 {
+	font-size: 34pt;
+	text-align: center;
+	display: block;
+	margin: 2em 0;
+	font-weight: bold;
+}
+
+h2 {
+	font-size: 20pt;
+	text-align: center;
+	margin-top: 40px;
+}
+
+span {
+	font-family: "Garamond", Georgia, Times, sans-serif;
+}
+
+em {
+	font-style: italic;
+}
+
+strong {
+	font-weight: bold;
+}
+
+a {
+	text-decoration: none;
+}
+
+/*==================================================*/
+/*                   Header                    		*/
+/*==================================================*/
+
+.header {
+	width: 100%;
+	height: 230px;
+	margin: 0;
+	top: 0;
+	left: 0;
+	background: rgb(11,19,30) url(img/header_neu_blau.png) no-repeat center -250px;
+}
+
+.logo {
+	background: transparent;
+	width: 900px;
+	height: 160px;
+	margin: 35px auto 0px auto;
+	text-align: center;
+}
+
+.logo_img {
+	margin: 25px auto;
+	width: 430px;
+}
+
+.dropdown {
+	position: relative;
+  	content: "";
+  	border-top: 0;
+	top: auto;
+  	left: auto;
+}
+
+/*================  Main Navigation  ===============*/
+
+div.menueleiste {
+	height: 40px;
+	background: rgba(255,255,255);
+	position: relative;
+	top: 30px;
+   	right: 0;
+   	margin: 0 auto;
+	text-align: center;
+	z-index: 500;
+}
+
+div.menueleiste div {
+	height: 40px;
+	margin: auto;
+	width: 80%;
+}
+
+div.menueleiste ul {
+	text-align: center;
+}
+
+li.hauptpunkt {
+    position: relative;
+	float: left;
+	width: 16.6667%; /*20% for five fields*/
+	padding: 9px 0 4px;
+	height: 27px;
+	margin: 0;
+	list-style: none;
+   	display: inline;
+   	font-size: 17px;
+}
+
+li.hauptpunkt a {
+	display: block;
+	height: 27px;
+   	color: white;
+	padding: 3px 10px;
+	font-size: 15px;
+	text-shadow: 0px 0px 0px #fff;
+}
+
+li.hauptpunkt li:first-child > a, li.hauptpunkt > a {
+	font-size: 17px;
+}
+
+li.hauptpunkt a:hover {
+	text-shadow: 0px 0px 20px #fff;
+}
+
+li.hauptpunkt a:visited {
+   	color: rgb(245,245,245);
+	text-shadow: 0 0 2px 0 rgba(0,0,0,0.5);
+}
+
+li.hauptpunkt li {
+	height: 40px;
+	float: none;
+}
+
+li.hauptpunkt div {
+    display: none;
+    position: absolute;
+	background: rgb(11,19,30);
+    z-index: 1;
+    height: auto;
+    width: 100%;
+	top: 9px;
+}
+
+li.hauptpunkt:hover div {
+    display: block;
+}
+
+/* fuer kopfleiste fast uebernommen */
+
+.login {
+	position: fixed;
+	top: 0px;
+	width: 90%;
+	height: 27px;
+	background: rgba(255,255,255,0.8);
+	padding: 4px 10% 4px 0;
+	text-align: right;
+	z-index: 1000;
+}
+
+.login_button {
+	background: none;
+	color: rgb(0,0,0);
+	border: 0;
+	font-size: 12pt;
+	float: right;
+	font-family: "Futura Book", Helvetica, Arial, serif;
+	padding: 6px 10px;
+}
+
+.caret {
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+    margin-left: 4px;
+    vertical-align: middle;
+    border-top: 4px dashed;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+.login_button a {
+	color: rgb(0,0,0) !important;
+	font-family: "Futura Book", Helvetica, Arial, serif;
+}
+
+.badge {
+  display: inline-block;
+  min-width: 12px;
+  padding: 5px 3px;
+  font-weight: bold;
+  line-height: 0.7;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  background: rgb(46,74,98);
+  border-radius: 6px;
+  height: 8px;
+}
+
+.dropdown_menu {
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 160px;
+    padding: 5px 0px;
+    margin: 33px 0px 0px;
+    font-size: 12pt;
+    text-align: left;
+    list-style: outside none none;
+    background-color: #FFF;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.176);
+    right: 0;
+  	left: auto;
+}
+
+.dropdown_menu > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.dropdown_header {
+	display: block;
+	font-size: 12pt;
+	line-height: 1.5;
+	color: #777;
+	white-space: nowrap;
+	text-align: center;
+	padding: 3px 20px;
+}
+
+.dropdown_level {
+	font-size: 10pt;
+	margin-top: -8px;
+}
+
+.dropdown_credits {
+	text-align: left;
+	padding: 3px 0px 3px 20px;
+}
+
+.dropdown_menu .divider {
+    height: 1px;
+    margin: 9px 0px;
+    overflow: hidden;
+    background-color: #E5E5E5;
+}
+
+img.dropdown_coin {
+	height: 17px;
+	margin: 0px;
+	display: inline;
+	vertical-align: -3px;
+}
+
+
+/*==================================================*/
+/*                 Content General                  */
+/*==================================================*/
+
+.inhalt {
+	margin: 50px auto;
+}
+
+.container {
+	width: 60%;
+	padding: 50px 20%;
+}
+
+table {
+	width: 100%;
+}
+
+th, td {
+	border-bottom: 1px solid rgb(220,220,220);
+	
+}
+
+th {
+	font-size: 14pt;
+	height: 20px;
+    padding: 5px 0;
+	color: rgb(180,180,180);
+	text-align: right;
+}
+
+td {
+	font-size: 12pt;
+}
+
+/* Gast-Seiten */
+
+.blog {
+	width: 800px;
+	padding-bottom: 30px;
+	margin: auto;
+}
+
+.blog h1 {
+	font-size: 20pt;
+}
+
+.blog p {
+	line-height: 1.6em;
+	margin: 30px 0 30px;	
+	font-size: 16pt;
+}
+
+.blog a:link {
+	color: rgb(46,74,98);
+	border-bottom: 1px dotted;
+}
+
+.blog a:hover {
+	border-bottom: 1px solid;
+	color: rgba(46,74,98,0.8);
+}
+
+.blog a:visited {
+	border-bottom: 1px solid;
+	color: rgba(46,74,98,0.6);
+}
+
+.blog a {
+	text-decoration: none;
+}
+
+.blog_text_fragen h2 {
+	font-size: 20pt;
+	text-shadow: 0px 0px 0px #666;	
+	text-align: left;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	font-weight: normal;
+}
+
+.blog_upgrade, .blog_subscribe {
+	padding: 30px;
+	width: 100%;
+    background-color: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.05) inset;
+    display: inline-block;
+    font-size: 16pt;
+    max-width: 900px;
+    position: relative;
+    text-align: center;
+}
+
+.blog_subscribe {
+    max-width: 438px;
+    margin: 30px auto;
+}
+
+.inputfield {
+	padding: 0 14px;
+	background-color: #fff;
+	border: 1px solid #cfcfcf;
+	margin: 5px;
+	width: 172px;
+	height: 50px;
+	font-size: 16pt;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+}
+
+.inputbutton {
+	text-decoration: none;
+	background: rgb(46,74,98);
+	color: #fff;
+	border: 0;
+	border-radius: 2px;
+	margin: 5px;
+	min-width: 200px;
+	height: 50px;
+	font-size: 16pt;
+	font-family: "Futura Book", Helvetica, Arial, serif;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+}
+
+.inputbutton:hover {
+	background: rgb(30,48,64);
+}
+
+.inputbutton:disabled {
+	background: rgb(200,200,200);
+}
+
+a.blog_linkbutton {
+	text-decoration: none;
+	display: block;
+	border-radius: 2px;
+	color: rgb(255,255,255) !important;
+	background: rgb(46,74,98);
+	border: 0 !important;
+	margin: 30px auto 10px auto;
+	max-width: 400px;
+	height: 37px;
+	padding-top: 13px;
+	font-size: 16pt;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+	text-align: center;
+}
+
+a.blog_linkbutton:hover {
+	color: rgb(255,255,255);
+	background: rgb(30,48,64);
+	text-decoration: none;
+}
+
+a.blog_linkbutton:visited {
+	color: rgb(255,255,255);
+	text-decoration: none;
+}
+
+/* Veranstaltungen */
+
+div.veranstaltungen {
+	width: 60%;
+	padding-bottom: 30px;
+	margin: 50px auto;
+}
+
+div.veranstaltung {
+	text-align: center;
+	margin: 27px 0 0;
+}
+
+div.veranstaltung > div {
+	font-size: 18pt;
+	text-align: center;
+	margin: 50px 0 0;
+}
+
+div.veranstaltung > h1 {
+	font-size: 20pt;
+	margin: 15px 0 10px 0;
+}
+
+div.veranstaltung > h1 > a {
+	color: rgb(46,74,98);
+	text-decoration: none;
+}
+
+div.veranstaltung > h1 > a:hover {
+	color: black;
+}
+
+div.veranstaltung > h1 + div {
+	font-size: 14pt;
+	margin: 0 0 40px 0;
+	font-style: italic;
+}
+
+div.veranstaltung p {
+	font-size: 16pt;
+	margin: 15px 0;
+	text-align: justify;
+	line-height: 1.6;
+}
+
+p.linie {
+	margin-top: 15px;
+	text-align: center !important;
+	padding-bottom: 20px;
+}
+
+p.linie img {
+	display: inline;
+	max-height: 35px;
+}
+
+.separator {
+	box-shadow: 0 0 1px 0 rgba(0,0,0,0.6);
+	width: 100%;
+	text-align: center;
+	padding: 15px 0;
+	background: rgb(250,250,250);
+}
+
+.separator h2 {
+	font-size: 20pt;
+	color: rgba(0,0,0,0.6);
+	text-transform: uppercase;
+	margin-top: 0;
+}
+
+/*============== fuer detail-view, uebernommen =============*/
+.salon_content {
+	width: 800px;
+	padding-bottom: 30px;
+	margin: 50px auto;
+}
+
+.salon_content a {
+	color: rgb(0,0,0);
+	text-decoration: none;
+	border-bottom: 0px dotted rgb(46,74,98);
+}
+
+.salon_content a:hover{
+	color: rgb(0,0,0);
+	border-bottom: 0px solid rgb(46,74,98);
+}
+
+.salon_content img {
+	text-align: center;
+	margin: 30px 0;
+}
+
+.salon_content p {
+	font-size: 16pt;
+	margin: 15px 0;
+	text-align: justify;
+	line-height: 1.6;
+}
+
+.salon_content li {
+	font-size: 14pt;
+	line-height: 1.6;
+}
+
+.medien_anmeldung {
+	text-align: right;
+}
+
+.medien_anmeldung a {
+	color: rgb(46,74,98);
+	font-size: 14pt;
+	text-decoration: none;
+	border-bottom: 1px dotted rgb(46,74,98);
+	text-align: center;
+	margin: 0 auto;
+	font-family: "Futura Book", Helvetica, Arial, serif;
+}
+
+.medien_anmeldung a:hover{
+	color: rgb(0,0,0);
+	border-bottom: 1px solid rgb(46,74,98);
+}
+
+.salon_reservation {
+	text-align: center;
+	margin: auto;
+	padding: auto;
+    display: inline-block;
+    position: relative;
+}
+
+
+/* habe ich fuer pagination uebernommen */
+
+.pagination {
+	padding: 3px;
+	margin: 50px auto 5px 0;
+	font-size: 16pt;
+	text-align: center;
+}
+
+.pagination a {
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	text-decoration: none;
+	color: rgb(46,74,98);
+	border: 0 !important;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+}
+
+.pagination a:hover, .pagination a:active {
+	color: #000;
+}
+
+.pagination span.current {
+	padding: 1px 5px 1px 5px;
+	margin: 1px 2px;
+	font-weight: bold;
+	background-color: rgb(46,74,98);
+	color: #fff;
+}
+
+.pagination span.disabled {
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	color: #000;
+}
+
+
+/*==================================================*/
+/*                   Footer                    		*/
+/*==================================================*/
+
+.footer {
+	min-height: 35px;
+	width: 100%;
+	background: rgb(7,16,24);
+	margin: 0;
+	padding-top: 10px;
+	color: rgb(238,238,238);
+}
+
+.footer a {
+	color: rgb(238,238,238);
+	text-decoration: none;
+}
+
+.footer a:hover {
+	text-decoration: underline;
+}
+
+.footer_section {
+	width: 80%;
+	padding: 20px 10%;
+	overflow: hidden;
+}
+
+.footer_info {
+	width: 60%;
+	margin-right: 5%;
+	float: left;
+}
+
+.footer_info p {
+	font-size: 12pt;
+	text-align: justify;
+	line-height: 1.5;
+	margin-top: 140px;
+}
+
+.footer_contact {
+	width: 35%;
+	float: right;
+}
+
+.footer_contact img {
+	width: 350px;
+	margin-bottom: 40px;
+}
+
+.footer_contact p {
+	font-size: 14pt;
+	padding: 10px 0 0 0;
+	margin-left: 7px;
+	font-family: "Futura Book", Helvetica, Arial, serif;
+}
+
+.footer_contact ul {
+	margin-left: 7px;
+}
+
+.footer_contact li {
+	font-size: 14pt;
+	line-height: 1.4;
+}
+
+.footer_tm {
+	width: 60%;
+	margin-right: 5%;
+	float: left;
+}
+
+.footer_tm p {
+	font-size: 16pt;
+	line-height: 2;
+	text-align: left;
+}
+
+.footer_logo a {
+	display: block;
+	font-size: 15pt;
+	padding: 0 10px;
+}
+
+.footer_social {
+	width: 35%;
+	float: right;
+	text-align: right;
+}
+.footer_social ul {
+	margin-left: 90px;
+}
+
+.footer_social li {
+	float: left;
+	width: 40px;
+	margin: 0 5px;
+}
+
+.footer_social a {
+	text-decoration: none;
+	display: block;
+	height: 40px;
+	width: 40px;
+	background-size: contain;
+}
+
+.footer_social a:hover {
+	opacity: 0.8;
+}
+
+.footer_social_facebook {
+	background: url(img/footer_social_facebook.png) no-repeat;
+}
+
+.footer_social_twitter {
+	background: url(img/footer_social_twitter.png) no-repeat;
+}
+
+.footer_social_youtube {
+	background: url(img/footer_social_youtube.png) no-repeat;
+}
