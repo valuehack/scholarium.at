@@ -1,5 +1,5 @@
-appdirs==1.4.0
-Django==1.9.12
+appdirs==1.4.2
+Django==1.9.11
 django-easycart==0.4.0
 django-extensions==1.7.5
 django-guardian==1.4.1

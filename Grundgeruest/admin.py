@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from guardian.admin import GuardedModelAdmin
 from userena.models import UserenaSignup
 from userena import settings as userena_settings
+from django.contrib.auth.models import Group
 
 from .models import *
 
@@ -36,7 +37,7 @@ class UserenaAdmin(UserAdmin, GuardedModelAdmin):
 if not userena_settings.USERENA_REGISTER_USER:
     try:
         admin.site.unregister(get_user_model())
-        admin.site.unregister('django.contrib.auth.Group')
+        admin.site.unregister(Group)
     except admin.sites.NotRegistered:
         pass
     
