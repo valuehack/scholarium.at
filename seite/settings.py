@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'Veranstaltungen',
     'Produkte',
     'Bibliothek',
-    'Scholien', 
+    'Scholien',
 
     'django.contrib.admin',
     'django.contrib.auth',

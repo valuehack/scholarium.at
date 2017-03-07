@@ -26,7 +26,7 @@ class ArtDerVeranstaltung(Grundklasse):
         verbose_name_plural = "Arten der Veranstaltungen"
     
 class Veranstaltung(KlasseMitProdukten):
-    beschreibung = models.TextField()
+    beschreibung = models.TextField(max_length=2000)
     datum = models.DateField()
     art_veranstaltung = models.ForeignKey(ArtDerVeranstaltung)
     class Meta:
@@ -34,14 +34,6 @@ class Veranstaltung(KlasseMitProdukten):
     
     def get_preis(self):
         return self.art_veranstaltung.preis_praesenz
-
-class Studiumdings(KlasseMitProdukten):
-    beschreibung = models.TextField()
-    class Meta:
-        verbose_name_plural = "Studiendinger"
-    
-    def get_preis(self):
-        return "Noch nicht implementiert"
     
 class Medium(KlasseMitProdukten):
     gehoert_zu = models.ForeignKey(Veranstaltung, null=True, blank=True)

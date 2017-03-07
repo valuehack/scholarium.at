@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue, aus_datei_mitglieder_einlesen
+from Grundgeruest.views import TemplateMitMenue, aus_datei_mitglieder_einlesen, ListeMitMenue
 from Grundgeruest.forms import Anmeldeformular
 from userena.views import signup
 from Veranstaltungen.urls import *
+from Veranstaltungen.models import Studiumdings
 
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -27,10 +28,23 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Gast/fragen.html'), 
         name='gast_fragen'),
-#    url(r'^scholien/', 
-#        TemplateMitMenue.as_view(
-#            template_name='Gast/scholien.html'), 
-#        name='gast_scholien'),
+    url(r'^scholien/', 
+        TemplateMitMenue.as_view(
+            template_name='Gast/scholien.html'), 
+        name='gast_scholien'),
+    url(r'^studium/$', 
+        ListeMitMenue.as_view(
+            model=Studiumdings,
+	    template_name='Veranstaltungen/liste_studien.html',
+	    context_object_name = 'studien'
+ 	),
+        name='liste_gast_studium'),
+    url(r'^studium/(?P<slug>[-\w]+)/$', 
+        DetailMitMenue.as_view(
+            template_name='Veranstaltungen/detail.html',
+            model="Veranstaltungen.Studiumdings",
+            context_object_name = 'veranstaltung'), 
+        name='studium_gast_detail'),
     url(r'^vortrag/', 
         TemplateMitMenue.as_view(
             template_name='Gast/vortrag.html'), 

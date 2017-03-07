@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltungen">
+  {% for studium in studien %}
+  {% with art=studium.art_veranstaltung %}
+    <div class="veranstaltung">
+    {% block art_veranstaltung_name %}
+      <div>{{ art.bezeichnung }}</div>
+    {% endblock art_veranstaltung_name %}
+      <h1><a href='{{ studium.slug }}'>{{ studium }}</a></h1>
+      <p>{{ studium.beschreibung }}</p>
+      <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+    </div>
+    {% endwith %}{% endfor %}
+  </div>
+{% endblock content %}

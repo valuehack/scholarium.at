@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltungen">
+  {% for veranstaltung in veranstaltungen %}
+  {% with art=veranstaltung.art_veranstaltung %}
+    <div class="veranstaltung">
+    {% block art_veranstaltung_name %}
+      <div>{{ art.bezeichnung }}</div>
+    {% endblock art_veranstaltung_name %}
+      <h1><a href='{{ veranstaltung.slug }}'>{{ veranstaltung }}</a></h1>
+      <div>
+        {{ veranstaltung.datum | date:"l, d. F Y," }} {{ art.zeit_beginn | time:"H:i" }} bis {{ art.zeit_ende|time:"H:i" }} Uhr
+      </div>
+      <p>{{ veranstaltung.beschreibung }}</p>
+      <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+    </div>
+    {% endwith %}{% endfor %}
+  </div>
+  {% include "paginationsleiste.html" %}
+{% endblock content %}
