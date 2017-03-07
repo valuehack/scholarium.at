@@ -88,10 +88,33 @@ class ScholariumProfile(UserenaBaseProfile):
     land = models.CharField(
         max_length=30,
         null=True, blank=True)    
-    guthaben = models.IntegerField(default=0)
+    guthaben = models.SmallIntegerField(default=0)
+    titel = models.CharField(
+        max_length=30,
+        null=True, blank=True)
+    anredename = models.CharField(
+        max_length=30,
+        null=True, blank=True)    
+    letzte_zahlung = models.DateField(null=True, blank=True)
+    datum_ablauf = models.DateField(null=True, blank=True)
+    alt_id = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_notiz = models.CharField(
+        max_length=255,
+        default='', editable=False)    
+    alt_scholien = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_mahnstufe = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_auslaufend = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_gave_credits = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_registration_ip = models.SmallIntegerField(
+        default=0, editable=False)
 
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
-
+    
 

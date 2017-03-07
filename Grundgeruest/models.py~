@@ -27,12 +27,6 @@ class Menuepunkt(Grundklasse):
     class Meta:
         abstract = True
         ordering = ['nummer']
-
-    def __str__(self):
-        return "{}: {} - {}".format(
-            self.gehoert_zu.gehoert_zu.bezeichnung,
-            self.gehoert_zu.bezeichnung,
-            self.bezeichnung)
             
 class GanzesMenue(Grundklasse):
     pass
@@ -44,6 +38,11 @@ class Hauptpunkt(Menuepunkt):
 class Unterpunkt(Menuepunkt):
     gehoert_zu = models.ForeignKey(Hauptpunkt)
     class Meta: verbose_name_plural = 'Menü - Unterpunkte'
+    def __str__(self):
+        return "{}: {} - {}".format(
+            self.gehoert_zu.gehoert_zu.bezeichnung,
+            self.gehoert_zu.bezeichnung,
+            self.bezeichnung)
 
 class Nutzer(AbstractUser):
     def save(self, *args, **kwargs):
@@ -89,10 +88,36 @@ class ScholariumProfile(UserenaBaseProfile):
     land = models.CharField(
         max_length=30,
         null=True, blank=True)    
-    guthaben = models.IntegerField(default=0)
+    guthaben = models.SmallIntegerField(default=0)
+    titel = models.CharField(
+        max_length=30,
+        null=True, blank=True)
+    anredename = models.CharField(
+        max_length=30,
+        null=True, blank=True)    
+    letzte_zahlung = models.DateField(null=True, blank=True)
+    datum_ablauf = models.DateField(null=True, blank=True)
+    alt_id = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_notiz = models.CharField(
+        max_length=255,
+        default='', editable=False)    
+    alt_scholien = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_mahnstufe = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_auslaufend = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_gave_credits = models.SmallIntegerField(
+        default=0, editable=False)
+    alt_registration_ip = models.SmallIntegerField(
+        default=0, editable=False)
 
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
+    
+    from userena.models import UserenaSignup
+    user.userena_signup = property(lambda u: UserenaSignup.objects.get_or_create(user=u)[0])
 
 

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue
+from Grundgeruest.views import TemplateMitMenue, aus_datei_mitglieder_einlesen
 from Grundgeruest.forms import Anmeldeformular
 from userena.views import signup
 from Veranstaltungen.urls import *
@@ -38,6 +38,9 @@ urlpatterns = [
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': Anmeldeformular}),
+    url(r'^accounts/aus_datei_einlesen$', 
+        aus_datei_mitglieder_einlesen, 
+        name='mitglieder_einlesen'),
     url(r'^accounts/', include('userena.urls')),
     url(r'^warenkorb/', include('Produkte.urls')),
     url(r'^veranstaltungen/', include(veranstaltungen_urls)),
