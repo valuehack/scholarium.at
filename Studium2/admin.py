@@ -22,4 +22,3 @@ class MediumAdmin(admin.ModelAdmin):
 admin.site.register(Veranstaltung, VeranstaltungAdmin)
 admin.site.register(ArtDerVeranstaltung)
 admin.site.register(Medium, MediumAdmin)
-admin.site.register(Studiumdings)
