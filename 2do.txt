@@ -1,0 +1,6 @@
+ - Gast-Ansicht fertig machen: 
+   - Veranstaltungen
+   - Unterstützen (vll. model für Stufen? - ja, wäre gut)
+   - Startseite
+ - alle Templates putzen, auch Warenkorb etc.
+ - einige urls an 

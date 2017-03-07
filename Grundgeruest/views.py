@@ -3,7 +3,11 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from userena.models import UserenaSignup
+from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
+from django.db import transaction
+import sqlite3 as lite
+import pdb
 from .models import *
 
 def erstelle_liste_menue(user=None):
@@ -80,13 +84,22 @@ def seite_rest(request, slug):
         {'punkt': punkte[0], 'liste_menue': liste_menue})
 
 def aus_datei_mitglieder_einlesen(request):
-    f = open('../dumpme', 'r')
-    text = f.read()[:-11]
-    f.close()
+    """
+    Liest Mitglieder aus der Datenbank im Parent-Ordner
     
-    zeilen_def = text.splitlines()[3:42]
-    nr_feld = dict([(z.split('`')[1], i) for i, z in enumerate(zeilen_def)])
-    
+    Idee: öffne Datenbank und hole Zeilen als dict Attribut -> Wert
+    erstelle dict für alte Attributnamen -> neue Namen 
+    erstelle Liste von Nutzern und speichere sie (wegen Profil und Signup)
+    füge für jeden Nutzer alle Attribute hinzu, speichere
+    """
+    con = lite.connect('../mysqlite3.db')
+    with con:
+        con.row_factory = lite.Row
+        cur = con.cursor()    
+        cur.execute("SELECT * FROM mitgliederExt")
+
+        zeilen = [dict(zeile) for zeile in cur.fetchall()]
+            
     profil_attributnamen = dict([
         ('stufe', 'Mitgliedschaft'),
         ('anrede', 'Anrede'),
@@ -118,20 +131,53 @@ def aus_datei_mitglieder_einlesen(request):
         ('last_login', 'last_login_time'),
     ])
     
-    def eintragen(objekt, attribut, felder):
-        def clean_wert(wert):
-            if wert == '0000-00-00 00:00:00':
-                return '1900-01-01 00:00:00'
-            else:
-                return wert
-                
-        if attribut in nutzer_attributnamen:
-            wert = clean_wert(felder[nr_feld[nutzer_attributnamen[attribut]]])
-            setattr(objekt, attribut, wert)
-        elif attribut in profil_attributnamen:
-            wert = clean_wert(felder[nr_feld[profil_attributnamen[attribut]]])
-            setattr(objekt, attribut, wert)
-            
+    zeilen = zeilen[:]
+    Nutzer.objects.filter(id__gt=6).delete()    
+        
+    letzte_id = max(Nutzer.objects.all().values_list('id', flat=True))
+    liste_nutzer = Nutzer.objects.bulk_create(
+        [Nutzer(
+            username='alteDB_%s' % zeile['user_id'], 
+            id=letzte_id+1+i
+        ) for i, zeile in enumerate(zeilen)])    
+        
+    for zeile in zeilen: # falls None drin steht, gäbe es sonst Fehler
+        zeile['Vorname'] = zeile['Vorname'] or ''
+        zeile['Nachname'] = zeile['Nachname'] or ''
+        for k, v in zeile.items():
+            if v == '0000-00-00 00:00:00':
+                zeile[k] = '1111-01-01 00:00:00'
+            if v == '0000-00-00':
+                zeile[k] = '1111-01-01'
+        
+    def eintragen_nutzer(nutzer, zeile):
+        for neu, alt in nutzer_attributnamen.items():
+            setattr(nutzer, neu, zeile[alt])
+
+    def eintragen_profil(profil, zeile):
+        for neu, alt in profil_attributnamen.items():
+            setattr(profil, neu, zeile[alt])
+    
+    with transaction.atomic():
+        for i, nutzer in enumerate(liste_nutzer):
+            zeile = zeilen[i]
+            eintragen_nutzer(nutzer, zeile)
+            pw_alt = zeile['user_password_hash']
+            nutzer.password = 'bcrypt$$2b$10${}'.format(pw_alt.split('$')[-1])
+            signup = UserenaSignup.objects.get_or_create(user=nutzer)[0]
+            signup.activation_key = USERENA_ACTIVATED
+            signup.activation_notification_send = True
+            profil = ScholariumProfile.objects.create(user=nutzer)
+            eintragen_profil(profil, zeile)
+            profil.save()
+            signup.save()
+            nutzer.save()
+    
+    pdb.set_trace()
+        
+    
+
+
     liste_user = text.split(');\nINSERT INTO "mitgliederExt" VALUES(')[1:]
     for u in liste_user[2:4]:
         wert = lambda s: felder[nr_feld[profil_attributnamen[s]]]

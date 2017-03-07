@@ -42,7 +42,7 @@ urlpatterns = [
     url(r'^studium/(?P<slug>[-\w]+)/$', 
         DetailMitMenue.as_view(
             template_name='Veranstaltungen/detail.html',
-            model="Veranstaltungen.Studiumdings",
+            model=Studiumdings,
             context_object_name = 'veranstaltung'), 
         name='studium_gast_detail'),
     url(r'^vortrag/', 
@@ -52,7 +52,7 @@ urlpatterns = [
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': Anmeldeformular}),
-    url(r'^accounts/aus_datei_einlesen$', 
+    url(r'^accounts/e$', 
         aus_datei_mitglieder_einlesen, 
         name='mitglieder_einlesen'),
     url(r'^accounts/', include('userena.urls')),

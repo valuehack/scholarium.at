@@ -4,4 +4,4 @@
 /env/
 /static/
 /media/
-db.sqlite3
+*.sqlite3

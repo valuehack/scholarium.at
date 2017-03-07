@@ -48,7 +48,7 @@ class Nutzer(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = ''.join(random.sample(string.ascii_lowercase, 20))
-        super().save(*args, **kwargs)
+        super(Nutzer, self).save(*args, **kwargs)
 
 class ScholariumProfile(UserenaBaseProfile):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
@@ -68,7 +68,7 @@ class ScholariumProfile(UserenaBaseProfile):
     anrede = models.CharField(
         max_length=4,
         choices=[('Herr', 'Herr'), ('Frau', 'Frau')],
-        default='Herr')
+        default='Herr', null=True)
     tel = models.CharField(
         max_length=20,
         null=True, blank=True)
@@ -100,24 +100,21 @@ class ScholariumProfile(UserenaBaseProfile):
     alt_id = models.SmallIntegerField(
         default=0, editable=False)
     alt_notiz = models.CharField(
-        max_length=255,
+        max_length=255, null=True,
         default='', editable=False)    
     alt_scholien = models.SmallIntegerField(
-        default=0, editable=False)
+        default=0, null=True, editable=False)
     alt_mahnstufe = models.SmallIntegerField(
-        default=0, editable=False)
+        default=0, null=True, editable=False)
     alt_auslaufend = models.SmallIntegerField(
-        default=0, editable=False)
+        default=0, null=True, editable=False)
     alt_gave_credits = models.SmallIntegerField(
-        default=0, editable=False)
-    alt_registration_ip = models.SmallIntegerField(
-        default=0, editable=False)
+        default=0, null=True, editable=False)
+    alt_registration_ip = models.GenericIPAddressField(
+        editable=False, null=True)
 
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
     
-    from userena.models import UserenaSignup
-    user.userena_signup = property(lambda u: UserenaSignup.objects.get_or_create(user=u)[0])
-
 
