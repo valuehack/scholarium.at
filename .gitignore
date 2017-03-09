@@ -5,3 +5,4 @@
 /static/
 /media/
 *.sqlite3
+local_*
