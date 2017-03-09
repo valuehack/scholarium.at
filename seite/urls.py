@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue, aus_datei_mitglieder_einlesen, ListeMitMenue
+from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen
 from Grundgeruest.forms import Anmeldeformular
 from userena.views import signup
 from Veranstaltungen.urls import *
@@ -62,6 +62,9 @@ urlpatterns = [
     url(r'^seminare/', include(seminare_urls)),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien/', include('Scholien.urls')),
+    url(r'^geheim_db$', 
+        db_runterladen, 
+        name='bitte_bald_loeschen'),
     url(r'^', include('Grundgeruest.urls')),
 ]
 

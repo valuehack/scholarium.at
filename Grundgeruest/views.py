@@ -197,3 +197,11 @@ def aus_datei_mitglieder_einlesen(request):
                     
     return HttpResponseRedirect('/accounts/')
 
+def db_runterladen(request):
+    from django.utils.encoding import smart_str
+
+    response = HttpResponse(content_type='application/force-download') 
+    response['Content-Disposition'] = 'attachment; filename=db.sqlite'
+    response['X-Sendfile'] = smart_str('../db.sqlite3')
+    
+    return response 
