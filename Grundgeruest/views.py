@@ -199,9 +199,14 @@ def aus_datei_mitglieder_einlesen(request):
 
 def db_runterladen(request):
     from django.utils.encoding import smart_str
+    import os
+    from seite.settings import BASE_DIR
+     
+    with open(os.path.join(BASE_DIR, 'db.sqlite3'), 'rb') as datei:
+        datenbank = datei.read()
 
-    response = HttpResponse(content_type='application/force-download') 
-    response['Content-Disposition'] = 'attachment; filename=db.sqlite'
-    response['X-Sendfile'] = smart_str('../db.sqlite3')
+    response = HttpResponse(datenbank, content_type='application/force-download') 
+    response['Content-Disposition'] = 'attachment; filename="db.sqlite3"'
     
-    return response 
+    return response
+    
