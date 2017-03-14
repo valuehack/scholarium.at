@@ -28,16 +28,12 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Gast/fragen.html'), 
         name='gast_fragen'),
-    url(r'^scholien/', 
-        TemplateMitMenue.as_view(
-            template_name='Gast/scholien.html'), 
-        name='gast_scholien'),
     url(r'^studium/$', 
         ListeMitMenue.as_view(
             model=Studiumdings,
-	    template_name='Veranstaltungen/liste_studien.html',
-	    context_object_name = 'studien'
- 	),
+    	    template_name='Veranstaltungen/liste_studien.html',
+	        context_object_name = 'studien'
+    	),
         name='liste_gast_studium'),
     url(r'^studium/(?P<slug>[-\w]+)/$', 
         DetailMitMenue.as_view(

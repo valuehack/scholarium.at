@@ -113,6 +113,12 @@ class ScholariumProfile(UserenaBaseProfile):
     alt_registration_ip = models.GenericIPAddressField(
         editable=False, null=True)
 
+    def darf_scholien_sehen(self):
+        if self.guthaben < 20:
+            return True
+        else:
+            raise TypeError('Guthaben zu hoch, editiere ScholariumProfile.darf_scholien_sehen()')
+        
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'

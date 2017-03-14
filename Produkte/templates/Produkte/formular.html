@@ -5,7 +5,7 @@
 <h2> Produkte zum Warenkorb hinzufügen </h2>
 
 <p>Gib die id und die Anzahl ein</p>
-<form action="{% url 'Warenkorb:cart-add' %}" method="post">
+<form action="{% url 'Produkte:cart-add' %}" method="post">
 
 {% csrf_token %}
 
