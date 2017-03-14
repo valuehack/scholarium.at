@@ -53,9 +53,15 @@ urlpatterns = [
         name='mitglieder_einlesen'),
     url(r'^accounts/', include('userena.urls')),
     url(r'^warenkorb/', include('Produkte.urls')),
-    url(r'^veranstaltungen/', include(veranstaltungen_urls)),
-    url(r'^salon/', include(salons_urls)),
-    url(r'^seminare/', include(seminare_urls)),
+    url(r'^veranstaltungen/', include(
+        veranstaltungen_urls, 
+        namespace='Veranstaltungen')),
+    url(r'^salon/', include(
+        salons_urls, 
+        namespace='Veranstaltungen')),
+    url(r'^seminare/', include(
+        seminare_urls, 
+        namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien/', include('Scholien.urls')),
     url(r'^geheim_db$', 

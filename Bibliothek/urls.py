@@ -3,7 +3,7 @@ from django.conf.urls import url
 from . import views, models
 from Grundgeruest.views import ListeMitMenue
 
-app_name = 'Veranstaltungen'
+app_name = 'Bibliothek'
 
 urlpatterns = [
     url(r'^$', 
