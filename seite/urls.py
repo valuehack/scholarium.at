@@ -20,40 +20,41 @@ from Grundgeruest.forms import Anmeldeformular
 from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
+from Produkte.models import Spendenstufen
 
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^fragen/', 
+    url(r'^fragen/',
         TemplateMitMenue.as_view(
-            template_name='Gast/fragen.html'), 
+            template_name='Gast/fragen.html'),
         name='gast_fragen'),
-    url(r'^scholien/', 
+    url(r'^scholien/',
         TemplateMitMenue.as_view(
-            template_name='Gast/scholien.html'), 
+            template_name='Gast/scholien.html'),
         name='gast_scholien'),
-    url(r'^studium/$', 
+    url(r'^studium/$',
         ListeMitMenue.as_view(
             model=Studiumdings,
 	    template_name='Veranstaltungen/liste_studien.html',
 	    context_object_name = 'studien'
  	),
         name='liste_gast_studium'),
-    url(r'^studium/(?P<slug>[-\w]+)/$', 
+    url(r'^studium/(?P<slug>[-\w]+)/$',
         DetailMitMenue.as_view(
             template_name='Veranstaltungen/detail.html',
             model=Studiumdings,
-            context_object_name = 'veranstaltung'), 
+            context_object_name = 'veranstaltung'),
         name='studium_gast_detail'),
-    url(r'^vortrag/', 
+    url(r'^vortrag/',
         TemplateMitMenue.as_view(
-            template_name='Gast/vortrag.html'), 
+            template_name='Gast/vortrag.html'),
         name='gast_vortrag'),
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': Anmeldeformular}),
-    url(r'^accounts/e$', 
-        aus_datei_mitglieder_einlesen, 
+    url(r'^accounts/e$',
+        aus_datei_mitglieder_einlesen,
         name='mitglieder_einlesen'),
     url(r'^accounts/', include('userena.urls')),
     url(r'^warenkorb/', include('Produkte.urls')),
@@ -62,9 +63,14 @@ urlpatterns = [
     url(r'^seminare/', include(seminare_urls)),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien/', include('Scholien.urls')),
-    url(r'^geheim_db$', 
-        db_runterladen, 
+    url(r'^spende/',
+        ListeMitMenue.as_view(
+            template_name='Produkte/spende.html',
+            model=Spendenstufen,
+            context_object_name = 'stufen'),
+        name='gast_spende'),
+    url(r'^geheim_db$',
+        db_runterladen,
         name='bitte_bald_loeschen'),
     url(r'^', include('Grundgeruest.urls')),
 ]
-
