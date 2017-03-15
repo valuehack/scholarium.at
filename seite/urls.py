@@ -20,7 +20,7 @@ from Grundgeruest.forms import Anmeldeformular
 from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
-from Produkte.models import Spendenstufen
+from Produkte.models import Spendenstufe
 
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -68,7 +68,7 @@ urlpatterns = [
     url(r'^spende/',
         ListeMitMenue.as_view(
             template_name='Produkte/spende.html',
-            model=Spendenstufen,
+            model=Spendenstufe,
             context_object_name = 'stufen'),
         name='gast_spende'),
     url(r'^geheim_db$',
