@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Produkt, Spendenstufen
+from .models import Produkt, Spendenstufe
 
 admin.site.register(Produkt)
-admin.site.register(Spendenstufen)
+admin.site.register(Spendenstufe)

@@ -110,7 +110,7 @@ class Kauf(models.Model):
     class Meta():
         verbose_name_plural = 'Käufe'
 
-class Spendenstufen(Grundklasse):
+class Spendenstufe(Grundklasse):
     spendenbeitrag = models.SmallIntegerField()
     beschreibung = models.TextField()
     gegenwert1 = models.TextField(null=True, blank=True)
@@ -121,3 +121,9 @@ class Spendenstufen(Grundklasse):
     gegenwert6 = models.TextField(null=True, blank=True)
     class Meta:
         verbose_name_plural = "Spendenstufen"
+        
+    def gegenwerte_html(self):
+        ausgabe = '<ul>\n'
+        for i in range(1, 7):
+            ausgabe += '<li> ' + getattr(self, 'gegenwert%s' % i) + '\n'
+        ausgabe += '</ul>\n'
