@@ -437,6 +437,152 @@ td {
 
 /* Gast-Seiten */
 
+.jubilaeum_banner {
+	width:70%;
+	padding: 20px 0px 20px 0px;
+	display: inline-block;
+	color: rgb(20,20,20);
+	background: rgb(46,74,98) none repeat scroll 0% 0%;
+	margin: 0px 15% 10px 15%;
+	font-size: 16pt;
+	text-align: center;
+}
+
+
+.jubilaeum_banner a,  .jubilaeum_banner a:hover, .jubilaeum_banner a:visited {
+	color: rgb(255,255,255) !important;
+	text-decoration: none;
+}
+
+.jubilaeum_banner:hover {
+	background: rgb(30,48,64);
+}
+
+.startseite_letzter_artikel {
+    padding: 30px 0 0px; 
+    position: relative;
+}
+
+.startseite_letzter_artikel h1 {
+    font-family: "Futura Book", Helvetica, Arial, serif;
+    margin: 0px; 
+}
+
+.startseite_letzter_artikel h1 a {
+    font-size: 20pt; 
+    color: rgb(20,20,20);
+}
+
+.startseite_letzter_artikel div {
+    margin: 15px 0;
+    text-align: center;
+}
+
+.startseite_letzter_artikel div span {
+	text-transform: uppercase;
+	font-size: 12pt;
+	margin-right: 10px;
+}
+
+.startseite_letzter_artikel p {
+	font-size: 14pt;
+	line-height: 1.5;
+	margin-top: 15px;
+}
+
+.startseite_letzter_artikel p a {
+	border-bottom: 1px dotted rgb(46,74,98);
+	text-decoration: none;
+	color: rgb(46,74,98);
+}
+
+.startseite_letzter_artikel p a:hover {
+	border-bottom: 1px solid rgb(46,74,98);
+}
+
+.startseite_zeile {
+	padding: 0px 15%;
+	width: 70%;
+	display: inline-block;
+}
+
+.startseite_zeile > div {
+	width: 47.5%;
+	margin: 20px 0;
+	padding: 0;
+	text-align: left;
+}
+
+.startseite_zeile > div h1 {
+	text-transform: uppercase;
+	text-align: left;
+	font-size: 12pt;
+	color: rgb(255,255,255);
+	background: rgb(46,74,98);
+	padding: 10px;
+	margin: 0px; 
+	font-family: "Futura Book", Helvetica, Arial, serif;
+	font-weight: normal !important;
+}
+
+.startseite_zeile > div img {
+	width: 100%;
+	max-height: 100px;
+}
+
+.startseite_zeile > div:nth-child(1) {
+	padding-right: 2.5%;
+	float: left;
+}
+
+.startseite_zeile > div:nth-child(2) {
+	padding-left: 2.5%;
+	float: right;
+}
+
+.startseite_zeile > div > div {
+    margin-top: 10px;
+}
+
+.startseite_zeile > div > div a {
+	font-size: 16pt;
+	text-decoration: none;
+	color: rgb(20,20,20);
+	line-height: 1.4;
+}
+
+.startseite_zeile > div > div a:hover {
+	text-decoration: underline;
+}
+
+.startseite_zeile > div > div a:visited {
+	text-decoration: none;
+	color: rgb(20,20,20);
+}
+
+.startseite_zeile > div > div p {
+	border-bottom: 1px solid rgb(230,230,230);
+	padding: 10px 0;
+}
+
+.startseite_zeile > div > div span {
+	margin: 0 10px;
+}
+
+.startseite_zeile > div > p a {
+	text-decoration: none;
+	border-bottom: 1px dotted rgb(46,74,98);
+	margin: 5px;
+	float: right;
+	color: rgb(46,74,98);
+}
+
+.startseite_zeile > div > p a:hover {
+	border-bottom: 1px solid rgb(46,74,98);
+}
+
+
+
 .blog {
 	width: 800px;
 	padding-bottom: 30px;

@@ -9,6 +9,9 @@ from django.db import transaction
 import sqlite3 as lite
 import pdb
 from .models import *
+from Scholien.models import Artikel
+from Veranstaltungen.models import Veranstaltung, Medium
+from Bibliothek.models import Buch
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated():
@@ -56,7 +59,11 @@ class MenueMixin():
         return context        
 
 class TemplateMitMenue(MenueMixin, TemplateView):
-    pass
+    extra_context = {}
+    def get_context_data(self, **kwargs):
+        context = super(TemplateMitMenue, self).get_context_data(**kwargs)
+        context.update(self.extra_context)
+        return context
 
 class ListeMitMenue(MenueMixin, ListView):
     pass
@@ -65,12 +72,23 @@ class DetailMitMenue(MenueMixin, DetailView):
     pass
         
 def index(request):
-    liste_menue = erstelle_liste_menue(request.user)
-    
-    return render(
-        request, 
-        'base.html', 
-        {'liste_menue': liste_menue})
+    if request.user.is_authenticated():
+        liste_artikel = Artikel.objects.order_by('-datum_publizieren')[:4]
+        veranstaltungen = Veranstaltung.objects.order_by('-datum')[:3]
+        medien = Medium.objects.order_by('-zeit_erstellt')[:3]
+        buecher = Buch.objects.order_by('-zeit_erstellt')[:3]
+        return TemplateMitMenue.as_view(
+            template_name='startseite.html',
+            extra_context={
+                'liste_artikel': liste_artikel, 
+                'medien': medien,
+                'veranstaltungen': veranstaltungen,
+                'buecher': buecher
+            })(request)
+    else:
+        return TemplateMitMenue.as_view(
+            template_name='Gast/startseite_gast.html'
+            )(request)
     
 def seite_rest(request, slug):
     punkte = (Hauptpunkt.objects.filter(slug=slug) or 

@@ -11,10 +11,7 @@ veranstaltungen_urls = [
         views.ListeAlle.as_view(), 
         name='liste_alle'),
     url(r'^(?P<slug>[-\w]+)/$', 
-        DetailMitMenue.as_view(
-            template_name='Veranstaltungen/detail.html',
-            model=Veranstaltung,
-            context_object_name = 'veranstaltung'), 
+        views.eine_veranstaltung, 
         name='veranstaltung_detail'),
     ]
 

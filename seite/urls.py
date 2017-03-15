@@ -29,16 +29,12 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Gast/fragen.html'),
         name='gast_fragen'),
-    url(r'^scholien/',
-        TemplateMitMenue.as_view(
-            template_name='Gast/scholien.html'),
-        name='gast_scholien'),
-    url(r'^studium/$',
+    url(r'^studium/$', 
         ListeMitMenue.as_view(
             model=Studiumdings,
-	    template_name='Veranstaltungen/liste_studien.html',
-	    context_object_name = 'studien'
- 	),
+    	    template_name='Veranstaltungen/liste_studien.html',
+	        context_object_name = 'studien'
+        ),
         name='liste_gast_studium'),
     url(r'^studium/(?P<slug>[-\w]+)/$',
         DetailMitMenue.as_view(
@@ -58,9 +54,15 @@ urlpatterns = [
         name='mitglieder_einlesen'),
     url(r'^accounts/', include('userena.urls')),
     url(r'^warenkorb/', include('Produkte.urls')),
-    url(r'^veranstaltungen/', include(veranstaltungen_urls)),
-    url(r'^salon/', include(salons_urls)),
-    url(r'^seminare/', include(seminare_urls)),
+    url(r'^veranstaltungen/', include(
+        veranstaltungen_urls, 
+        namespace='Veranstaltungen')),
+    url(r'^salon/', include(
+        salons_urls, 
+        namespace='Veranstaltungen')),
+    url(r'^seminare/', include(
+        seminare_urls, 
+        namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien/', include('Scholien.urls')),
     url(r'^spende/',

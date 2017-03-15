@@ -78,7 +78,9 @@ class Produkt(Grundklasse):
             return 'Teilnahme an {}'.format(self.zu_veranstaltung)
         elif self.zu_medium:
             return 'Medium zu {}'.format(self.zu_medium)
-
+        else:
+            return 'Produkt: weder eine Teilnahme noch ein Medium, bitte Produkt.__str__() anpassen'
+    
     class Meta:
         verbose_name_plural = 'Produkte'
 
@@ -96,7 +98,7 @@ class Kauf(models.Model):
     zeit = models.DateTimeField(
         auto_now_add=True,
         editable=False)
-    # falls was schief geht, wird das guthaben gecached:
+    # falls was schief geht, wird das Guthaben gecached:
     guthaben_davor = models.SmallIntegerField(editable=False)
 
     def __str__(self):
