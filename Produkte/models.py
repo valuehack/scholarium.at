@@ -121,9 +121,11 @@ class Spendenstufe(Grundklasse):
     gegenwert6 = models.TextField(null=True, blank=True)
     class Meta:
         verbose_name_plural = "Spendenstufen"
-        
+
     def gegenwerte_html(self):
-        ausgabe = '<ul>\n'
+        gegenwerte = []
         for i in range(1, 7):
-            ausgabe += '<li> ' + getattr(self, 'gegenwert%s' % i) + '\n'
-        ausgabe += '</ul>\n'
+            if getattr(self, 'gegenwert%s' % i):
+                gegenwerte.append(getattr(self, 'gegenwert%s' % i))
+        return gegenwerte
+        

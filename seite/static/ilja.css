@@ -155,6 +155,10 @@ h2 {
 	margin-top: 40px;
 }
 
+li {
+	font-size: 11pt;
+}
+
 span {
 	font-family: "Garamond", Georgia, Times, sans-serif;
 }
@@ -209,7 +213,7 @@ a {
 
 div.menueleiste {
 	height: 40px;
-	background: rgba(255,255,255);
+	background: rgb(11,19,30);
 	position: relative;
 	top: 30px;
    	right: 0;
@@ -877,6 +881,164 @@ p.linie img {
 	color: #000;
 }
 
+/* für Spendenstufen nahezu alles aus Payment/Upgrade übernommen*/
+
+.payment {
+	width: 75%;
+	margin: 50px auto;
+}
+
+.payment h1 {
+	font-size: 36pt;
+	text-shadow: 0px 0px 1px rgb(20,20,20);
+	margin: 50px 0;
+	text-align: center;
+}
+
+.payment p {
+	font-size: 14pt;
+	line-height: 1.4;
+	text-align: justify;
+	margin: 20px 0;
+	-ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto
+}
+
+.payment ul {
+	margin-left: 50px;
+	line-height: 1.6;
+	font-size: 14pt;
+}
+
+.payment_info {
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	line-height: 1.6em;
+	font-size: 14pt;
+	text-align: justify;
+	-ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto
+}
+
+.pay_option_box {
+	width: 100%;
+	padding: 10px;
+	margin: 50px auto 20px auto;
+	box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.15) inset;
+	border-radius: 2px;
+	min-height: 200px;
+	opacity: 0.95;
+}
+
+.pay_option_box:hover {
+	opacity: 1;
+	box-shadow: 2px 2px 15px 0 rgba(237,120,2,0.5), -2px 2px 15px 0 rgba(237,120,2,0.5), 2px -2px 15px 0 rgba(237,120,2,0.5), -2px -2px 15px 0 rgba(237,120,2,0.5);
+}
+
+.pay_option_box_Gast {
+	background: rgb(88,134,129);
+}
+
+.pay_option_box_Teilnehmer {
+	background: rgb(21,87,100);
+}
+
+.pay_option_box_Scholar {
+	background: rgb(1,39,68);
+}
+
+.pay_option_box_Partner {
+	background: rgb(21,87,100);
+}
+
+.pay_option_box_Beirat {
+	background: rgb(88,134,129);
+}
+
+.pay_option_box_Patron {
+	background: rgb(140,156,136);
+}
+
+.pay_option_box th {
+	color: #fff;
+	width: 25%;
+	padding: 0 30px;
+	vertical-align: middle;
+    border-bottom: none;
+}
+
+.pay_option_box td {
+	color: rgb(255,255,255);
+	width: 75%;
+	padding: 0 20px;
+	vertical-align: middle;
+    border-bottom: none;
+
+}
+
+.pay_option_box h1 {
+	font-size: 22pt;
+	text-align: center;
+	color: rgb(255,255,255);
+	margin-bottom: 15px;
+	text-shadow: 0 0 0;
+}
+
+.pay_option_box h2 {
+    margin-top: 0;
+	font-size: 26pt;
+	text-align: center;
+	color: #rgb(255,255,255);
+	font-family: "Futura Book", Helvetica, Arial, serif;
+}
+
+.pay_option_box p {
+	line-height: 1.8em;
+	font-size: 14pt;
+	margin: 30px 0;
+	text-align: left;
+	color: rgb(255,255,255);
+}
+
+.pay_option_box ul {
+	list-style-position: outside;
+	list-style-type: disc;
+	font-size: 14pt;
+	padding-left: 12px;
+	color: #fff;
+	margin-left: 0px;
+}
+
+.pay_option_box li {
+	line-height: 1.6em;
+}
+
+.pay_option_form {
+	text-align: center;
+	height: 110px;
+}
+
+.pay_option_box_inputbutton {
+	text-decoration: none;
+	background: rgb(237,120,2);
+	color: #fff;
+	text-shadow: 1px 1px 4px 0 rgba(0,0,0,0.9);
+	border: 0;
+	border-radius: 2px;
+	margin: 10px 0 15px 0;
+	width: 400px;
+	height: 50px;
+	font-size: 16pt;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16) inset, 0px 0px 10px 0px rgba(0, 0, 0, 0.34) inset;
+}
+
+.pay_option_box_inputbutton:hover {
+	background: rgb(230,103,2);
+}
 
 /*==================================================*/
 /*                   Footer                    		*/
