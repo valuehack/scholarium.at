@@ -1,50 +1,63 @@
 {% extends "base.html" %} {% load humanize %} {% block content %}
 
+  <h1> Übersicht Ihrer Bestellungen</h1>
 
-<h1> Übersicht über Bestellungen</h1>
-<div class="separator">
-    <h2>Ihre Veranstaltungen</h2></div>
-<div class="container">
-
+  {% if veranstaltungen %}
+  <div class="separator">
+    <h2>Ihre Veranstaltungen</h2>
+  </div>
+  <div class="container">
     <table>
-        <tr>
-            <th/>
-            <th>Status</th>
-            <th>Plätze</th>
-        </tr>
-        {% for kauf in veranstaltungen %}
-        <tr>
-            <td>{{ kauf.zeit|naturaltime }}</td>
-            <td>{{ kauf.produkt }}</td>
-            <td>{{ kauf.menge }}</td>
-        </tr>
-        {% endfor %}
+      <tr>
+        <th/>
+        <th>Status</th>
+        <th>Plätze</th>
+      </tr>
+      {% for kauf in veranstaltungen %}
+      <tr>
+        <td>{{ kauf.zeit|naturaltime }}</td>
+        <td>{{ kauf.produkt }}</td>
+        <td>{{ kauf.menge }}</td>
+      </tr>
+      {% endfor %}
     </table>
-</div>
-
-<div class="separator">
-    <h2>Ihre Schriften und Medien</h2></div>
-<div class="container">
-
+  </div>
+  {% else %}
+  <div class="separator" style="margin-bottom: 100px">
+    <h2>Keine Veranstaltungen gebucht</h2>
+  </div>
+  {% endif %}
+  
+  {% if medien %}
+  <div class="separator">
+    <h2>Ihre Schriften und Medien</h2>
+  </div>
+  <div class="container">
     <table>
-        <tr>
-            <th/>
-            <th/>
-            <th>Download</th>
-        </tr>
-        {% for kauf in medien %}
-        <tr>
-            <td>{{ kauf.zeit|naturaltime }}</td>
-            <td>{{ kauf.produkt }}</td>
-            <td> Preis später </td>
-        </tr>
-        {% endfor %}
+      <tr>
+        <th/>
+        <th/>
+        <th>Download</th>
+      </tr>
+      {% for kauf in medien %}
+      <tr>
+        <td>{{ kauf.zeit|naturaltime }}</td>
+        <td>{{ kauf.produkt }}</td>
+        <td> Preis später </td>
+      </tr>
+      {% endfor %}
     </table>
-</div>
+  </div>
+  {% else %}
+  <div class="separator" style="margin-bottom: 100px">
+    <h2>Keine Medien gebucht</h2>
+  </div>
+  {% endif %}
 
-<div class="separator">
-    <h2>Ihre Spenden und Programme</h2></div>
-<div class="container">
+  <div class="separator">
+    <h2>Ihre Spenden und Programme</h2>
+  </div>
+  <div class="container">
     <h2>Spenden</h2>
 
     <table>
