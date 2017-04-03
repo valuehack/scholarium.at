@@ -2,11 +2,11 @@
 {% load static %}
 
 {% block content %}
-  <div class="blog">
+  <div class="payment">
     <header>
-      <h1>Für Bürger</h1>
+      <h2>Für Bürger</h2>
     </header>
-	<div class="blog_text_fragen">
+	<div class="payment_info">
       <p>
           Großartig, dass Sie zu uns gefunden haben! Es gibt heute nur noch wenige, die bereit sind, Institutionen zivilgesellschaftlich zu tragen – die meisten verlassen sich auf Staat und Lobbies und „engagieren“ sich allenfalls als Zuwendungsempfänger.
       </p>
@@ -22,13 +22,40 @@
     </div>
     <div>
         {% for stufe in stufen %}
-          <p>
-              {{ stufe }} {{ stufe.spendenbeitrag }}
-          </p>
-          <p>
-              {{ stufe.beschreibung }} {{ stufe.gegenwert1 }} {{ stufe.gegenwert2 }}
-          </p>
-        {%endfor %}
+          <div class="pay_option_box pay_option_box_{{ stufe }}">
+            <table>
+                <tr><th rowspan="3">
+                    <h1>{{ stufe }}</h1>
+                    <h2>{{ stufe.spendenbeitrag }}&euro;</h2>
+                </th>
+                <td>
+                    <p>
+                        {{ stufe.beschreibung }}
+                    </p>
+                </td>
+            </tr><tr>
+                <td>
+                    <ul>
+                        {% for gegenwert in stufe.gegenwerte_html %}
+                          <li>
+                              {{ gegenwert }}
+                          </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr><tr>
+                <td class="pay_option_form" colspan="2">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="betrag" value="{{ stufe.spendenbeitrag }}">
+                        <input type="hidden" name="level" value="{{ stufe }}">
+                        <input type="submit" class="pay_option_box_inputbutton" name="pay" value="Werden Sie jetzt {{ stufe }}">
+                    </form>
+                </td>
+            </tr>
+            </table>
+        </div>
+        {% endfor %}
     </div>
   </div>
 {% endblock content %}
