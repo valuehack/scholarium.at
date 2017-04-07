@@ -15,8 +15,8 @@ class Artikel(Grundklasse):
         ordering = ['-datum_publizieren']
 
 class Buechlein(KlasseMitProdukten):
-    pdf = models.FileField()
-    typ = models.CharField(max_length=30, null=True, blank=True)
+    pdf = models.FileField(upload_to='scholienbuechlein', null=True)
+    bild = models.ImageField(upload_to='scholienbuechlein', null=True)
     beschreibung = models.TextField(max_length=2000, null=True, blank=True)
     
     def get_preis(self):

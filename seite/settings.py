@@ -180,6 +180,7 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # EMail-Versand
 

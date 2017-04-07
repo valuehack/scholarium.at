@@ -8,7 +8,7 @@ import pdb
 
 # Create your views here.
 
-def scholien_startseite(request):
+def liste_artikel(request):
     if request.user.is_authenticated():
         return ListeMitMenue.as_view(
             model=models.Artikel,
@@ -19,6 +19,15 @@ def scholien_startseite(request):
         return TemplateMitMenue.as_view(
             template_name='Gast/scholien.html', 
             )(request) 
+            
+@login_required
+def liste_buechlein(request):
+    return ListeMitMenue.as_view(
+        model=models.Buechlein,
+        template_name='Scholien/liste_buechlein.html',
+        context_object_name='buechlein',
+        paginate_by = 5)(request)
+
 
 @login_required
 def ein_artikel(request, slug):

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltungen">
+    {% for band in buechlein %}
+    <div style="float: left;">
+      <img src="{{ band.bild.url }}">
+      <div class="veranstaltung">
+        <div>Scholie</div>
+        <h1><a href='{{ band.slug }}'>{{ band.bezeichnung }}</a></h1>
+        <p>{{ band.beschreibung | safe }}</p>
+        <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% include "paginationsleiste.html" %}
+{% endblock content %}

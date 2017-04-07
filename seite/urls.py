@@ -13,7 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
 from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen
 from Grundgeruest.forms import Anmeldeformular
@@ -64,7 +66,7 @@ urlpatterns = [
         seminare_urls, 
         namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),
-    url(r'^scholien/', include('Scholien.urls')),
+    url(r'^scholien', include('Scholien.urls')),
     url(r'^spende/',
         ListeMitMenue.as_view(
             template_name='Produkte/spende.html',
@@ -75,4 +77,5 @@ urlpatterns = [
         db_runterladen,
         name='bitte_bald_loeschen'),
     url(r'^', include('Grundgeruest.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
