@@ -45,11 +45,11 @@
                 </td>
             </tr><tr>
                 <td class="pay_option_form" colspan="2">
-                    <form action="" method="post">
-                        {% csrf_token %}
+                    <form action="/spende/zahlung/" method="post">
+                    {% csrf_token %}
                         <input type="hidden" name="betrag" value="{{ stufe.spendenbeitrag }}">
-                        <input type="hidden" name="level" value="{{ stufe }}">
-                        <input type="submit" class="pay_option_box_inputbutton" name="pay" value="Werden Sie jetzt {{ stufe }}">
+                        <input type="hidden" name="stufe" value="{{ stufe }}">
+                        <input type="submit" class="pay_option_box_inputbutton" value="Werden Sie jetzt {{ stufe }}">
                     </form>
                 </td>
             </tr>

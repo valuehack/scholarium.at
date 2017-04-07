@@ -73,6 +73,10 @@ urlpatterns = [
             model=Spendenstufe,
             context_object_name = 'stufen'),
         name='gast_spende'),
+    url(r'^spende/zahlung/$',
+        TemplateMitMenue.as_view(
+            template_name='Produkte/zahlung.html'),
+        name='gast_zahlung'),
     url(r'^geheim_db$',
         db_runterladen,
         name='bitte_bald_loeschen'),
