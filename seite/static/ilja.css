@@ -410,34 +410,35 @@ img.dropdown_coin {
 /*==================================================*/
 
 .inhalt {
-	margin: 50px auto;
+    margin: 50px auto;
 }
 
 .container {
-	width: 60%;
-	padding: 50px 20%;
+    width: 60%;
+    padding: 50px 20%;
 }
 
 table {
-	width: 100%;
+    width: 100%;
 }
 
 th, td {
-	border-bottom: 1px solid rgb(220,220,220);
-	
+    border-bottom: 1px solid rgb(220,220,220);
 }
 
 th {
-	font-size: 14pt;
-	height: 20px;
+    font-size: 14pt;
+    height: 20px;
     padding: 5px 0;
-	color: rgb(180,180,180);
-	text-align: right;
+    color: rgb(180,180,180);
+    text-align: right;
 }
 
 td {
-	font-size: 12pt;
+    font-size: 12pt; 
+    text-align: right;
 }
+
 
 /* Gast-Seiten */
 
@@ -1110,6 +1111,132 @@ p.linie img {
 .profil_inputbutton:hover {
 	background: rgb(30,48,64);
 }
+/*==================================================*/
+/*                   Warenkorb                 		*/
+/*==================================================*/
+
+table.warenkorb {
+    width: 76%;
+    margin: 60px 12% 0;
+}
+
+table.warenkorb td {
+    padding: 30px 0;
+    font-size: 23;    
+	font-family: "Garamond",Georgia,Times,sans-serif;
+}
+
+table.warenkorb th:first-child {
+    width: 60%;
+}
+
+table.warenkorb td img {
+	height: 21px;
+	margin: 1px 5px -1px;
+	display: inline;
+}
+
+table.warenkorb td:first-child {
+    width: 60%;
+    text-align: left;
+}
+
+table.warenkorb tfoot td {
+    border-bottom: none;
+    font-size: 33;
+}
+
+table.warenkorb tfoot td img {
+    height: 28px;
+	margin: 2px 5px -4px;    
+}
+
+table.warenkorb tfoot td:first-child {
+    text-align: right;
+}
+
+table.warenkorb + div {
+    text-align: right;
+    padding: 20px 0 90px;
+    width: 76%;
+    margin: 10px 12%;
+}
+
+table.warenkorb + div form {
+	float: right;
+}
+
+table.warenkorb + div input {
+	text-decoration: none;
+	border: 1px solid rgb(245,245,245);
+	background: rgb(255,255,255);
+	color: rgb(150,150,150);
+	border-radius: 3px;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.02), 0px 0px 1px 0px rgba(0, 0, 0, 0.04);
+	margin: 5px;
+	width: 200px;
+	height: 50px;
+	font-size: 14pt;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	text-align: center;
+}
+
+table.warenkorb + div form:first-child input {
+	text-decoration: none;
+	background: rgb(46,74,98);
+	color: rgb(255, 255, 255);
+	border: 0;
+	border-radius: 2px;
+	margin: 5px 0 5px 10px;
+	min-width: 200px;
+	height: 50px;
+	font-size: 16pt;
+	font-family: "Garamond", Georgia, Times, sans-serif;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+}
+
+div.warenkorb_veranstaltung {
+    width: calc(65%-240px);
+    display: table;
+}
+
+div.warenkorb_veranstaltung span:first-child {
+    font-size: 14pt;
+    margin-bottom: 10px;
+    display: block;
+}
+
+div.warenkorb_veranstaltung span:nth-child(2) {
+    display: block;
+    font-size: 20pt;
+    padding-bottom: 20px;
+    text-align: left;
+}
+
+div.warenkorb_veranstaltung span:nth-child(2) a {
+    color: rgb(46,74,98);
+    text-decoration: none;
+}
+
+div.warenkorb_veranstaltung span:nth-child(3), span:nth-child(4) {
+    font-size: 14pt;
+    font-style: italic;
+    display: block;
+}
+
+div.warenkorb_veranstaltung form input {
+    text-decoration: none;
+    background: transparent;
+    color: rgb(46,74,98);
+    margin: 35px 0 12px;
+    font-size: 12pt;
+    font-family: "Garamond", Georgia, Times, sans-serif;
+    border: 0;
+    padding: 0;
+    border-bottom: 1px dotted rgb(46,74,98);
+}
+
+
 /*==================================================*/
 /*                   Footer                    		*/
 /*==================================================*/
