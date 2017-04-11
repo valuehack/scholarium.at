@@ -23,6 +23,8 @@ from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
 from Produkte.models import Spendenstufe
+from Produkte.views import zahlen
+
 
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -67,11 +69,8 @@ urlpatterns = [
         namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien', include('Scholien.urls')),
-    url(r'^spende/zahlung/$',
-        TemplateMitMenue.as_view(
-            template_name='Produkte/zahlung.html'),
-        name='gast_zahlung'),
-    url(r'^spende/',
+    url(r'^spende/zahlung$', zahlen, name='gast_zahlung'),
+    url(r'^spende',
         ListeMitMenue.as_view(
             template_name='Produkte/spende.html',
             model=Spendenstufe,
