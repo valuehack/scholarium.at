@@ -60,7 +60,11 @@ def zahlen(request):
         # check whether it's valid:
         if formular.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
+            print('{} Sie haben folgende Daten eingegeben: {}{}'.format(
+                20*'\n',
+                request.POST,
+                20*'\n'
+            ))
             # redirect to a new URL:
             return HttpResponseRedirect('/thanks/')
 

@@ -6,6 +6,7 @@ class ZahlungFormular(forms.ModelForm):
     vorname = forms.CharField()
     nachname = forms.CharField()
     zahlungsweise = forms.ChoiceField(
+        widget=forms.RadioSelect,
         choices=[
             ('u', 'Überweisung'), 
             ('p', 'PayPal'), 
