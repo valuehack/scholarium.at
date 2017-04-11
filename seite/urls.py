@@ -67,16 +67,16 @@ urlpatterns = [
         namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien', include('Scholien.urls')),
+    url(r'^spende/zahlung/$',
+        TemplateMitMenue.as_view(
+            template_name='Produkte/zahlung.html'),
+        name='gast_zahlung'),
     url(r'^spende/',
         ListeMitMenue.as_view(
             template_name='Produkte/spende.html',
             model=Spendenstufe,
             context_object_name = 'stufen'),
         name='gast_spende'),
-    url(r'^spende/zahlung/$',
-        TemplateMitMenue.as_view(
-            template_name='Produkte/zahlung.html'),
-        name='gast_zahlung'),
     url(r'^geheim_db$',
         db_runterladen,
         name='bitte_bald_loeschen'),
