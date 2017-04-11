@@ -69,7 +69,7 @@ urlpatterns = [
         namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),
     url(r'^scholien', include('Scholien.urls')),
-    url(r'^spende/zahlung$', zahlen, name='gast_zahlung'),
+    url(r'^spende/zahlung', zahlen, name='gast_zahlung'),
     url(r'^spende',
         ListeMitMenue.as_view(
             template_name='Produkte/spende.html',

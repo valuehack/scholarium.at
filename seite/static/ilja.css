@@ -1054,6 +1054,10 @@ p.linie img {
 	padding: 50px 17.5%;
 }
 
+.profil table {
+    all: initial;
+}
+
 .profil p {
 	margin: 0;
 	text-align: center;
@@ -1080,7 +1084,7 @@ p.linie img {
 	border: 1px solid #cfcfcf;
 }
 
-.profil_inputfield {
+.profil input {
 	padding: 0 14px;
 	background-color: #fff;
 	border: 1px solid #cfcfcf;
@@ -1091,11 +1095,13 @@ p.linie img {
 	font-family: "Futura Book", Helvetica, Arial, sans-serif;
 }
 
-.profil_radio {
+.profil input[type="radio"] {
+	height: initial;
+	width: initial;
 	margin: 10px 10px 10px 157px;
 }
 
-.profil_inputbutton {
+.profil input[type="submit"] {
 	text-decoration: none;
 	background: rgb(46,74,98);
 	color: #fff;
@@ -1109,7 +1115,7 @@ p.linie img {
 	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
 }
 
-.profil_inputbutton:hover {
+.profil input[type="submit"]:hover {
 	background: rgb(30,48,64);
 }
 /*==================================================*/
