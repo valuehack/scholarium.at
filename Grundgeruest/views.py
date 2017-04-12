@@ -12,6 +12,7 @@ from .models import *
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung, Medium
 from Bibliothek.models import Buch
+from .forms import ZahlungFormular
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated():
@@ -90,6 +91,42 @@ def index(request):
             template_name='Gast/startseite_gast.html'
             )(request)
     
+def zahlen(request):
+    # falls POST, werden Daten verarbeitet:
+    if request.method == 'POST':
+        # eine form erstellen, insb. um sie im Fehlerfall zu nutzen:
+        formular = ZahlungFormular(request.POST)
+        # und falls alle Eingaben gültig sind, Daten verarbeiten: 
+        if formular.is_valid():
+            if not (request.user.is_authenticated() or
+                Nutzer.objects.filter(email=request.POST['email'])):
+                # erstelle neuen Nutzer mit eingegebenen Daten:
+                nutzer = Nutzer.objects.create(email=request.POST['email'])
+                signup = UserenaSignup.objects.create(user=nutzer)
+                profil = ScholariumProfile.objects.create(user=nutzer)
+                nutzer.first_name = request.POST['vorname']
+                nutzer.last_name = request.POST['nachname']
+                for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
+                    'ort']:
+                    setattr(profil, attr, request.POST[attr])
+                nutzer.save()
+                profil.save()
+                signup.save()
+                print('{0}gibts noch nicht{0}'.format(10*'\n'))
+            else:
+                print('{0}gibts schon{0}'.format(10*'\n'))
+                
+            # redirect to a new URL:
+            return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        formular = ZahlungFormular()
+
+    return render(request, 'Produkte/zahlung.html', {'formular': formular})    
+        
+
+
 def seite_rest(request, slug):
     punkte = (Hauptpunkt.objects.filter(slug=slug) or 
               Unterpunkt.objects.filter(slug=slug))
@@ -157,7 +194,7 @@ def aus_datei_mitglieder_einlesen(request):
         [Nutzer(
             username='alteDB_%s' % zeile['user_id'], 
             id=letzte_id+1+i
-        ) for i, zeile in enumerate(zeilen)])    
+        ) for i, zeile in enumerate(zeilen)])
         
     for zeile in zeilen: # falls None drin steht, gäbe es sonst Fehler
         zeile['Vorname'] = zeile['Vorname'] or ''
@@ -227,4 +264,4 @@ def db_runterladen(request):
     response['Content-Disposition'] = 'attachment; filename="db.sqlite3"'
     
     return response
-    
+

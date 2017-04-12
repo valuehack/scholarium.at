@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from easycart import BaseCart, BaseItem
 from Grundgeruest.views import erstelle_liste_menue
 from .models import Kauf, Produkt
-from .forms import ZahlungFormular
+
 
 class Ware(BaseItem):
     PRICE_ATTR = 'get_preis'
@@ -51,26 +51,4 @@ def kaufen(request):
         warenkorb.remove(ware.obj.pk)
         
     return HttpResponseRedirect(reverse('Produkte:warenkorb'))
-    
-def zahlen(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        formular = ZahlungFormular(request.POST)
-        # check whether it's valid:
-        if formular.is_valid():
-            # process the data in form.cleaned_data as required
-            print('{} Sie haben folgende Daten eingegeben: {}{}'.format(
-                20*'\n',
-                request.POST,
-                20*'\n'
-            ))
-            # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        formular = ZahlungFormular()
-
-    return render(request, 'Produkte/zahlung.html', {'formular': formular})    
     
