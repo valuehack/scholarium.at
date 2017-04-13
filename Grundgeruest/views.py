@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from userena.models import UserenaSignup
+from userena.mail import UserenaConfirmationMail
 from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
 from django.db import transaction
@@ -102,16 +103,63 @@ def zahlen(request):
                 Nutzer.objects.filter(email=request.POST['email'])):
                 # erstelle neuen Nutzer mit eingegebenen Daten:
                 nutzer = Nutzer.objects.create(email=request.POST['email'])
+                nutzer.save()
+                nutzer.is_active = False
                 signup = UserenaSignup.objects.create(user=nutzer)
+                from userena.utils import generate_sha1
+                from guardian.models import UserObjectPermission
+                from django.contrib.auth.models import Permission
+                from django.contrib.contenttypes.models import ContentType
+                nutzer1 = Nutzer.objects.get(id=234)
+                salt, hash = generate_sha1(nutzer.username)
+                signup.activation_key = hash
+                signup.send_activation_email()
                 profil = ScholariumProfile.objects.create(user=nutzer)
                 nutzer.first_name = request.POST['vorname']
                 nutzer.last_name = request.POST['nachname']
                 for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
                     'ort']:
                     setattr(profil, attr, request.POST[attr])
+                ct_profile = ContentType.objects.get(model='scholariumprofile')    
+                ct_nutzer = ContentType.objects.get(model='nutzer')    
+                #p1 = UserObjectPermission(
+                #    permission=Permission.objects.get(name='Can view profile'),
+                #    object_pk = str(nutzer.my_profile.id), 
+                #    user = nutzer,
+                #    content_type = ct_profile)
+                #p2 = UserObjectPermission(
+                #    permission=Permission.objects.get(name='Can change profile'),
+                #    object_pk = str(nutzer.my_profile.id), 
+                #    user = nutzer,
+                #    content_type = ct_profile)
+                #p3 = UserObjectPermission(
+                #    permission=Permission.objects.get(name='Can delete profile'),
+                #    object_pk = str(nutzer.my_profile.id), 
+                #    user = nutzer,
+                #    content_type = ct_profile)
+                #p4 = UserObjectPermission(
+                #    permission=Permission.objects.get(id=55), #dafür Test schreiben! könnte sich ändern?!
+                #    object_pk = str(nutzer.id), 
+                #    user = nutzer,
+                #    content_type = ct_nutzer)
+                #p5 = UserObjectPermission(
+                #    permission=Permission.objects.get(id=56),
+                #    object_pk = str(nutzer.id), 
+                #    user = nutzer,
+                #    content_type = ct_nutzer)
+                # content_type.id = 5
+                # object_pk = str(user.my_profile.id)
+                # permission, 3x: name = 'Can view profile', 'Can change profile', 'Can delete profile'
                 nutzer.save()
                 profil.save()
                 signup.save()
+                #p1.save()
+                #p2.save()
+                #p3.save()
+                #p4.save()
+                #p5.save()
+                import pdb
+                pdb.set_trace()
                 print('{0}gibts noch nicht{0}'.format(10*'\n'))
             else:
                 print('{0}gibts schon{0}'.format(10*'\n'))
