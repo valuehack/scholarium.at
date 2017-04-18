@@ -2,7 +2,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from userena.models import UserenaSignup
+from .models import MeinUserenaSignup
 from userena.mail import UserenaConfirmationMail
 from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
@@ -113,11 +113,13 @@ def zahlen(request):
                 nutzer.save()
                 profil = ScholariumProfile.objects.create(user=nutzer)
                 profil.save()
-                signup = UserenaSignup.objects.create(user=nutzer)
+                signup = MeinUserenaSignup.objects.create(user=nutzer)
                 signup.save()
                 salt, hash = generate_sha1(nutzer.username)
                 signup.activation_key = hash
-                signup.send_activation_email()
+                pw = nutzer.erzeuge_zufall(8)
+                signup.send_activation_email(pw=pw)
+                nutzer.set_password(pw)
                 nutzer.first_name = request.POST['vorname']
                 nutzer.last_name = request.POST['nachname']
                 for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
@@ -266,7 +268,7 @@ def aus_datei_mitglieder_einlesen(request):
             eintragen_nutzer(nutzer, zeile)
             pw_alt = zeile['user_password_hash']
             nutzer.password = 'bcrypt$$2b$10${}'.format(pw_alt.split('$')[-1])
-            signup = UserenaSignup.objects.get_or_create(user=nutzer)[0]
+            signup = MeinUserenaSignup.objects.get_or_create(user=nutzer)[0]
             signup.activation_key = USERENA_ACTIVATED
             signup.activation_notification_send = True
             profil = ScholariumProfile.objects.create(user=nutzer)
@@ -290,7 +292,7 @@ def aus_datei_mitglieder_einlesen(request):
         pwalt = felder[nr_feld['user_password_hash']]
         neuer_nutzer.password = 'bcrypt$$2b$10${}'.format(pwalt.split('$')[-1])
         neuer_nutzer.save()
-        us = UserenaSignup.objects.get_or_create(user=neuer_nutzer)[0]
+        us = MeinUserenaSignup.objects.get_or_create(user=neuer_nutzer)[0]
         neuer_nutzer.userena_signup = us
         profil = ScholariumProfile.objects.create(user=neuer_nutzer)
         for attribut in profil_attributnamen:

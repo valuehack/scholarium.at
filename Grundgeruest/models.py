@@ -11,7 +11,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from userena.models import UserenaBaseProfile
+from userena.models import UserenaBaseProfile, UserenaSignup
 from django.core.validators import RegexValidator
 import random, string
 
@@ -45,10 +45,37 @@ class Unterpunkt(Menuepunkt):
             self.bezeichnung)
 
 class Nutzer(AbstractUser):
+    def erzeuge_zufall(self, laenge):
+        return ''.join(random.sample(string.ascii_lowercase, laenge))
+        
     def save(self, *args, **kwargs):
         if not self.username:
-            self.username = ''.join(random.sample(string.ascii_lowercase, 20))
+            self.username = self.erzeuge_zufall(20)
         super(Nutzer, self).save(*args, **kwargs)
+
+class MeinUserenaSignup(UserenaSignup):
+    def send_activation_email(self, **kwargs):
+        """
+        Ich aendere die Funktion ab.
+        Damit Context auch dass Passwort enthaelt
+        """
+        from userena.mail import UserenaConfirmationMail
+        import userena.settings as userena_settings
+        from django.contrib.sites.models import Site
+        from userena.utils import get_protocol
+
+        context = {'user': self.user,
+                  'without_usernames': userena_settings.USERENA_WITHOUT_USERNAMES,
+                  'protocol': get_protocol(),
+                  'activation_days': userena_settings.USERENA_ACTIVATION_DAYS,
+                  'activation_key': self.activation_key,
+                  'site': Site.objects.get_current(),
+                  'passwort': kwargs['pw']}
+        
+        mailer = UserenaConfirmationMail(context=context)
+        mailer.generate_mail("activation")
+        mailer.send_mail(self.user.email)
+
 
 class ScholariumProfile(UserenaBaseProfile):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
