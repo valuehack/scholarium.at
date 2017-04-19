@@ -45,7 +45,8 @@ class Unterpunkt(Menuepunkt):
             self.bezeichnung)
 
 class Nutzer(AbstractUser):
-    def erzeuge_zufall(self, laenge):
+    @staticmethod
+    def erzeuge_zufall(laenge):
         return ''.join(random.sample(string.ascii_lowercase, laenge))
         
     def save(self, *args, **kwargs):
