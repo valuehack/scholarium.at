@@ -24,14 +24,14 @@ class Anmeldeformular(SignupForm):
         # erzeuge zufallsnamen, wie in SignupFormOnlyEmail
         Nutzer = get_user_model()
         while True:
-            username = Nutzer.erzeuge_zufall(laenge=12)
+            username = Nutzer.erzeuge_username()
             try:
                 get_user_model().objects.get(username__iexact=username)
             except get_user_model().DoesNotExist: break
 
         self.cleaned_data['username'] = username
         # fast aus SignupForm kopiert, insb. Mail senden per Hand, wegen pw
-        password = Nutzer.erzeuge_zufall(laenge=8)
+        password = Nutzer.erzeuge_pw()
         username, email = (self.cleaned_data['username'],
                                      self.cleaned_data['email'])
 

@@ -122,7 +122,7 @@ def zahlen(request):
                 signup.save()
                 salt, hash = generate_sha1(nutzer.username)
                 signup.activation_key = hash
-                pw = nutzer.erzeuge_zufall(8)
+                pw = nutzer.erzeuge_zufall(7)
                 signup.send_activation_email(pw=pw)
                 nutzer.set_password(pw)
                 nutzer.first_name = request.POST['vorname']

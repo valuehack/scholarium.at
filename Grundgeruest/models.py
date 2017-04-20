@@ -46,10 +46,27 @@ class Unterpunkt(Menuepunkt):
 
 class Nutzer(AbstractUser):
     @staticmethod
-    def erzeuge_zufall(laenge):
-        s = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-        return ''.join(random.sample(s, laenge))
-        
+    def erzeuge_zufall(laenge, sonderzeichen=3):
+        s = ['abcdefghijkmnopqrstuvwxyz',
+            'ABCDEFGHJKLMNPQRSTUVWXYZ',
+            '23456789_-', 
+            '@.%&+!$?/()#*']
+        zufall = []
+        for i in range(laenge):
+            zufall.append(random.sample(s[i % sonderzeichen], 1)[0])
+        return ''.join(zufall)
+
+    @staticmethod
+    def erzeuge_pw():
+        return Nutzer.erzeuge_zufall(7, sonderzeichen=4)
+
+    @staticmethod
+    def erzeuge_username():
+        return Nutzer.erzeuge_zufall(12)
+
+    def hat_guthaben(self):
+        return bool(self.my_profile.guthaben)
+    
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.erzeuge_zufall(16)

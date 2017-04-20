@@ -9,24 +9,33 @@ import pdb
 # Create your views here.
 
 def liste_artikel(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.hat_guthaben():
         return ListeMitMenue.as_view(
             model=models.Artikel,
             template_name='Scholien/liste_artikel.html',
             context_object_name='liste_artikel',
             paginate_by = 5)(request)
+    elif request.user.is_authenticated():
+        return TemplateMitMenue.as_view(
+            template_name='Gast/scholien_angemeldet.html', 
+            )(request)         
     else:
         return TemplateMitMenue.as_view(
             template_name='Gast/scholien.html', 
             )(request) 
             
-@login_required
 def liste_buechlein(request):
-    return ListeMitMenue.as_view(
-        model=models.Buechlein,
-        template_name='Scholien/liste_buechlein.html',
-        context_object_name='buechlein',
-        paginate_by = 5)(request)
+    if request.user.is_authenticated() and request.user.hat_guthaben():
+        return ListeMitMenue.as_view(
+            model=models.Buechlein,
+            template_name='Scholien/liste_buechlein.html',
+            context_object_name='buechlein',
+            paginate_by = 5)(request)
+    else:
+        # im Template wird Kleinigkeit unterschieden: 
+        return TemplateMitMenue.as_view(
+            template_name='Gast/scholien.html', 
+            )(request)             
 
 
 @login_required

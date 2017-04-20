@@ -1,12 +1,12 @@
       {% for paar in liste_menue %}{% with slug=paar.0.slug text=paar.0.bezeichnung %}       
         <li class="hauptpunkt">
-          <a href="/{{ slug }}/">{{ text }}</a>
+          <a href="/{{ slug }}">{{ text }}</a>
           {% with paar.1 as unterpunkte %}{% if unterpunkte %}
           <div>
             <ul>
-              <li><a href="/{{ slug }}/">{{ text }}</a></li>
+              <li><a href="/{{ slug }}">{{ text }}</a></li>
               {% for punkt in unterpunkte %}
-              <li><a href="/{{ punkt.slug }}/">{{ punkt.bezeichnung }}</a></li>
+              <li><a href="/{{ punkt.slug }}">{{ punkt.bezeichnung }}</a></li>
               {% endfor %}
             </ul>
           </div>
