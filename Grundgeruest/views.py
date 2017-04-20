@@ -20,6 +20,7 @@ from Veranstaltungen.models import Veranstaltung, Medium
 from Bibliothek.models import Buch
 from .forms import ZahlungFormular
 
+import pdb
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated():
@@ -99,8 +100,12 @@ def index(request):
             )(request)
     
 def zahlen(request):
-    # falls POST, werden Daten verarbeitet:
-    if request.method == 'POST':
+    # falls POST von unangemeldet, keine Fehlermeldungen:
+    #if request.method=='POST' and 'von_spende' in request.POST:
+    #    formular = ZahlungFormular(request.POST)
+    
+    # falls POST von hier, werden Daten verarbeitet:
+    if request.method=='POST':
         # eine form erstellen, insb. um sie im Fehlerfall zu nutzen:
         formular = ZahlungFormular(request.POST)
         # und falls alle Eingaben gültig sind, Daten verarbeiten: 
@@ -122,6 +127,9 @@ def zahlen(request):
                 nutzer.set_password(pw)
                 nutzer.first_name = request.POST['vorname']
                 nutzer.last_name = request.POST['nachname']
+                profil.stufe = int(request.POST['stufe'])
+                profil.guthaben_aufladen(request.POST['betrag'])
+                # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
                 for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
                     'ort']:
                     setattr(profil, attr, request.POST[attr])
@@ -167,12 +175,19 @@ def zahlen(request):
                 
             # redirect to a new URL:
             return HttpResponseRedirect('/thanks/')
-
+        
+        if 'von_spende' in request.POST:
+            formular = ZahlungFormular()
+    
     # if a GET (or any other method) we'll create a blank form
     else:
         formular = ZahlungFormular()
 
-    return render(request, 'Produkte/zahlung.html', {'formular': formular})    
+    stufe = request.POST.get('stufe', 'Gast')
+    betrag = request.POST.get('betrag', '75')
+
+    return render(request, 'Produkte/zahlung.html', 
+        {'formular': formular, 'betrag': betrag, 'stufe': stufe})    
         
 
 

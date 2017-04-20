@@ -1,6 +1,5 @@
- - Gast-Ansicht fertig machen: 
-   - Veranstaltungen
-   - Unterstützen (vll. model für Stufen? - ja, wäre gut)
-   - Startseite
- - alle Templates putzen, auch Warenkorb etc.
- - einige urls an 
+ - Trennung gezahlt oder nicht fertigmachen
+ - singup putzen; das vom Anmeldeformular ist auch nicht gaanz "richtig", aber anders und einfacher als die Vorgehensweise vom Zahlungsformular, vll letztere umstellen
+ - alle Templates hübsch machen, auch Warenkorb etc.
+ - Spendenstufe ist extra model aber im Profil als IntegerField, muss noch vereinheitlicht werden
+

@@ -13,7 +13,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from userena.models import UserenaBaseProfile, UserenaSignup
 from django.core.validators import RegexValidator
-import random, string
+import random
 
 #from Produkte.models import Produkt
 from seite.models import Grundklasse
@@ -47,11 +47,12 @@ class Unterpunkt(Menuepunkt):
 class Nutzer(AbstractUser):
     @staticmethod
     def erzeuge_zufall(laenge):
-        return ''.join(random.sample(string.ascii_lowercase, laenge))
+        s = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        return ''.join(random.sample(s, laenge))
         
     def save(self, *args, **kwargs):
         if not self.username:
-            self.username = self.erzeuge_zufall(20)
+            self.username = self.erzeuge_zufall(16)
         super(Nutzer, self).save(*args, **kwargs)
 
 class MeinUserenaSignup(UserenaSignup):
@@ -146,6 +147,10 @@ class ScholariumProfile(UserenaBaseProfile):
             return True
         else:
             raise TypeError('Guthaben zu hoch, editiere ScholariumProfile.darf_scholien_sehen()')
+    
+    def guthaben_aufladen(self, betrag):
+        """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """
+        self.guthaben += int(betrag)
         
     class Meta():
         verbose_name = 'Nutzerprofil'

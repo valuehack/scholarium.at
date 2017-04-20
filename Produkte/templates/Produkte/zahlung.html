@@ -300,8 +300,8 @@
         {% endfor %}
         <br>
         <input type="hidden" name="ok" value="1">
-        <input type="hidden" name="betrag" value="<?php echo $betrag; ?>">
-        <input type="hidden" name="level" value="<?php echo $level; ?>">
+        <input type="hidden" name="betrag" value="{{ betrag }}">
+        <input type="hidden" name="stufe" value="{{ stufe }}">
         <input type="hidden" name="profile[first_reg]" value="upgrade_buerger">
     	
         <input id="weiter_button" type="submit" name="register_from_outside_submit" value="Weiter">
