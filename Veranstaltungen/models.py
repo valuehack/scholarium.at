@@ -36,7 +36,8 @@ class Veranstaltung(KlasseMitProdukten):
         return self.art_veranstaltung.preis_praesenz
 
 class Studiumdings(KlasseMitProdukten):
-    beschreibung = models.TextField()
+    beschreibung1 = models.TextField()
+    beschreibung2 = models.TextField()
     class Meta:
         verbose_name_plural = "Studiendinger"
     
