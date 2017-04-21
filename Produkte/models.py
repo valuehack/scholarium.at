@@ -35,6 +35,10 @@ class Produkt(Grundklasse):
         "Veranstaltungen.Medium",
         null=True, blank=True,
         on_delete=models.SET_NULL)
+    zu_studiumdings = models.ForeignKey(
+        "Veranstaltungen.Studiumdings",
+        null=True, blank=True,
+        on_delete=models.SET_NULL)
 #    zu_buechlein = models.ForeignKey(
 #        "Scholien.Buechlein",
 #        null=True, blank=True,
@@ -78,8 +82,10 @@ class Produkt(Grundklasse):
             return 'Teilnahme an {}'.format(self.zu_veranstaltung)
         elif self.zu_medium:
             return 'Medium zu {}'.format(self.zu_medium)
+        elif self.zu_studiumdings:
+            return 'Studium: {}'.format(self.zu_studiumdings)
         else:
-            return 'Produkt: weder eine Teilnahme noch ein Medium, bitte Produkt.__str__() anpassen'
+            return 'Produkt: nicht Teilnahme/Medium/Studium, bitte Produkt.__str__() anpassen'
     
     class Meta:
         verbose_name_plural = 'Produkte'

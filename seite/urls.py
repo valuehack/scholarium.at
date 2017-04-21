@@ -22,6 +22,7 @@ from Grundgeruest.forms import Anmeldeformular
 from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
+from Veranstaltungen.views import studiumdings_detail
 from Produkte.models import Spendenstufe
 
 
@@ -39,11 +40,8 @@ urlpatterns = [
 	        context_object_name = 'studien'
         ),
         name='liste_gast_studium'),
-    url(r'^studium/(?P<slug>[-\w]+)/$',
-        DetailMitMenue.as_view(
-            template_name='Veranstaltungen/detail.html',
-            model=Studiumdings,
-            context_object_name = 'veranstaltung'),
+    url(r'^studium/(?P<slug>[-\w]+)/$', 
+        studiumdings_detail, 
         name='studium_gast_detail'),
     url(r'^vortrag/',
         TemplateMitMenue.as_view(

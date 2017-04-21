@@ -34,3 +34,14 @@ def eine_veranstaltung(request, slug):
     else:
         return HttpResponse('die uneingeloggte Ansicht bitte noch in Veranstaltungen.views implementieren')
 
+def studiumdings_detail(request, slug):
+    if request.user.is_authenticated() and request.user.hat_guthaben():
+        template_name='Veranstaltungen/detail_studiendings.html'
+    else:
+        template_name='Veranstaltungen/detail_studiendings_gast.html'
+    
+    return DetailMitMenue.as_view(
+            template_name=template_name,
+            model=Studiumdings,
+            context_object_name = 'studiumdings')(request, slug=slug)
+

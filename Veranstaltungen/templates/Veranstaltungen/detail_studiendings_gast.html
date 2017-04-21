@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltung">
+    <h1 style="padding: 80px 0 105px; font-size: 37;">{{ studiumdings.bezeichnung }}</h1>
+  </div>
+  <div class="separator">
+    <h2>Inhalt und Informationen</h2>
+  </div>
+  <div class="salon_content">
+    {{ studiumdings.beschreibung1|safe }}
+    {{ studiumdings.beschreibung2|safe }}
+    <a class="blog_linkbutton" href="mailto:info@scholarium.at">Anfrage schicken</a>
+  </div>
+{% endblock content %}

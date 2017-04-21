@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltung">
+    <h1>{{ veranstaltung.bezeichnung }}</h1>
+  </div>
+  <div class="separator">
+    <h2>Inhalt und Informationen</h2>
+  </div>
+  <div class="salon_content">
+    {{ veranstaltung.beschreibung1|safe }}
+    {{ veranstaltung.beschreibung2|safe }}
+    <div class="medien_anmeldung">
+    <a href="/veranstaltungen/">zurück zu den Veranstaltungen</a>
+    </div>
+    <div style="text-align: center;">
+      <div class="salon_reservation">
+        <div class="sinfo">
+          <h5>Vor Ort</h5>
+          <p>Anzahl gewünschter Teilnehmer:</p>
+          <form action="{% url 'Produkte:cart-add' %}" method="post">
+          	{% csrf_token %}
+            <input type="hidden" name="pk" value="{{ produkt.id }}">
+            <script type="text/javascript">
+              function preis_berechnen(menge, einzelpreis) {
+              var p = document.getElementById('gesamtpreis');
+              p.innerHTML = menge*einzelpreis
+            }
+            </script>
+            <select class="input-select" name="quantity" onchange="preis_berechnen(this.value, {{ produkt.preis }})">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <input class="inputbutton" type="submit" value="Auswählen"><br>
+          </form>
+          <span id="gesamtpreis" class="coin-span">{{ produkt.preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
