@@ -711,6 +711,64 @@ a.blog_linkbutton:visited {
 	text-decoration: none;
 }
 
+.medien_info {
+	width: 800px;
+	padding-bottom: 30px;
+	margin: auto;
+}
+
+.medien_info h1 {
+	font-size: 20pt;
+	color: rgba(0,0,0,0.9);
+	margin: 50px 0 30px 0;
+	text-align: center;
+}
+
+.medien_info p {
+	line-height: 1.6em;
+	font-size: 16pt;
+	text-align: justify;
+	margin: 20px 0;
+}
+
+.medien_info a {
+	color: rgb(46,74,98);
+	text-decoration: none;
+	border-bottom: 0px dotted rgb(46,74,98);
+}
+
+.medien_info a:hover {
+	color: rgb(0,0,0);
+	text-decoration: none !important;
+	border-bottom: 0px solid rgb(46,74,98);
+}
+
+.projekte {
+	width: 70%;
+	margin: auto;
+}
+
+.projekte h1 {
+	font-size: 20pt;
+	text-align: center;
+	margin: 0px;
+}
+
+.projekte h1 a {
+	text-decoration: none;
+	color: rgb(46,74,98);
+}
+
+.projekte h1 a:hover {
+	border-bottom: 0px solid rgb(46,74,98);
+	color: rgb(0,0,0);
+}
+
+.projekte p {
+	font-size: 14pt;
+}
+
+
 /* Veranstaltungen */
 
 div.veranstaltungen {
