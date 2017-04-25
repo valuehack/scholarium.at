@@ -32,6 +32,10 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Gast/fragen.html'),
         name='gast_fragen'),
+    url(r'^mitwirkende/',
+        TemplateMitMenue.as_view(
+            template_name='Gast/mitwirkende.html'),
+        name='gast_mitwirkende'),
     url(r'^studium/$', 
         ListeMitMenue.as_view(
             model=Studiumdings,
@@ -81,4 +85,3 @@ urlpatterns = [
         name='bitte_bald_loeschen'),
     url(r'^', include('Grundgeruest.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

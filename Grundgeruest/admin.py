@@ -20,6 +20,7 @@ class HauptpunktAdmin(admin.ModelAdmin):
 
 admin.site.register(Hauptpunkt, HauptpunktAdmin)
 admin.site.register(Unterpunkt)
+admin.site.register(Mitwirkende)
 
 
 # von userena.admin kopiert und angepasst
@@ -42,4 +43,3 @@ if not userena_settings.USERENA_REGISTER_USER:
         pass
     
     admin.site.register(get_user_model(), UserenaAdmin)
-

@@ -4,7 +4,7 @@
 {% block content %}
 	<div class="blog">
 		<header>
-			<h1>Häufige Fragen</h1>
+			<h1>Mitwirkende</h1>
 		</header>
 		<div class="blog_text_fragen">
 			
@@ -18,8 +18,13 @@
 <h2>Welche Unterst&uuml;tzungsstufe soll ich w&auml;hlen?</h2><p>Das scholarium ist kein Produkt, das man schnell einmal konsumiert. Wir bieten zwar auch viel gegenw&auml;rtigen Mehrwert, aber mehr noch eine langfristige Investitionsm&ouml;glichkeit. &uuml;berlegen Sie daher, wenn Sie den Wert unserer Institution erkennen, wieviel Sie monatlich beitragen k&ouml;nnen. Klar, alle wollen Ihr Geld und Sie sind es schon leid. Wir wollen Sie vor allem daf&uuml;r sensibilisieren, dass Sie Verantwortung nicht delegieren, sondern als B&uuml;rger endlich aus der sorglosen Konsummentalit&auml;t aufwachen und, nach der Sorge f&uuml;r Ihr Wohl und das Ihrer Familie, in den Aufbau alternativer Institutionen investieren, die L&uuml;cken f&uuml;llen k&ouml;nnen, wenn die bestehenden fallen. Wenn Sie Alternativen im Bereich der Bildung und Forschung so wie wir f&uuml;r wesentlich halten, bieten wir Ihnen eine konkrete Alternative als rein freiwilliges Angebot. Wir sind Ihnen nicht b&ouml;se, wenn Sie andere Alternativen vorziehen oder selbst entwickeln. Wir glauben blo&szlig; auch hier an Arbeitsteilung und sind davon &uuml;berzeugt, dass unser Unternehmen eines der am tiefsten gehenden, professionellsten, realistischsten, und daher am wenigsten von Wunschbildern, Ideologien und Eitelkeiten getragenen Projekte im alternativen Bereich ist. Gerne &uuml;berzeugen wir Sie pers&ouml;nlich davon. Hinter dem scholarium steht ein Jahrzehnt der Vorbereitung und ein Netzwerk von erfahrenen Machern, die im besten Sinne Unternehmer und nicht Unterlasser sind.</p>
 <h2>Warum ist das scholarium in Wien?</h2><p>Wien war einst das weltweite Zentrum realistischer Sozial-, Wirtschafts- und Politikwissenschaft, handwerklich und geistig hochstehender Kultur sowie geistigen und wirtschaftlichen Austauschs zwischen Ost und West. Davon ist wenig &uuml;brig, aber das Wenige lohnt noch, an die historischen Bez&uuml;ge anzukn&uuml;pfen. Das scholarium ist kein &ouml;sterreichisches Institut, sondern eine Bildungs- und Forschungsst&auml;tte, die in die gesamte Welt wirkt, mit Vorzug der deutschen Sprache, doch polyglott, und Teilnehmer, Mitwirkende, Studierende, Besucher aus aller Welt anzieht. Wien liegt daf&uuml;r hinreichend zentral und ist als Standort hinreichend attraktiv. Wir wehren uns aber nicht gegen einen besseren Standort und freuen uns auf Anregungen und Einladungen. Die meisten unserer Inhalte sind aus der Ferne zug&auml;nglich, aber Wien lohnt auch einen Besuch.</p>
 <h2>Ich bin nicht in Wien zuhause, ist also nichts f&uuml;r mich?</h2><p>Die wenigsten unserer Unterst&uuml;tzer sind in Wien zuhause, sondern in Deutschland und der Schweiz, darum richten wir unsere Arbeit besonders auf Nicht-Wiener aus: Wir &uuml;bertragen alle Veranstaltungen live oder zeichnen sie auf, wir publizieren vieles und bieten intensive Wochenendseminare, die sich perfekt mit einem Wienbesuch verbinden lassen. Wir sind ein prim&auml;r deutschsprachiges B&uuml;rgerinstitut &ndash; solange Sie diese Sprache verstehen, sind Sie bei uns richtig. Auch englischsprachig hingegen ist unser <a href="http://craftprobe.com">Bildungsprogramm f&uuml;r Jugendliche</a>.</p>		
-{% include 'Gast/kostenlos_eintragen.html' with von_wo='faq' %}
-
+			<div style="text-align: center;">
+				<form method="post" action="/fragen.php" name="registerform">
+  					<input class="inputfield" id="user_email" type="email" placeholder=" E-Mail-Adresse" name="user_email" required>
+  					<input type=hidden name="first_reg" value="faq">
+  					<input class="inputbutton" type="submit" name="eintragen_submit" value="Kostenlos eintragen">
+				</form>
+			</div>
 			 
 		</div>		
 	</div>
