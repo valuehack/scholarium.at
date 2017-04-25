@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="separator">
+    <h2>Die kommenden Veranstaltungen</h2>
+  </div>
+  <div class="veranstaltungen">
+  {% for veranstaltung in veranstaltungen %}
+    <div class="veranstaltung">
+      {% include 'Veranstaltungen/titel_veranstaltung.html' with veranstaltung=veranstaltung %}
+      <p>{{ veranstaltung.beschreibung }}</p>
+      <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+    </div>
+  {% endfor %}
+  </div>
+  {% include "paginationsleiste.html" %}
+  <div class="separator">
+    <h2>Medien vergangener Veranstaltungen</h2>
+  </div>
+  <table class="veranstaltungen">
+    {% for veranstaltung in veranstaltungen %}
+    <tr>
+      <td>
+        <a href="{{ veranstaltung.get_url }}">
+          {{ veranstaltung.art_veranstaltung }}: {{ veranstaltung.bezeichnung }}
+        </a>
+      </td>
+      <td>
+        <p>{{ veranstaltung.beschreibung|safe|truncatewords:28 }}</p>
+      </td>
+      <td>
+        {{ veranstaltung.datum }}
+      </td>
+      <td>
+        <form action="{% url 'Produkte:cart-add' %}" method="post">
+        	{% csrf_token %}
+          <input type="hidden" name="pk" value="{{ produkt.id }}">
+          <input class="inputbutton" type="submit" value="Auswählen">
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock content %}

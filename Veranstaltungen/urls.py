@@ -6,24 +6,30 @@ from .models import Veranstaltung
 
 app_name = 'Veranstaltungen'
 
-veranstaltungen_urls = [
+veranstaltungen_urls = ([
     url(r'^$', 
         views.ListeAlle.as_view(), 
         name='liste_alle'),
     url(r'^(?P<slug>[-\w]+)/$', 
         views.eine_veranstaltung, 
         name='veranstaltung_detail'),
-    ]
+    ], 'Veranstaltungen')
 
-salons_urls = [
-    url(r'^$', 
-        views.ListeAlle.as_view(), 
+salons_urls = ([
+    url(r'^s', 
+        views.ListeArt.as_view(), 
         {'art': 'Salon'}, name='liste_salons'),
-    ]
+    url(r'^/(?P<slug>[-\w]+)/$', 
+        views.VeranstaltungDetail.as_view(), 
+        {'art': 'Salon'}, name='salon_detail'),
+    ], 'Veranstaltungen')
 
-seminare_urls = [
-    url(r'^$', 
-        views.ListeAlle.as_view(), 
+seminare_urls = ([
+    url(r'^e', 
+        views.ListeArt.as_view(), 
         {'art': 'Seminar'}, name='liste_seminare'),
-    ]
+    url(r'^/(?P<slug>[-\w]+)/$', 
+        views.VeranstaltungDetail.as_view(), 
+        {'art': 'Seminar'}, name='seminar_detail'),
+    ], 'Veranstaltungen')
 

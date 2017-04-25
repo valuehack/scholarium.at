@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltung">
+    {% include 'Veranstaltungen/titel_veranstaltung.html' with veranstaltung=veranstaltung %}
+    {% include 'Veranstaltungen/buchung_veranstaltung_oben.html' with produkt=veranstaltung.produkt_set.all.0 %}
+  </div>
+  <div class="separator">
+    <h2>Inhalt und Informationen</h2>
+  </div>
+  <div class="salon_content">
+    <p>{{ veranstaltung.beschreibung|safe }}</p>
+    {{ veranstaltung.art_veranstaltung.beschreibung|safe }}
+    <div class="medien_anmeldung">
+    <a href="/veranstaltungen/">zurück zu den Veranstaltungen</a>
+    </div>
+    {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' with produkt=veranstaltung.produkt_set.all.0 %}
+  </div>
+{% endblock content %}

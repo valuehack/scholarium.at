@@ -33,7 +33,7 @@ def erstelle_liste_menue(user=None):
             ]),
             ({'bezeichnung': 'Veranstaltungen', 'slug': 'veranstaltungen'}, [
             {'bezeichnung': 'Alle', 'slug': 'veranstaltungen'},
-            {'bezeichnung': 'Salon', 'slug': 'salon'},
+            {'bezeichnung': 'Salon', 'slug': 'salons'},
             {'bezeichnung': 'Seminare', 'slug': 'seminare'},
             {'bezeichnung': 'Vortrag', 'slug': 'vortrag'},
             ]),

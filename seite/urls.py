@@ -25,7 +25,6 @@ from Veranstaltungen.models import Studiumdings
 from Veranstaltungen.views import studiumdings_detail
 from Produkte.models import Spendenstufe
 
-
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
@@ -58,10 +57,10 @@ urlpatterns = [
     url(r'^veranstaltungen/', include(
         veranstaltungen_urls, 
         namespace='Veranstaltungen')),
-    url(r'^salon/', include(
-        salons_urls, 
+    url(r'^salon', include(
+        salons_urls,
         namespace='Veranstaltungen')),
-    url(r'^seminare/', include(
+    url(r'^seminar', include(
         seminare_urls, 
         namespace='Veranstaltungen')),
     url(r'^bibliothek/', include('Bibliothek.urls')),

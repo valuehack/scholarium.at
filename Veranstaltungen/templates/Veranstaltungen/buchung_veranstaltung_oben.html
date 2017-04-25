@@ -1,0 +1,31 @@
+{% load static %}
+{% if produkt %}
+  <div style="text-align: center;">
+    <div class="salon_reservation">
+      <span class="salon_reservation_span_a">
+		    Anzahl gewünschter Teilnehmer</span><br>
+        <form action="{% url 'Produkte:cart-add' %}" method="post">
+        	{% csrf_token %}
+          <input type="hidden" name="pk" value="{{ produkt.id }}">
+          <script type="text/javascript">
+            function preis_berechnen(menge, einzelpreis) {
+            var p = document.getElementById('gesamtpreis');
+            p.innerHTML = menge*einzelpreis
+          }
+          </script>
+          <select class="input-select" name="quantity" onchange="preis_berechnen(this.value, {{ produkt.preis }})">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <input class="inputbutton" type="submit" value="Auswählen"><br>
+          <span id="gesamtpreis" class="coin-span">{{ produkt.preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
+        </form>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <p style="margin-bottom: 50px; text-align: center;"><i> Die Veranstaltung ist noch nicht zur Buchung freigegeben </i></p>
+{% endif %}

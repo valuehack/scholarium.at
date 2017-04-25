@@ -667,7 +667,8 @@ td {
 	color: #fff;
 	border: 0;
 	border-radius: 2px;
-	margin: 5px;
+	margin-top: 4px;
+    margin-bottom: 8px;
 	min-width: 200px;
 	height: 50px;
 	font-size: 16pt;
@@ -815,6 +816,27 @@ div.veranstaltung p {
 	line-height: 1.6;
 }
 
+table.veranstaltungen {
+    width: 84%;
+    margin: 60px 8% 0;
+}
+
+table.veranstaltungen td {
+    padding: 10px 2%;
+    font-size: 18;    
+	font-family: "Garamond", Georgia, Times, sans-serif;
+}
+
+table.veranstaltungen td:first-child {
+    width: 24%;
+    font-size: 24;
+}
+
+table.veranstaltungen td:nth-child(3) {
+    width: 10%;
+}
+
+
 p.linie {
 	margin-top: 15px;
 	text-align: center !important;
@@ -901,6 +923,45 @@ p.linie img {
 	padding: auto;
     display: inline-block;
     position: relative;
+}
+
+.sinfo {
+	padding: 20px;
+	margin: 10px 0px;
+	border: 1px solid rgb(125, 125, 125);
+}
+
+.sinfo p {
+	margin: 5px 0;
+}
+
+.sinfo-link:link, .sinfo-link:active, .sinfo-link:hover, .sinfo-link:visited {
+	font-size: 14pt;
+	text-decoration: none;
+}
+
+.sinfo-link:link, .sinfo-link:visited {
+	border-bottom: 1px dotted rgb(46,74,98);
+}
+
+.sinfo-link:active, .sinfo-link:hover {
+	border-bottom: 1px solid rgb(46,74,98);
+}
+
+.input-select {
+	padding: 10px;
+    padding-top: 6px;
+	font-size: 14pt;
+	height: 50px;
+}
+
+.coin-span {
+	font-size: 18pt;
+}
+
+.coin-span__img {
+	width: 1.4em;
+	margin: 0.5em  0 -.4em 0.5em !important;
 }
 
 

@@ -10,6 +10,7 @@ Die Modelle der Veranstaltungen und Medien
 from django.db import models
 from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
+from django.core.urlresolvers import reverse
 import random, string
 
 class ArtDerVeranstaltung(Grundklasse):
@@ -34,6 +35,12 @@ class Veranstaltung(KlasseMitProdukten):
     
     def get_preis(self):
         return self.art_veranstaltung.preis_praesenz
+    
+    def get_url(self):
+        if self.art_veranstaltung.bezeichnung == 'Salon':
+            return '/salon/%s' % self.slug
+        elif self.art_veranstaltung.bezeichnung == 'Seminar':
+            return '/seminar/%s' % self.slug
 
 class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()

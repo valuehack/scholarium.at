@@ -1,0 +1,7 @@
+  {% with art=veranstaltung.art_veranstaltung %}
+  <div>{{ art.bezeichnung }}</div>
+  <h1><a href='{{ veranstaltung.get_url }}'>{{ veranstaltung }}</a></h1>
+  <div>
+    {{ veranstaltung.datum | date:"l, d. F Y," }} {{ art.zeit_beginn | time:"H:i" }} bis {{ art.zeit_ende|time:"H:i" }} Uhr
+  </div>
+  {% endwith %}
