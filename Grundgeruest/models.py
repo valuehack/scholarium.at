@@ -73,11 +73,15 @@ class Nutzer(AbstractUser):
         super(Nutzer, self).save(*args, **kwargs)
 
 class MeinUserenaSignup(UserenaSignup):
+    class Meta:
+        proxy = True
+    
     def send_activation_email(self, **kwargs):
         """
         Ich aendere die Funktion ab.
         Damit Context auch dass Passwort enthaelt
         """
+        
         from userena.mail import UserenaConfirmationMail
         import userena.settings as userena_settings
         from django.contrib.sites.models import Site
