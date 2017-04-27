@@ -1,8 +1,9 @@
 from django import forms
 from userena.forms import SignupForm
 from django.contrib.auth import get_user_model
-from .models import ScholariumProfile, MeinUserenaSignup
+from .models import ScholariumProfile#, MeinUserenaSignup
 from userena.models import UserenaSignup # das ist Absicht, dass das und Mein~ importiert wird
+from userena.models import UserenaSignup as MeinUserenaSignup # das ist Absicht, dass das und Mein~ importiert wird
 from userena.utils import generate_sha1
 
 #from hashlib import sha1
@@ -68,3 +69,4 @@ class ZahlungFormular(forms.ModelForm):
         model = ScholariumProfile
         fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma', 
             'strasse', 'plz', 'ort', 'zahlungsweise']
+

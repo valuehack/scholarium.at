@@ -4,7 +4,11 @@ from django.contrib.auth.decorators import login_required
 from Grundgeruest.views import DetailMitMenue, ListeMitMenue, TemplateMitMenue
 from . import models
 
-import pdb
+from django.db import transaction
+import sqlite3 as lite
+
+from django.conf import settings
+import os, pdb
 
 # Create your views here.
 
@@ -64,3 +68,27 @@ def aus_datei_einlesen(request):
             
     return HttpResponseRedirect('/scholien/')
 
+def aus_alter_db_einlesen(request):
+    """ liest scholienartikel aus alter db (als .sqlite exportiert) aus 
+    !! Achtung, löscht davor die aktuellen Einträge !! """
+    
+    models.Artikel.objects.all().delete()
+    
+    con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
+    with con:
+        con.row_factory = lite.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM blog;")
+
+        zeilen = [dict(zeile) for zeile in cur.fetchall()]
+        with transaction.atomic():
+            for scholie in zeilen:
+                if scholie['publ_date'] == '0000-00-00':
+                    scholie['publ_date'] = '1111-01-01'
+                models.Artikel.objects.create(
+                    bezeichnung=scholie['title'],
+                    inhalt=scholie['public_text'],
+                    inhalt_nur_fuer_angemeldet=scholie['private_text'],
+                    datum_publizieren=scholie['publ_date'])
+
+    return HttpResponseRedirect('/scholien')

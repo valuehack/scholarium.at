@@ -2,7 +2,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from .models import MeinUserenaSignup
+from userena.models import UserenaSignup
 from userena.mail import UserenaConfirmationMail
 from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
@@ -211,10 +211,10 @@ def aus_datei_mitglieder_einlesen(request):
     erstelle Liste von Nutzern und speichere sie (wegen Profil und Signup)
     füge für jeden Nutzer alle Attribute hinzu, speichere
     """
-    con = lite.connect('../mysqlite3.db')
+    con = lite.connect('../alte_db.sqlite3')
     with con:
         con.row_factory = lite.Row
-        cur = con.cursor()    
+        cur = con.cursor()
         cur.execute("SELECT * FROM mitgliederExt")
 
         zeilen = [dict(zeile) for zeile in cur.fetchall()]

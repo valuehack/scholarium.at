@@ -15,7 +15,6 @@ from userena.models import UserenaBaseProfile, UserenaSignup
 from django.core.validators import RegexValidator
 import random
 
-#from Produkte.models import Produkt
 from seite.models import Grundklasse
 
 class Menuepunkt(Grundklasse):
@@ -72,32 +71,32 @@ class Nutzer(AbstractUser):
             self.username = self.erzeuge_zufall(16)
         super(Nutzer, self).save(*args, **kwargs)
 
-class MeinUserenaSignup(UserenaSignup):
-    class Meta:
-        proxy = True
-    
-    def send_activation_email(self, **kwargs):
-        """
-        Ich aendere die Funktion ab.
-        Damit Context auch dass Passwort enthaelt
-        """
-        
-        from userena.mail import UserenaConfirmationMail
-        import userena.settings as userena_settings
-        from django.contrib.sites.models import Site
-        from userena.utils import get_protocol
-
-        context = {'user': self.user,
-                  'without_usernames': userena_settings.USERENA_WITHOUT_USERNAMES,
-                  'protocol': get_protocol(),
-                  'activation_days': userena_settings.USERENA_ACTIVATION_DAYS,
-                  'activation_key': self.activation_key,
-                  'site': Site.objects.get_current(),
-                  'passwort': kwargs['pw']}
-        
-        mailer = UserenaConfirmationMail(context=context)
-        mailer.generate_mail("activation")
-        mailer.send_mail(self.user.email)
+#class MeinUserenaSignup(UserenaSignup):
+#    class Meta:
+#        proxy = True
+#    
+#    def send_activation_email(self, **kwargs):
+#        """
+#        Ich aendere die Funktion ab.
+#        Damit Context auch dass Passwort enthaelt
+#        """
+#        
+#        from userena.mail import UserenaConfirmationMail
+#        import userena.settings as userena_settings
+#        from django.contrib.sites.models import Site
+#        from userena.utils import get_protocol
+#
+#        context = {'user': self.user,
+#                  'without_usernames': userena_settings.USERENA_WITHOUT_USERNAMES,
+#                  'protocol': get_protocol(),
+#                  'activation_days': userena_settings.USERENA_ACTIVATION_DAYS,
+#                  'activation_key': self.activation_key,
+#                  'site': Site.objects.get_current(),
+#                  'passwort': kwargs['pw']}
+#        
+#        mailer = UserenaConfirmationMail(context=context)
+#        mailer.generate_mail("activation")
+#        mailer.send_mail(self.user.email)
 
 
 class ScholariumProfile(UserenaBaseProfile):
@@ -176,6 +175,7 @@ class ScholariumProfile(UserenaBaseProfile):
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
+
 
 class Mitwirkende(models.Model):
     name = models.CharField(max_length=100)
