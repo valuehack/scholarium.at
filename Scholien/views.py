@@ -51,24 +51,12 @@ def ein_artikel(request, slug):
             model=models.Artikel,
             context_object_name = 'scholie')(request, slug=slug)
 
-def aus_datei_einlesen(request):
-    f = open('../dumpscholien', 'r')
-    text = f.read()[:-11]
-    f.close()
+def daten_einlesen(request):
+    aus_alter_db_einlesen()
+    return HttpResponseRedirect('/scholien')
     
-    liste_scholien = text.split(');\nINSERT INTO "blog" VALUES(')[1:]
-    for scholie_roh in liste_scholien:
-        scholie = scholie_roh.split("'")[1::2]
-        print(11*'\n'+scholie_roh+11*'\n')
-        models.Artikel.objects.create(
-            bezeichnung=scholie[1],
-            inhalt=scholie[2],
-            inhalt_nur_fuer_angemeldet=scholie[3],
-            datum_publizieren=scholie[4])
-            
-    return HttpResponseRedirect('/scholien/')
 
-def aus_alter_db_einlesen(request):
+def aus_alter_db_einlesen():
     """ liest scholienartikel aus alter db (als .sqlite exportiert) aus 
     !! Achtung, löscht davor die aktuellen Einträge !! """
     
@@ -90,5 +78,3 @@ def aus_alter_db_einlesen(request):
                     inhalt=scholie['public_text'],
                     inhalt_nur_fuer_angemeldet=scholie['private_text'],
                     datum_publizieren=scholie['publ_date'])
-
-    return HttpResponseRedirect('/scholien')

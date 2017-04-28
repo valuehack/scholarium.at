@@ -247,30 +247,37 @@ def aus_datei_mitglieder_einlesen(request):
             profil.save()
             signup.save()
             nutzer.save()
-    
-    pdb.set_trace()
-        
-    
 
 
-    liste_user = text.split(');\nINSERT INTO "mitgliederExt" VALUES(')[1:]
-    for u in liste_user[2:4]:
-        wert = lambda s: felder[nr_feld[profil_attributnamen[s]]]
-        felder = [f.strip("'") for f in u.split(",")]
-        neuer_nutzer = Nutzer(username='alteDB_%s'%felder[nr_feld['user_id']])
-        for attribut in nutzer_attributnamen:
-            eintragen(neuer_nutzer, attribut, felder)
-        pwalt = felder[nr_feld['user_password_hash']]
-        neuer_nutzer.password = 'bcrypt$$2b$10${}'.format(pwalt.split('$')[-1])
-        neuer_nutzer.save()
-        us = MeinUserenaSignup.objects.get_or_create(user=neuer_nutzer)[0]
-        neuer_nutzer.userena_signup = us
-        profil = ScholariumProfile.objects.create(user=neuer_nutzer)
-        for attribut in profil_attributnamen:
-            eintragen(profil, attribut, felder)
-        neuer_nutzer.save()
-                    
-    return HttpResponseRedirect('/accounts/')
+def alles_aus_mysql_einlesen():
+    """ Laedt newBig Datenbank runter und liest Daten ein (aktuelle Zeilen
+    werden vorher geloescht) fuer:
+     - Scholienartikel
+     - Veranstaltungen
+     - [zu vervollständigen]
+    """
+    import os 
+    from Veranstaltungen.views import aus_alter_db_einlesen as einlesen_v
+    from Scholien.views import aus_alter_db_einlesen as einlesen_s
+    liste_dateien = os.listdir('.')
+    if not 'alte_db.sql' in liste_dateien:
+        print("ich will jetzt die newBig Datenbank runterladen...")
+        os.system('mysqldump --extended-insert=FALSE --complete-insert=TRUE -h 37.148.204.116 -u newBig -p newBig > alte_db.sql')
+        print('habe newBig nach alte_db.sql runtergeladen')
+    if not 'alte_db.sqlite3' in liste_dateien:
+        os.system('./mysql2sqlite alte_db.sql | sqlite3 alte_db.sqlite3')
+        print('habe alte_db.sqlite3 erzeugt')
+    if input('...werde jetzt Veranstaltungen und Medien löschen und aus alter DB übernehmen - richtig? Zum Abbrechen etwas eingeben, Fortfahren mit nur Eingabetaste'):
+        print('abgebrochen')
+    else:
+        einlesen_v()
+        print('eingelesen')
+    if input('...werde jetzt Scholienartikel löschen und aus alter DB übernehmen - richtig? Zum Abbrechen etwas eingeben, Fortfahren mit nur Eingabetaste'):
+        print('abgebrochen')
+    else:
+        einlesen_s()
+        print('eingelesen')
+
 
 def db_runterladen(request):
     from django.utils.encoding import smart_str

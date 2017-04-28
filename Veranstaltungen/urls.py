@@ -14,7 +14,7 @@ veranstaltungen_urls = ([
         views.eine_veranstaltung, 
         name='veranstaltung_detail'),
     url(r'^aus_alt_einlesen', 
-        views.aus_alter_db_einlesen, 
+        views.daten_einlesen, 
         name='aus_alt_einlesen'),
     ], 'Veranstaltungen')
 

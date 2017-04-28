@@ -65,7 +65,12 @@ def studiumdings_detail(request, slug):
             model=Studiumdings,
             context_object_name = 'studiumdings')(request, slug=slug)
 
-def aus_alter_db_einlesen(request):
+def daten_einlesen(request):
+    aus_alter_db_einlesen()
+    return HttpResponseRedirect('/veranstaltungen')
+    
+
+def aus_alter_db_einlesen():
     """ liest veranstaltungen aus alter db (als .sqlite exportiert) aus 
     !! Achtung, löscht davor die aktuellen Einträge !! """
     
@@ -76,6 +81,7 @@ def aus_alter_db_einlesen(request):
     from django.http import HttpResponseRedirect
 
     Veranstaltung.objects.all().delete()
+    Medium.objects.all().delete()
     
     con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
     with con:
@@ -98,5 +104,3 @@ def aus_alter_db_einlesen(request):
                 datum=zeile['start'].split(' ')[0])
             m = Medium.objects.create(gehoert_zu=v)
             m.link = zeile['livestream']
-
-    return HttpResponseRedirect('/veranstaltungen')
