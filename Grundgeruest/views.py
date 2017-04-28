@@ -114,17 +114,9 @@ def zahlen(request):
                 Nutzer.objects.filter(email=request.POST['email'])):
 
                 # erstelle neuen Nutzer mit eingegebenen Daten:
-                nutzer = Nutzer.objects.create(email=request.POST['email'])
-                nutzer.save()
-                profil = ScholariumProfile.objects.create(user=nutzer)
-                profil.save()
-                signup = MeinUserenaSignup.objects.create(user=nutzer)
-                signup.save()
-                salt, hash = generate_sha1(nutzer.username)
-                signup.activation_key = hash
-                pw = nutzer.erzeuge_zufall(7)
-                signup.send_activation_email(pw=pw)
-                nutzer.set_password(pw)
+                nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+                profil = nutzer.my_profile
+                signup = nutzer.userena_signup
                 nutzer.first_name = request.POST['vorname']
                 nutzer.last_name = request.POST['nachname']
                 profil.stufe = int(request.POST['stufe'])
@@ -133,43 +125,9 @@ def zahlen(request):
                 for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
                     'ort']:
                     setattr(profil, attr, request.POST[attr])
-                # per Hand 5 permissions erzeugen, fuer userena: 
-                ct_profile = ContentType.objects.get(model='scholariumprofile')    
-                ct_nutzer = ContentType.objects.get(model='nutzer')    
-                p1 = UserObjectPermission(
-                    permission=Permission.objects.get(name='Can view profile'),
-                    object_pk = str(nutzer.my_profile.id), 
-                    user = nutzer,
-                    content_type = ct_profile)
-                p2 = UserObjectPermission(
-                    permission=Permission.objects.get(name='Can change profile'),
-                    object_pk = str(nutzer.my_profile.id), 
-                    user = nutzer,
-                    content_type = ct_profile)
-                p3 = UserObjectPermission(
-                    permission=Permission.objects.get(name='Can delete profile'),
-                    object_pk = str(nutzer.my_profile.id), 
-                    user = nutzer,
-                    content_type = ct_profile)
-                p4 = UserObjectPermission(
-                    permission=Permission.objects.get(id=55), #dafür Test schreiben! könnte sich ändern?!
-                    object_pk = str(nutzer.id), 
-                    user = nutzer,
-                    content_type = ct_nutzer)
-                p5 = UserObjectPermission(
-                    permission=Permission.objects.get(id=56),
-                    object_pk = str(nutzer.id), 
-                    user = nutzer,
-                    content_type = ct_nutzer)
+
                 nutzer.save()
                 profil.save()
-                signup.save()
-                p1.save()
-                p2.save()
-                p3.save()
-                p4.save()
-                p5.save()
-                print('{0}gibts noch nicht{0}'.format(10*'\n'))
             else:
                 print('{0}gibts schon{0}'.format(10*'\n'))
                 

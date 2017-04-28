@@ -24,34 +24,10 @@ class Anmeldeformular(SignupForm):
     def save(self):
         # erzeuge zufallsnamen, wie in SignupFormOnlyEmail
         Nutzer = get_user_model()
-        while True:
-            username = Nutzer.erzeuge_username()
-            try:
-                get_user_model().objects.get(username__iexact=username)
-            except get_user_model().DoesNotExist: break
-
-        self.cleaned_data['username'] = username
-        # fast aus SignupForm kopiert, insb. Mail senden per Hand, wegen pw
-        password = Nutzer.erzeuge_pw()
-        username, email = (self.cleaned_data['username'],
-                                     self.cleaned_data['email'])
-
-        new_user = UserenaSignup.objects.create_user(username,
-                                                     email,
-                                                     password,
-                                                     active=False,
-                                                     send_email=False)
-        
-        UserenaSignup.objects.filter(user=new_user).delete()
-        signup = MeinUserenaSignup.objects.create(user=new_user)
-        salt, hash = generate_sha1(new_user.username)
-        signup.activation_key = hash
-        signup.save()
-        signup.send_activation_email(pw=password)
-        new_user.userena_signup = signup
-        new_user.save()
+        new_user = Nutzer.neuen_erstellen(self.cleaned_data['email'])
         
         return new_user
+
 
 class ZahlungFormular(forms.ModelForm):
     email = forms.EmailField()
