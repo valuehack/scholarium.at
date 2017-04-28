@@ -61,19 +61,17 @@ def erstelle_liste_menue(user=None):
     return liste_punkte
 
 class MenueMixin():
+    extra_context = {}
     def get_context_data(self, **kwargs):
         liste_menue = erstelle_liste_menue(self.request.user)
         context = super().get_context_data(**kwargs)
         context['liste_menue'] = liste_menue
+        context.update(self.extra_context)
         return context        
 
 class TemplateMitMenue(MenueMixin, TemplateView):
-    extra_context = {}
-    def get_context_data(self, **kwargs):
-        context = super(TemplateMitMenue, self).get_context_data(**kwargs)
-        context.update(self.extra_context)
-        return context
-
+    pass 
+    
 class ListeMitMenue(MenueMixin, ListView):
     pass
 

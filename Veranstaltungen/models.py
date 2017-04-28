@@ -54,6 +54,7 @@ class Studiumdings(KlasseMitProdukten):
 class Medium(KlasseMitProdukten):
     gehoert_zu = models.ForeignKey(Veranstaltung, null=True, blank=True)
     datei = models.FileField()
+    link = models.URLField(null=True, blank=True)
     # folgendes v.a. relevant wenn keine Veranstaltung verknüpft ist:
     typ = models.CharField(max_length=30, null=True, blank=True)
     beschreibung = models.TextField(max_length=2000, null=True, blank=True)

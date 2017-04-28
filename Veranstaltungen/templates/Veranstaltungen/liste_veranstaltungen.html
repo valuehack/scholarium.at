@@ -9,17 +9,16 @@
   {% for veranstaltung in veranstaltungen %}
     <div class="veranstaltung">
       {% include 'Veranstaltungen/titel_veranstaltung.html' with veranstaltung=veranstaltung %}
-      <p>{{ veranstaltung.beschreibung }}</p>
+      <p>{{ veranstaltung.beschreibung|safe }}</p>
       <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
     </div>
   {% endfor %}
   </div>
-  {% include "paginationsleiste.html" %}
   <div class="separator">
     <h2>Medien vergangener Veranstaltungen</h2>
   </div>
   <table class="veranstaltungen">
-    {% for veranstaltung in veranstaltungen %}
+    {% for medium in medien %}{% with veranstaltung=medium.gehoert_zu %}
     <tr>
       <td>
         <a href="{{ veranstaltung.get_url }}">
@@ -40,6 +39,7 @@
         </form>
       </td>
     </tr>
-    {% endfor %}
+    {% endwith %}{% endfor %}
   </table>
+  {% include "paginationsleiste.html" %}
 {% endblock content %}

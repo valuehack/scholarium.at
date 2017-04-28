@@ -15,12 +15,12 @@ class KlasseMitProdukten(Grundklasse):
         p.save()
         return None
 
-    def save(self):
+    def save(self, **kwargs):
         if not self.id:
-            super().save()
+            super().save(**kwargs)
             self.erstelle_produkt()
         else:
-            super().save()
+            super().save(**kwargs)
 
     class Meta:
         abstract = True
