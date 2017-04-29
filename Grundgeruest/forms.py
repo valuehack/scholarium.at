@@ -5,6 +5,7 @@ from .models import ScholariumProfile#, MeinUserenaSignup
 from userena.models import UserenaSignup # das ist Absicht, dass das und Mein~ importiert wird
 from userena.models import UserenaSignup as MeinUserenaSignup # das ist Absicht, dass das und Mein~ importiert wird
 from userena.utils import generate_sha1
+from django_countries.widgets import CountrySelectWidget
 
 #from hashlib import sha1
 #import random
@@ -44,5 +45,6 @@ class ZahlungFormular(forms.ModelForm):
     class Meta:
         model = ScholariumProfile
         fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma', 
-            'strasse', 'plz', 'ort', 'zahlungsweise']
+            'strasse', 'plz', 'ort', 'zahlungsweise', 'land']
+        widgets = {'land': CountrySelectWidget()}
 

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.humanize',
     'easycart', 
+    'django_countries',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -113,6 +114,12 @@ SITE_ID = 2 # für localhost in der ursprünglichen DB
 # easycart-specific settings
 
 EASYCART_CART_CLASS = 'Produkte.views.Warenkorb'
+
+# django-countries
+
+COUNTRIES_FIRST = ['DE', 'AT', 'CH', 'LI']
+COUNTRIES_FIRST_REPEAT = True
+COUNTRIES_FIRST_BREAK = 20*'-'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases

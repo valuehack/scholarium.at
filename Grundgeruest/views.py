@@ -121,7 +121,7 @@ def zahlen(request):
                 profil.guthaben_aufladen(request.POST['betrag'])
                 # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
                 for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
-                    'ort']:
+                    'ort', 'land']:
                     setattr(profil, attr, request.POST[attr])
 
                 nutzer.save()

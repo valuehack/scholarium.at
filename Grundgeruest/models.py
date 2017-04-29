@@ -15,6 +15,7 @@ from userena.models import UserenaBaseProfile, UserenaSignup
 from userena.utils import generate_sha1
 from django.core.validators import RegexValidator
 import random
+from django_countries.fields import CountryField
 
 from seite.models import Grundklasse
 
@@ -155,9 +156,9 @@ class ScholariumProfile(UserenaBaseProfile):
     ort = models.CharField(
         max_length=30,
         null=True, blank=True)
-    land = models.CharField(
-        max_length=30,
-        null=True, blank=True)    
+    land = CountryField(
+        blank_label='- Bitte Ihr Land auswählen -', 
+        null=True)
     guthaben = models.SmallIntegerField(default=0)
     titel = models.CharField(
         max_length=30,
