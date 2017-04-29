@@ -14,7 +14,10 @@ class KlasseMitProdukten(Grundklasse):
         p.__setattr__(attribut_name, self)
         p.save()
         return None
-
+    
+    def preis_ausgeben(self, art):
+        return 20
+        
     def save(self, **kwargs):
         if not self.id:
             super().save(**kwargs)
