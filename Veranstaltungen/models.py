@@ -33,8 +33,17 @@ class Veranstaltung(KlasseMitProdukten):
     class Meta:
         verbose_name_plural = "Veranstaltungen"
     
-    def get_preis(self):
-        return self.art_veranstaltung.preis_praesenz
+    liste_arten = [1, 2]
+    def preis_ausgeben(self, art):
+        """ Preis ausgeben, je nach Veranstaltung und art (Format) """
+        #if self.preis:
+        #    return self.preis
+        
+        art = int(art)
+        if art == 1:
+            return self.art_veranstaltung.preis_praesenz
+        elif art == 2: 
+            return self.art_veranstaltung.preis_aufzeichnung
     
     def get_url(self):
         if self.art_veranstaltung.bezeichnung == 'Salon':

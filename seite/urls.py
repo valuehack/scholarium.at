@@ -67,7 +67,7 @@ urlpatterns = [
     url(r'^seminar', include(
         seminare_urls, 
         namespace='Veranstaltungen')),
-    url(r'^bibliothek/', include('Bibliothek.urls')),
+    url(r'^buecher/', include('Bibliothek.urls')),
     url(r'^scholien', include('Scholien.urls')),
     url(r'^spende/zahlung', zahlen, name='gast_zahlung'),
     url(r'^spende',

@@ -17,5 +17,7 @@ urlpatterns = [
         name='add_test',),
     url('^kaufen$', views.kaufen, name='kaufen'),
     url('^bestellungen$', views.bestellungen, name='bestellungen'),
+
+    url(r'^add/$', views.AddItem.as_view(), name='cart-add'), # ersetzt view aus:
     url('', include('easycart.urls')),
 ]

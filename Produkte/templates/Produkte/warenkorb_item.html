@@ -1,21 +1,25 @@
 {% load static humanize %}
 
-{% with v=item.obj.zu_veranstaltung m=item.obj.zu_medium%}
-  {% if v %}
+{% if item.obj.datum %}
+  {% with v=item.obj %}
     <div class="warenkorb_veranstaltung">
-      <span>{{ v.art_veranstaltung }}</span>
+      <span>{{ v.art_veranstaltung.bezeichnung }}</span>
       <span>
         <a href="{% url 'Veranstaltungen:veranstaltung_detail' v.slug %}">{{ v.bezeichnung }}</a>
       </span>
-      <span>{{ v.datum | naturalday }}</span>
-      <span>Vor Ort</span>
+      {% if item.art == '1' %}
+        <span>{{ v.datum | naturalday }}</span>
+        <span>Vor Ort</span>
+      {% elif item.art == '2' %}
+        <span>Aufzeichnung</span>
+      {% endif %}
       <form action="{% url 'Produkte:cart-remove' %}" method="post">
       	{% csrf_token %}
         <input type="hidden" name="pk" value={{ item.obj.pk }}>
         <input type="submit" value="Entfernen">
       </form>
     </div>
-  {% elif m %}
-    {{ m }}
-  {% endif %}
-{% endwith %}
+  {% endwith %}
+{% elif m %}
+  {{ m }}
+{% endif %}

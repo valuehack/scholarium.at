@@ -4,21 +4,48 @@ dann leicht Produkte erstellen können soll.
 """
 
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
 from seite.models import Grundklasse
 
 
 class KlasseMitProdukten(Grundklasse):
     def erstelle_produkt(self):
+        """ veraltet, bald löschen """
         attribut_name = 'zu_'+self.__class__.__name__.lower()
         p = Produkt(bezeichnung=self.bezeichnung)
         p.__setattr__(attribut_name, self)
         p.save()
         return None
     
+    # evtl. zu überschreiben, Liste der Formate, für Schleife im Template
+    liste_arten = [0]
+    
+    def pk_ausgeben(self):
+        """ Gibt die Kennung des Produktes (contenttype, id), wie es der 
+        Warenkorb-Item braucht, zurück, dahinter muss noch die art. Zur 
+        Verwendung in Templates. 
+        Da muss noch was geändert werden, ist nicht DRY, vermutlich die 
+        Funktionen tupel_zu_pk und tupel_aus_pk von der Item-Klasse nach 
+        hier angepasst verschieben? """
+        return '; '.join([
+            self.__class__.__name__.lower(), 
+            str(self.pk), 
+            '',
+        ])
+    
     def preis_ausgeben(self, art):
-        return 20
+        """ Default-Implementation einer Preis-Funktion, die sollte bei 
+        jeder Klasse überschrieben werden. Grundsätzlich sollten nur 
+        Klassen, die nur eine Art haben den Parameter art==0 akzeptieren;
+        wenn es mehrere gibt, dann heißen die zur Vermeidung von Fehlern 
+        1 bis n """
+        if art == 0:
+            return 0
+        else: 
+            return 999
         
     def save(self, **kwargs):
+        """ auch bald löschen? """
         if not self.id:
             super().save(**kwargs)
             self.erstelle_produkt()
@@ -30,6 +57,7 @@ class KlasseMitProdukten(Grundklasse):
 
 
 class Produkt(Grundklasse):
+    """ brauchen wir nicht mehr, bald löschen """
     zu_veranstaltung = models.ForeignKey(
         "Veranstaltungen.Veranstaltung",
         null=True, blank=True,
@@ -51,10 +79,10 @@ class Produkt(Grundklasse):
 #        null=True, blank=True,
 #        on_delete=models.SET_NULL)
     preis = models.SmallIntegerField(blank=True, null=True)
-    kaeufe = models.ManyToManyField(
-        'Grundgeruest.ScholariumProfile',
-        through='Kauf',
-        editable=False)
+    #kaeufe = models.ManyToManyField(
+    #    'Grundgeruest.ScholariumProfile',
+    #    through='Kauf',
+    #    editable=False)
 
     # vielleicht ist das Quatsch, weil gedoppelt mit zu_xy-Attribut
     art_choices = [('Teilnahme', )*2,
@@ -99,10 +127,12 @@ class Kauf(models.Model):
         'Grundgeruest.ScholariumProfile',
         on_delete=models.SET_NULL,
         null=True)
-    produkt = models.ForeignKey(
-        Produkt,
+    produkt_model = models.ForeignKey(
+        ContentType,
         on_delete=models.SET_NULL,
-        null=True)
+        null=True,)
+    produkt_id = models.SmallIntegerField(null=True)
+    produkt_art = models.SmallIntegerField(null=True)
     menge = models.SmallIntegerField(blank=True, default=1)
     zeit = models.DateTimeField(
         auto_now_add=True,

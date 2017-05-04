@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
+import pdb
 
 # Create your views here.
 
@@ -46,17 +47,21 @@ Idee der built-in-Implementation:
    wie Preis oder besetzte Plätze; aber alternativ muss man zu jedem Objekt
    ein extra Produkt erstellen, welches (zumeist leere) Verknüpfungen zu 
    den verschiedenen produktfähigen Klassen hat...
- - Konkret die Umsetzung, um möglichst wenig zu ändern. Achtung, jetzt 
-   wird's kompliziert:
-   - die urls werden an andere views geleitet; als POST-Parameter erwarte 
-     ich immer noch nur pk (String mit drei Werten) und optional quantity.
-   - der CartView, von dem die konkreten views erben, zerteilt die pk und 
-     gibt redundant sowohl den ganzen pk (die braucht die Cart-Instanz um 
-     die als keys der items-dict zu nehmen) als auch die art (die wird als
-     optionaler kwarg interpretiert und automatisch an den Item-Konstruktor
-     weitergeleitet). So muss ich nur get_queryset und encode ändern, und 
+ - Konkret die Umsetzung, um möglichst wenig zu ändern. Ist viiel einfacher
+   als es ursprünglich schien:
+   - der Item-Konstruktor bekommt die art als kwarg übergeben, speichert
+     sie automatisch in der Item-Instanz.
+   - sowohl das items-dict der Cart als auch die session_items bekommen 
+     als keys die kombinierten Strings mit drei Werten.
+   - für die Erstellung der Item-Instanzen aus der session sind also nur 
+     kleine Details zu ändern. 
+   - die url für add verweist auf neuen view, der die pk zerteilt und 
+     sowohl den ganzen pk (die braucht die Cart-Instanz um die als keys 
+     der items-dict zu nehmen) als auch die art (die wird als optionaler 
+     kwarg interpretiert und automatisch an den Item-Konstruktor weiter
+     geleitet) zurück. So muss ich nur get_queryset und encode ändern, und 
      den Konstruktor und __repr__ vom Item. 
-     - z.B. Cart.add bekommt die Parameter pk, quantity, art, holt sich obj
+     - Cart.add bekommt die Parameter pk, quantity, art, holt sich obj
      über die pk, und fügt Item(...) zum items-dict unter dem key pk hinzu.
 """
 
@@ -68,6 +73,7 @@ class Ware(BaseItem):
         #pdb.set_trace()
         self.price = obj.preis_ausgeben(kwargs['art'])
         self.obj = obj
+        self.art = kwargs['art']
         for key, value in kwargs.items():
             setattr(self, key, value)
         self._kwargs = kwargs
@@ -241,4 +247,39 @@ def kaufen(request):
         warenkorb.remove(ware.obj.pk)
         
     return HttpResponseRedirect(reverse('Produkte:warenkorb'))
-    
+
+
+from easycart.views import CartView
+from easycart.cart import CartException
+
+class AddItem(CartView):
+    """ habe 'post()' fast aus easycart.views.CartView kopiert, etwas 
+    vereinfacht, da ja konkreter für "add" und die Warenkorb-Klasse, und 
+    das Übergeben von art hinzugefügt
+    """
+        
+    def post(self, request):
+        # Extract parameters from the post data
+        params = {}
+        try:
+            params['pk'] = request.POST['pk']
+        except KeyError:
+            return JsonResponse({
+                'error': 'MissingRequestParam',
+                'param': 'pk',
+            })
+        
+        params['quantity'] = request.POST.get('quantity', 1)
+
+        # parameter art hinzufügen
+        model_name, obj_pk, art = Warenkorb.tupel_aus_pk(params['pk'])
+        params.update([('art', art)])
+
+        # Perform an action on the cart using these parameters
+        cart = Warenkorb(request)
+        try:
+            cart.add(**params)
+        except CartException as exc:
+            return JsonResponse(dict({'error': exc.__class__.__name__},
+                                     **exc.kwargs))
+        return cart.encode()
