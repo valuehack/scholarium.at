@@ -120,6 +120,8 @@ class Nutzer(AbstractUser):
             self.username = self.erzeuge_zufall(16)
         super(Nutzer, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return 'Nutzer {}'.format(self.email)
 
 class ScholariumProfile(UserenaBaseProfile):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,

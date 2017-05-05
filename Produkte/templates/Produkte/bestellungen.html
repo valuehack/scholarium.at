@@ -13,10 +13,10 @@
         <th>Status</th>
         <th>Plätze</th>
       </tr>
-      {% for kauf in veranstaltungen %}
+      {% for v in veranstaltungen %}
       <tr>
         <td>{{ kauf.zeit|naturaltime }}</td>
-        <td>{{ kauf.produkt }}</td>
+        <td>{{ v.bezeichnung }}</td>
         <td>{{ kauf.menge }}</td>
       </tr>
       {% endfor %}
@@ -27,7 +27,7 @@
     <h2>Keine Veranstaltungen gebucht</h2>
   </div>
   {% endif %}
-  
+
   {% if medien %}
   <div class="separator">
     <h2>Ihre Schriften und Medien</h2>

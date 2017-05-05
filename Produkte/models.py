@@ -141,10 +141,12 @@ class Kauf(models.Model):
     guthaben_davor = models.SmallIntegerField(editable=False)
 
     def __str__(self):
-        return 'Kauf von {}, {}: {}'.format(
+        return 'Kauf von {} am {}: {} Nr. {} im Format {}'.format(
             self.nutzer.user.__str__(),
             self.zeit.strftime('%x, %H:%M'),
-            self.produkt.__str__())
+            self.produkt_model.__str__(), 
+            self.produkt_id, 
+            self.produkt_art)
 
     class Meta():
         verbose_name_plural = 'Käufe'

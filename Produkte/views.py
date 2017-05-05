@@ -219,8 +219,10 @@ def bestellungen(request):
     nutzer = request.user.my_profile
     liste_menue = erstelle_liste_menue(request.user)
     kaeufe = Kauf.objects.filter(nutzer=nutzer)
-    medien = [kauf for kauf in kaeufe if kauf.produkt.zu_medium]
-    veranstaltungen = [kauf for kauf in kaeufe if kauf.produkt.zu_veranstaltung]
+    kaeufe_v = [v for v in kaeufe if v.produkt_model.model == 'veranstaltung']
+    veranstaltungen = [v.produkt_model.get_object_for_this_type(pk=v.produkt_id) for v in kaeufe_v]
+#    pdb.set_trace()
+    medien = []
     return render(request, 
         'Produkte/bestellungen.html', 
         {'medien': medien, 
@@ -234,17 +236,19 @@ def kaufen(request):
     if nutzer.guthaben < warenkorb.count_total_price():
         return HttpResponse('Guthaben reicht nicht aus!') # das schöner machen!
     
-    waren = warenkorb.list_items()
-    for ware in waren:
+    for pk, ware in list(warenkorb.items.items()):
+        model_name, obj_pk, art = Warenkorb.tupel_aus_pk(pk)
         guthaben = nutzer.guthaben
         kauf = Kauf.objects.create(
             nutzer=nutzer,
-            produkt_id=ware.obj.pk,
+            produkt_model=ContentType.objects.get(model=model_name),
+            produkt_id = obj_pk, 
+            produkt_art = art,
             menge=ware.quantity,
             guthaben_davor=guthaben)
         nutzer.guthaben = guthaben - ware.total
         nutzer.save()
-        warenkorb.remove(ware.obj.pk)
+        warenkorb.remove(pk)
         
     return HttpResponseRedirect(reverse('Produkte:warenkorb'))
 
