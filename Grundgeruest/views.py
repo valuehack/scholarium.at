@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from django.db import transaction
 import sqlite3 as lite
-import pdb
+import os, pdb
 from .models import *
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung, Medium
@@ -21,7 +21,6 @@ from Bibliothek.models import Buch
 from .forms import ZahlungFormular
 from datetime import date
 
-import pdb
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated():
@@ -248,6 +247,32 @@ def aus_datei_mitglieder_einlesen(request):
             profil.save()
             signup.save()
             nutzer.save()
+
+def aus_alter_db_einlesen():
+    """ liest Mitwirkende aus alter db (als .sqlite exportiert) aus 
+    !! Achtung, löscht davor die aktuellen Einträge !! """
+    
+    Mitwirkende.objects.all().delete()
+    
+    con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
+    with con:
+        con.row_factory = lite.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM crew;")
+
+        zeilen = [dict(zeile) for zeile in cur.fetchall()]
+
+    with transaction.atomic():
+        for person in zeilen:
+            neu = Mitwirkende.objects.create(alt_id=person['id'])
+                
+            for attr in ['name', 'text_de', 'text_en', 'link', 'level', 
+                'start', 'end']:
+                if person[attr] == '0000-00-00':
+                    person[attr] = '1111-01-01'
+                setattr(neu, attr, person[attr])
+            
+            neu.save()
 
 
 def alles_aus_mysql_einlesen():

@@ -202,20 +202,25 @@ class ScholariumProfile(UserenaBaseProfile):
 
 class Mitwirkende(models.Model):
     
+    level_choices = [(1, 'Rektor'), 
+        (2, 'Gründer'), 
+        (3, 'Mitarbeiter'), 
+        (4, 'Mentor')]
+    
     name = models.CharField(max_length=100)
-    id_old = models.PositiveSmallIntegerField(default=0)
+    alt_id = models.PositiveSmallIntegerField(default=0)
     text_de = models.TextField(null=True, blank=True)
     text_en = models.TextField(null=True, blank=True)
-    link = models.CharField(max_length=200, null=True, blank=True)
+    link = models.URLField(null=True, blank=True)
     level = models.PositiveSmallIntegerField(default=1, 
-    choices=[(1, 'Rektor'), (2, 'Gründer'), (3, 'Mitarbeiter'), (4, 'Mentoren')])
+        choices=level_choices)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
     
     class Meta:
         verbose_name = "Mitwirkender"
         verbose_name_plural = "Mitwirkende"
-        ordering = ('level', 'start', 'id_old')
+        ordering = ('level', 'start', 'alt_id')
     
     def __str__(self):
         return self.name
