@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-import re
+import re, os
 from .models import Buch
 from django.db import transaction
+from seite.settings import BASE_DIR
 
 attributnamen = {
     'author': 'autor',
@@ -20,7 +21,7 @@ attributnamen = {
 
 @transaction.atomic
 def aus_datei_einlesen(request, exlibris=''):
-    f = open('../buchliste', 'r')
+    f = open(os.path.join(BASE_DIR, 'buchliste'), 'r')
     text = f.read()[7:-2] # an die bibtex-Ausgabe von zotero angepasst
     f.close()
 
