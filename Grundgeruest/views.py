@@ -19,6 +19,7 @@ from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung, Medium
 from Bibliothek.models import Buch
 from .forms import ZahlungFormular
+from datetime import date
 
 import pdb
 
@@ -292,3 +293,10 @@ def db_runterladen(request):
     
     return response
 
+class ListeAktiveMitwirkende(ListeMitMenue):
+    template_name='Gast/mitwirkende.html'
+    context_object_name='mitwirkende'
+    
+    def get_queryset(self):
+        return Mitwirkende.objects.exclude(end__lt=date.today())
+    

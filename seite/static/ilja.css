@@ -1532,3 +1532,50 @@ div.warenkorb_veranstaltung form input {
 .footer_social_youtube {
 	background: url(img/footer_social_youtube.png) no-repeat;
 }
+
+/*==================================================*/
+/*                 Mitwirkende			            */
+/*==================================================*/
+
+.crew {
+	width: 100%;
+	display: inline-block;
+	margin: 20px 0;
+}
+
+.crew__col-1 {
+	width: 20%;
+	float: left;
+	text-align: center;
+}
+
+.crew__col-1 a {
+	font-size: 14pt;
+}
+
+.crew__col-4 {
+	width: 80%;
+	float: left;
+}
+
+.crew h1 {
+	text-align: left !important;
+	font-size: 16pt !important;
+	line-height: 24pt;
+	text-shadow: 0 0 0 !important;
+    margin: 0;
+}
+
+.crew p {
+	font-family: "Garamond", Georgia, Times, serif;
+	text-align: justify;
+	-ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+
+.crew_levels {
+	font-family: "Futura Book", Helvetica, Arial, sans-serif;
+	font-size: 20pt !important;
+}

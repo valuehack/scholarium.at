@@ -17,8 +17,9 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen, zahlen
+from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen, zahlen, ListeAktiveMitwirkende
 from Grundgeruest.forms import Anmeldeformular
+from Grundgeruest.models import Mitwirkende
 from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
@@ -33,8 +34,7 @@ urlpatterns = [
             template_name='Gast/fragen.html'),
         name='gast_fragen'),
     url(r'^mitwirkende/',
-        TemplateMitMenue.as_view(
-            template_name='Gast/mitwirkende.html'),
+        ListeAktiveMitwirkende.as_view(),
         name='gast_mitwirkende'),
     url(r'^studium/$', 
         ListeMitMenue.as_view(
