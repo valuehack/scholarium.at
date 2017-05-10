@@ -22,7 +22,7 @@ salons_urls = ([
     url(r'^s', 
         views.ListeArt.as_view(), 
         {'art': 'Salon'}, name='liste_salons'),
-    url(r'^/(?P<slug>[-\w]+)/$', 
+    url(r'^(?P<slug>[-\w]+)/$', 
         views.VeranstaltungDetail.as_view(), 
         {'art': 'Salon'}, name='salon_detail'),
     ], 'Veranstaltungen')
@@ -31,8 +31,7 @@ seminare_urls = ([
     url(r'^e', 
         views.ListeArt.as_view(), 
         {'art': 'Seminar'}, name='liste_seminare'),
-    url(r'^/(?P<slug>[-\w]+)/$', 
+    url(r'^(?P<slug>[-\w]+)/$', 
         views.VeranstaltungDetail.as_view(), 
         {'art': 'Seminar'}, name='seminar_detail'),
     ], 'Veranstaltungen')
-

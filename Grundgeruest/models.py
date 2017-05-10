@@ -200,25 +200,23 @@ class ScholariumProfile(UserenaBaseProfile):
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
 
-
 class Mitwirkende(models.Model):
+    
     name = models.CharField(max_length=100)
+    id_old = models.PositiveSmallIntegerField(default=0)
     text_de = models.TextField(null=True, blank=True)
     text_en = models.TextField(null=True, blank=True)
     link = models.CharField(max_length=200, null=True, blank=True)
-    level = models.CharField(max_length=30)
+    level = models.PositiveSmallIntegerField(default=1, 
+    choices=[(1, 'Rektor'), (2, 'Gründer'), (3, 'Mitarbeiter'), (4, 'Mentoren')])
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
+    
     class Meta:
         verbose_name = "Mitwirkender"
         verbose_name_plural = "Mitwirkende"
+        ordering = ('level', 'start', 'id_old')
     
     def __str__(self):
         return self.name
-
-    #def gegenwerte_html(self):
-    #    gegenwerte = []
-    #    for i in range(1, 7):
-    #        if getattr(self, 'gegenwert%s' % i):
-    #            gegenwerte.append(getattr(self, 'gegenwert%s' % i))
-    #    return gegenwerte
+        
