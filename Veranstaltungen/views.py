@@ -14,20 +14,38 @@ class ListeAlle(ListeMitMenue):
     context_object_name = 'veranstaltungen'
     paginate_by = 3
     model = Veranstaltung
+
+def liste_veranstaltungen(request, art):
+    if request.user.is_authenticated():
+        template_name = 'Veranstaltungen/liste_veranstaltungen.html'
+    else:
+        template_name = 'Veranstaltungen/liste_veranstaltungen_gast.html'
+    
+    return ListeArt.as_view(
+        template_name=template_name,
+        art=art)(request)
     
 class ListeArt(ListeAlle):
-    """ Stellt Liste der Seminare oder Salons dar
+    """ Klasse zur Darstellung der Seminare oder Salons
+    Bekommt als kwargs art übergeben und ob user.is_authenticated()
     """
-    template_name = 'Veranstaltungen/liste_veranstaltungen.html'
-    veranstaltungen = Veranstaltung.objects.filter(datum__gte=date.today())
-    extra_context = {'veranstaltungen': veranstaltungen.order_by('datum')}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.art_model = get_object_or_404(
+            ArtDerVeranstaltung, bezeichnung=self.art)
+        veranstaltungen = Veranstaltung.objects.filter(
+            datum__gte=date.today()).filter(
+            art_veranstaltung=self.art_model).order_by('datum')
+        self.extra_context = {
+            'veranstaltungen': veranstaltungen, 
+            'art_veranstaltung': self.art_model}
+    
+    art = 'Salon'
     context_object_name = 'medien'
     paginate_by = 3
     def get_queryset(self, **kwargs):
-        art_name = self.kwargs['art']
-        art = get_object_or_404(ArtDerVeranstaltung, bezeichnung=art_name)
         medien = [medium for medium in Medium.objects.all()
-            if medium.gehoert_zu.art_veranstaltung.bezeichnung==art_name
+            if medium.gehoert_zu.art_veranstaltung==self.art_model
             and medium.gehoert_zu.datum <= date.today()]
         medien.sort(key = lambda m: m.datum, reverse=True)
         return medien
@@ -104,3 +122,4 @@ def aus_alter_db_einlesen():
                 datum=zeile['start'].split(' ')[0])
             m = Medium.objects.create(gehoert_zu=v)
             m.link = zeile['livestream']
+            m.save()

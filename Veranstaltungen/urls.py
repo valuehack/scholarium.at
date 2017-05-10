@@ -20,7 +20,7 @@ veranstaltungen_urls = ([
 
 salons_urls = ([
     url(r'^s', 
-        views.ListeArt.as_view(), 
+        views.liste_veranstaltungen, 
         {'art': 'Salon'}, name='liste_salons'),
     url(r'^/(?P<slug>[-\w]+)/$', 
         views.VeranstaltungDetail.as_view(), 
@@ -29,7 +29,7 @@ salons_urls = ([
 
 seminare_urls = ([
     url(r'^e', 
-        views.ListeArt.as_view(), 
+        views.liste_veranstaltungen, 
         {'art': 'Seminar'}, name='liste_seminare'),
     url(r'^/(?P<slug>[-\w]+)/$', 
         views.VeranstaltungDetail.as_view(), 

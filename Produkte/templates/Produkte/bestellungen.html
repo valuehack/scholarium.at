@@ -2,7 +2,7 @@
 
   <h1> Übersicht Ihrer Bestellungen</h1>
 
-  {% if veranstaltungen %}
+  {% if kaeufe.veranstaltung %}{% with liste_v=kaeufe.veranstaltung %}
   <div class="separator">
     <h2>Ihre Veranstaltungen</h2>
   </div>
@@ -10,25 +10,25 @@
     <table>
       <tr>
         <th/>
-        <th>Status</th>
+        <th>Zeit</th>
         <th>Plätze</th>
       </tr>
-      {% for v in veranstaltungen %}
+      {% for kauf in liste_v %}
       <tr>
+        <td>{% include "Produkte/warenkorb_veranstaltung.html" with obj=kauf.objekt_ausgeben %}</td>
         <td>{{ kauf.zeit|naturaltime }}</td>
-        <td>{{ v.bezeichnung }}</td>
         <td>{{ kauf.menge }}</td>
       </tr>
       {% endfor %}
     </table>
   </div>
-  {% else %}
+  {% endwith %}{% else %}
   <div class="separator" style="margin-bottom: 100px">
     <h2>Keine Veranstaltungen gebucht</h2>
   </div>
   {% endif %}
 
-  {% if medien %}
+  {% if kaeufe.medium %}{% with liste_v=kaeufe.veranstaltung %}
   <div class="separator">
     <h2>Ihre Schriften und Medien</h2>
   </div>
@@ -48,7 +48,7 @@
       {% endfor %}
     </table>
   </div>
-  {% else %}
+  {% endwith %}{% else %}
   <div class="separator" style="margin-bottom: 100px">
     <h2>Keine Medien gebucht</h2>
   </div>

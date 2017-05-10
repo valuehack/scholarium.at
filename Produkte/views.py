@@ -10,7 +10,7 @@ import pdb
 
 from easycart import BaseCart, BaseItem
 from Grundgeruest.views import erstelle_liste_menue
-from .models import Kauf, Produkt
+from .models import Kauf
 
 """
 Integration des Pakets easycart - keine Modelle, über session Variablen
@@ -86,30 +86,31 @@ class Ware(BaseItem):
         extra_args = ['{}={}'.format(k, getattr(self, k)) for k in self._kwargs]
         args_repr = ', '.join([main_args] + extra_args)
         return  '<Ware: ' + args_repr + '>'
-
+    
+    def model_ausgeben(self):
+        return self.obj.__class__.__name__.lower()
 
 class Warenkorb(BaseCart):
     item_class = Ware
     
     @staticmethod
     def tupel_aus_pk(pk):
-        model_name, obj_pk, art = str(pk).split('; ')
-        return model_name, obj_pk, art
+        return Kauf.tupel_aus_pk(pk)
 
     @staticmethod
     def tupel_zu_pk(tupel_pk):
-        model_name, obj_pk, art = [str(x) for x in tupel_pk]
-        return '; '.join([model_name, obj_pk, art])    
+        return Kauf.tupel_zu_pk(tupel_pk)
+    
+    def items_ausgeben(self):
+        """ gibt pk-ware-Paare zurück; brauche ich im Template, da sonst
+        die Items nicht initialisiert sind """
+        return list(self.items.items())
     
     def get_queryset(self, pks):
-        """ Liest Objekte aus den übergebenen pks aus 
-        jeder pk wird in drei Teile zerlegt und die ersten beiden verwendet
-        um die Tabelle an der richtigen Zeile auszulesen """
+        """ Gibt Liste der Objekte zu den übergebenen pks zurück """
         objekte = []
         for pk in pks:
-            model_name, obj_pk, art = self.tupel_aus_pk(pk)
-            model = ContentType.objects.get(model=model_name)
-            objekte.append(model.get_object_for_this_type(pk=obj_pk))
+            objekte.append(Kauf.obj_aus_pk(pk))
         return objekte
 
     def encode(self, formatter=None):
@@ -218,38 +219,31 @@ class Warenkorb(BaseCart):
 def bestellungen(request):
     nutzer = request.user.my_profile
     liste_menue = erstelle_liste_menue(request.user)
-    kaeufe = Kauf.objects.filter(nutzer=nutzer)
-    kaeufe_v = [v for v in kaeufe if v.produkt_model.model == 'veranstaltung']
-    veranstaltungen = [v.produkt_model.get_object_for_this_type(pk=v.produkt_id) for v in kaeufe_v]
-#    pdb.set_trace()
-    medien = []
+    liste_kaeufe = Kauf.objects.filter(nutzer=nutzer)
+    # verteile Käufe nach model:
+    kaeufe = {}
+    for kauf in liste_kaeufe:
+        model = kauf.model_ausgeben() # ein string
+        if not model in kaeufe:
+            kaeufe[model] = [kauf, ]
+        else: 
+            kaeufe[model].append(kauf)
+    
     return render(request, 
         'Produkte/bestellungen.html', 
-        {'medien': medien, 
-            'veranstaltungen': veranstaltungen, 
-            'liste_menue': liste_menue,
-        })
+        {'kaeufe': kaeufe, 'liste_menue': liste_menue})
 
 def kaufen(request):
     warenkorb = Warenkorb(request)
     nutzer = request.user.my_profile
     if nutzer.guthaben < warenkorb.count_total_price():
         return HttpResponse('Guthaben reicht nicht aus!') # das schöner machen!
-    
-    for pk, ware in list(warenkorb.items.items()):
-        model_name, obj_pk, art = Warenkorb.tupel_aus_pk(pk)
-        guthaben = nutzer.guthaben
-        kauf = Kauf.objects.create(
-            nutzer=nutzer,
-            produkt_model=ContentType.objects.get(model=model_name),
-            produkt_id = obj_pk, 
-            produkt_art = art,
-            menge=ware.quantity,
-            guthaben_davor=guthaben)
-        nutzer.guthaben = guthaben - ware.total
-        nutzer.save()
-        warenkorb.remove(pk)
         
+    for pk, ware in list(warenkorb.items.items()):
+        Kauf.kauf_ausfuehren(nutzer, pk, ware)
+    
+    warenkorb.empty()
+                
     return HttpResponseRedirect(reverse('Produkte:warenkorb'))
 
 

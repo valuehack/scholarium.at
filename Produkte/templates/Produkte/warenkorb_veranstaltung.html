@@ -1,0 +1,18 @@
+{% load static humanize %}
+
+{% with v=obj %}
+
+  <div class="warenkorb_veranstaltung">
+    <span>{{ v.art_veranstaltung.bezeichnung }}</span>
+    <span>
+      <a href="{% url 'Veranstaltungen:veranstaltung_detail' v.slug %}">{{ v.bezeichnung }}</a>
+    </span>
+    <span>{{ v.datum|naturalday }}</span>
+    <span>Vor Ort</span>
+    <form action="{% url 'Produkte:cart-remove' %}" method="post">
+    	{% csrf_token %}
+      <input type="hidden" name="pk" value={{ pk }}>
+      <input type="submit" value="Entfernen">
+    </form>
+  </div>
+{% endwith %}

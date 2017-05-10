@@ -1,9 +1,10 @@
-{% load static %}
+{% for m in veranstaltung.medium_set.all %}
   <div style="text-align: center;">
     <div class="salon_reservation">
       <span class="salon_reservation_span_a">
 		    Die Aufzeichnung buchen: </span><br>
-        {% include 'Produkte/in_den_warenkorb.html' with produkt=veranstaltung art=veranstaltung.liste_arten.1 %}
+        {% include 'Produkte/in_den_warenkorb.html' with produkt=m art='livestream' max_anzahl=5 %}
       </div>
     </div>
   </div>
+{% endfor %}

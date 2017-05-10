@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="salon_info">
+    <h1>{{ art_veranstaltung.bezeichnung }}</h1>
+    {{ art_veranstaltung.beschreibung|safe }}
+  </div>
+  <div class="separator">
+    <h2>Die kommenden Veranstaltungen</h2>
+  </div>
+  <div class="veranstaltungen">
+  {% for veranstaltung in veranstaltungen %}
+    <div class="veranstaltung">
+      {% include 'Veranstaltungen/titel_veranstaltung.html' with veranstaltung=veranstaltung %}
+      <p>{{ veranstaltung.beschreibung|safe }}</p>
+      <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+    </div>
+  {% endfor %}
+  </div>
+{% endblock content %}

@@ -57,9 +57,11 @@ def daten_einlesen(request):
     
 
 def aus_alter_db_einlesen():
-    """ liest scholienartikel aus alter db (als .sqlite exportiert) aus 
+    """ liest scholienartikel und scholienbuechlein aus alter db (als 
+    .sqlite exportiert) aus 
     !! Achtung, löscht davor die aktuellen Einträge !! """
     
+    # zuerst Artikel auslesen
     models.Artikel.objects.all().delete()
     
     con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
@@ -69,12 +71,38 @@ def aus_alter_db_einlesen():
         cur.execute("SELECT * FROM blog;")
 
         zeilen = [dict(zeile) for zeile in cur.fetchall()]
-        with transaction.atomic():
-            for scholie in zeilen:
-                if scholie['publ_date'] == '0000-00-00':
-                    scholie['publ_date'] = '1111-01-01'
-                models.Artikel.objects.create(
-                    bezeichnung=scholie['title'],
-                    inhalt=scholie['public_text'],
-                    inhalt_nur_fuer_angemeldet=scholie['private_text'],
-                    datum_publizieren=scholie['publ_date'])
+
+    with transaction.atomic():
+        for scholie in zeilen:
+            if scholie['publ_date'] == '0000-00-00':
+                scholie['publ_date'] = '1111-01-01'
+            models.Artikel.objects.create(
+                bezeichnung=scholie['title'],
+                inhalt=scholie['public_text'],
+                inhalt_nur_fuer_angemeldet=scholie['private_text'],
+                datum_publizieren=scholie['publ_date'])
+
+    # und Büchlein auslesen
+    # es fehlt einiges, insb. die pdfs einzutragen
+    models.Buechlein.objects.all().delete()
+    
+    con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
+    with con:
+        con.row_factory = lite.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM produkte WHERE type='scholie';")
+
+        zeilen = [dict(zeile) for zeile in cur.fetchall()]
+
+    with transaction.atomic():
+        for scholie in zeilen:
+            buch = models.Buechlein.objects.create(
+                bezeichnung=scholie['title'],
+                beschreibung=scholie['text'],
+                alte_nr=scholie['n'])
+            
+            dateiname = scholie['id']+'.jpg'
+            buch.bild_holen(
+                'http://www.scholarium.at/schriften/'+dateiname,
+                dateiname)
+            buch.save()

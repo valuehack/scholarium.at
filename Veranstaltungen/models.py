@@ -12,68 +12,51 @@ from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
 from django.core.urlresolvers import reverse
 import random, string
-
-class ArtDerVeranstaltung(Grundklasse):
-    beschreibung = models.TextField(
-        max_length=1200, 
-        null=True, blank=True)    
-    preis_praesenz = models.SmallIntegerField()
-    preis_livestream = models.SmallIntegerField(null=True, blank=True)
-    preis_aufzeichnung = models.SmallIntegerField(null=True, blank=True)
-    max_teilnehmer = models.SmallIntegerField(null=True, blank=True)
-    zeit_beginn = models.TimeField()
-    zeit_ende = models.TimeField()
-    class Meta:
-        verbose_name_plural = "Arten der Veranstaltungen"
     
+
 class Veranstaltung(KlasseMitProdukten):
     beschreibung = models.TextField()
     datum = models.DateField()
-    art_veranstaltung = models.ForeignKey(ArtDerVeranstaltung)
+    art_veranstaltung = models.ForeignKey('ArtDerVeranstaltung')
+    
+    arten_liste = ['teilnahme', ]
+
     class Meta:
         verbose_name_plural = "Veranstaltungen"
     
-    liste_arten = [1, 2]
-    def preis_ausgeben(self, art):
-        """ Preis ausgeben, je nach Veranstaltung und art (Format) """
-        #if self.preis:
-        #    return self.preis
-        
-        art = int(art)
-        if art == 1:
+    def preis_ausgeben(self, art='teilnahme'):
+        """ Preis ausgeben, es gibt nur eine art für Präsenz? oder Medium-model hier einfügen, dann mehr? """
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+        elif self.finde_preis(art):
+            return self.finde_preis(art)
+        else: # das ändern, falls es mehrere Arten gibt
             return self.art_veranstaltung.preis_praesenz
-        elif art == 2: 
-            return self.art_veranstaltung.preis_aufzeichnung
     
     def get_url(self):
         if self.art_veranstaltung.bezeichnung == 'Salon':
             return '/salon/%s' % self.slug
         elif self.art_veranstaltung.bezeichnung == 'Seminar':
             return '/seminar/%s' % self.slug
+    
 
 class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()
     beschreibung2 = models.TextField()
+    arten_liste = ['teilnahme', ]
     class Meta:
         verbose_name_plural = "Studiendinger"
-    
-    def get_preis(self):
-        return "Noch nicht implementiert"
-    
+        
+
 class Medium(KlasseMitProdukten):
     gehoert_zu = models.ForeignKey(Veranstaltung, null=True, blank=True)
-    datei = models.FileField()
+    datei = models.FileField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
+    arten_liste = ['livestream', 'aufzeichnung']
     # folgendes v.a. relevant wenn keine Veranstaltung verknüpft ist:
     typ = models.CharField(max_length=30, null=True, blank=True)
     beschreibung = models.TextField(max_length=2000, null=True, blank=True)
     datum = models.DateField(blank=True, null=True)
-    
-    def get_preis(self):
-        if self.gehoert_zu:
-            return self.gehoert_zu.art_veranstaltung.preis_aufzeichnung
-        else:
-            return 999
     
     class Meta:
         verbose_name_plural = "Medien"
@@ -81,12 +64,27 @@ class Medium(KlasseMitProdukten):
     def __str__(self):
         return '{} ({})'.format(self.bezeichnung, self.slug) 
         
-    def save(self, **kwargs):
+    def save(self, *args, **kwargs):
         self.beschreibung = self.beschreibung or self.gehoert_zu.beschreibung
         self.bezeichnung = self.bezeichnung or self.gehoert_zu.bezeichnung
-        self.typ = self.typ or self.gehoert_zu.art_veranstaltung
+        self.typ = self.typ or self.gehoert_zu.art_veranstaltung.bezeichnung
         self.datum = self.datum or self.gehoert_zu.datum
         if not self.pk:
             self.slug = ''.join(random.sample(string.ascii_lowercase, 12))
-        super().save(**kwargs)
+        super().save(*args, **kwargs)
         
+
+class ArtDerVeranstaltung(Grundklasse):
+    beschreibung = models.TextField(
+        max_length=1200, 
+        null=True, blank=True)    
+    preis_praesenz = models.SmallIntegerField()
+    # Achtung, hier Felder einfügen wenn mehr Arten von Medien dazukommen
+    preis_livestream = models.SmallIntegerField(null=True, blank=True)
+    preis_aufzeichnung = models.SmallIntegerField(null=True, blank=True)
+
+    max_teilnehmer = models.SmallIntegerField(null=True, blank=True)
+    zeit_beginn = models.TimeField()
+    zeit_ende = models.TimeField()
+    class Meta:
+        verbose_name_plural = "Arten der Veranstaltungen"

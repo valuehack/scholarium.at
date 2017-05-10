@@ -3,136 +3,104 @@ Modelle für Produkt und die Grundklasse für Veranstaltungen etc., aus der man
 dann leicht Produkte erstellen können soll.
 """
 
+import json, six, functools
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from seite.models import Grundklasse
+from django.db.models.base import ModelBase
 
 
-class KlasseMitProdukten(Grundklasse):
-    def erstelle_produkt(self):
-        """ veraltet, bald löschen """
-        attribut_name = 'zu_'+self.__class__.__name__.lower()
-        p = Produkt(bezeichnung=self.bezeichnung)
-        p.__setattr__(attribut_name, self)
-        p.save()
-        return None
-    
-    # evtl. zu überschreiben, Liste der Formate, für Schleife im Template
-    liste_arten = [0]
-    
-    def pk_ausgeben(self):
-        """ Gibt die Kennung des Produktes (contenttype, id), wie es der 
-        Warenkorb-Item braucht, zurück, dahinter muss noch die art. Zur 
-        Verwendung in Templates. 
-        Da muss noch was geändert werden, ist nicht DRY, vermutlich die 
-        Funktionen tupel_zu_pk und tupel_aus_pk von der Item-Klasse nach 
-        hier angepasst verschieben? """
-        return '; '.join([
-            self.__class__.__name__.lower(), 
-            str(self.pk), 
-            '',
-        ])
-    
-    def preis_ausgeben(self, art):
-        """ Default-Implementation einer Preis-Funktion, die sollte bei 
-        jeder Klasse überschrieben werden. Grundsätzlich sollten nur 
-        Klassen, die nur eine Art haben den Parameter art==0 akzeptieren;
-        wenn es mehrere gibt, dann heißen die zur Vermeidung von Fehlern 
-        1 bis n """
-        if art == 0:
-            return 0
-        else: 
-            return 999
+class PreiseMetaklasse(ModelBase):
+    """ Metaklasse, die die Metaklasse ModelBase aufruft 
+    Soll der KlasseMitProdukten (und allen Erben) Felder für den Preis und 
+    die Mengen der Produktarten hinzufügen. Nutzt dazu Einträge der in den 
+    Klassen gesetzte arten_liste.
+    Das ist so kompliziert, damit dynamisch (aus der arten_liste als DRY
+    Datenquelle) automatisch alles erzeugt wird (und der Nutzer, der neu
+    von KlasseMitProdukt erbt das nicht vergessen kann) 
+    (vermutlich hätte auch __init_subclass__() zu verwenden geklappt, wäre
+    auch einfacher, habe ich aber erst später gefunden
+    """
+    def __new__(cls, name, parents, attribute):
+        super_new = super().__new__ # der Konstruktor von ModelBase
+        NeueKlasse = super_new(cls, name, parents, attribute)
+                
+        def setze_anzahl(self, art, anzahl):
+            setattr(self, 'anzahl_'+art, anzahl)
+
+        def setze_preis(self, art, preis):
+            setattr(self, 'preis_'+art, preis)
+
+        def finde_anzahl(self, art):
+            return getattr(self, 'anzahl_'+art)
+
+        def finde_preis(self, art):
+            return getattr(self, 'preis_'+art)
         
-    def save(self, **kwargs):
-        """ auch bald löschen? """
-        if not self.id:
-            super().save(**kwargs)
-            self.erstelle_produkt()
+        fkts = [setze_anzahl, finde_anzahl, setze_preis, finde_preis]
+        
+        # für KlasseMitProdukten allgemeine Funktionen setzen, die werden
+        # an die Kinder vererbt; spezielle Funktionen erst bei den Kindern
+        # setzen und vor allem Felder nur bei Kindern initialisieren
+        if name=='KlasseMitProdukten':
+            for fkt in fkts:
+                setattr(NeueKlasse, fkt.__name__, fkt)
         else:
-            super().save(**kwargs)
+            for art in NeueKlasse.arten_liste:
+                NeueKlasse.add_to_class(
+                    'preis_%s' % art, 
+                    models.SmallIntegerField(null=True, blank=True))
+                NeueKlasse.add_to_class(
+                    'anzahl_%s' % art, 
+                    models.SmallIntegerField(default=0, blank=True))
+                for fkt in fkts:
+                    setattr(NeueKlasse, 
+                        fkt.__name__+'_'+art, 
+                        functools.partialmethod(fkt, art))
+        
+        return NeueKlasse
 
+
+class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
+    """ Von dieser Klasse erbt alles, was man in den Warenkorb legen kann 
+    """
+    
+    """ Liste aller möglichen Formate der Produktklasse """ 
+    arten_liste = ['spam'] # Liste von <art> str
+    
+    def pk_ausgeben(self, art=0):
+        """ Gibt die pk (für Warenkorb-Item) zurück
+        Wird vom Templatetag {% produkt_pk <art> %} genutzt.
+        """
+        return Kauf.obj_zu_pk(self, art)
+            
+    def preis_ausgeben(self, art=0):
+        """ Default-Implementation einer Preis-Funktion, die vom Warenkorb-
+        Item verwendet wird. Kann bei jeder Klasse überschrieben werden. 
+        Wird auch vom Templatetag {% preis <art> %} genutzt. """
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+        else: 
+            return self.finde_preis(art)
+    
     class Meta:
         abstract = True
 
 
-class Produkt(Grundklasse):
-    """ brauchen wir nicht mehr, bald löschen """
-    zu_veranstaltung = models.ForeignKey(
-        "Veranstaltungen.Veranstaltung",
-        null=True, blank=True,
-        on_delete=models.SET_NULL)
-    zu_medium = models.ForeignKey(
-        "Veranstaltungen.Medium",
-        null=True, blank=True,
-        on_delete=models.SET_NULL)
-    zu_studiumdings = models.ForeignKey(
-        "Veranstaltungen.Studiumdings",
-        null=True, blank=True,
-        on_delete=models.SET_NULL)
-#    zu_buechlein = models.ForeignKey(
-#        "Scholien.Buechlein",
-#        null=True, blank=True,
-#        on_delete=models.SET_NULL)
-#    zu_buch = models.ForeignKey(
-#        "Bibliothek.Buch",
-#        null=True, blank=True,
-#        on_delete=models.SET_NULL)
-    preis = models.SmallIntegerField(blank=True, null=True)
-    #kaeufe = models.ManyToManyField(
-    #    'Grundgeruest.ScholariumProfile',
-    #    through='Kauf',
-    #    editable=False)
-
-    # vielleicht ist das Quatsch, weil gedoppelt mit zu_xy-Attribut
-    art_choices = [('Teilnahme', )*2,
-        ('Livestream', )*2,
-        ('Videoaufzeichnung', )*2,
-        ('Audioaufzeichnung', )*2, ]
-    art_produkt = models.CharField(
-        max_length=25,
-        choices=art_choices,
-        default='')
-
-    @property
-    def get_preis(self):
-        if self.preis: # Achtung Preis=0 kommt nicht in diesen Ast
-            print('eigener')
-            return self.preis
-        elif self.zu_veranstaltung:
-            print('von veranstaltung')
-            return self.zu_veranstaltung.get_preis()
-        elif self.zu_medium:
-            print('von medium')
-            return self.zu_medium.get_preis()
-        else:
-            return 888
-
-    def __str__(self):
-        if self.zu_veranstaltung:
-            return 'Teilnahme an {}'.format(self.zu_veranstaltung)
-        elif self.zu_medium:
-            return 'Medium zu {}'.format(self.zu_medium)
-        elif self.zu_studiumdings:
-            return 'Studium: {}'.format(self.zu_studiumdings)
-        else:
-            return 'Produkt: nicht Teilnahme/Medium/Studium, bitte Produkt.__str__() anpassen'
-    
-    class Meta:
-        verbose_name_plural = 'Produkte'
-
-
 class Kauf(models.Model):
+    """ Verknüpft Nutzer und Waren (im Form von 3-teiliger pk gespeichert)
+     
+    Die Klasse soll die definitive source of information für alle Methoden,
+    die mit der Konversion von pk und Objekten und mit der Ausgabe der
+    Eigenschaften zu tun haben, sein. 
+    views.Warenkorb erbt ein paar Methoden, und in den Templates sollen sie
+    genutzt werden um alle Daten zum Objekt des Kaufs zu bekommen.
+    """
     nutzer = models.ForeignKey(
         'Grundgeruest.ScholariumProfile',
         on_delete=models.SET_NULL,
         null=True)
-    produkt_model = models.ForeignKey(
-        ContentType,
-        on_delete=models.SET_NULL,
-        null=True,)
-    produkt_id = models.SmallIntegerField(null=True)
-    produkt_art = models.SmallIntegerField(null=True)
+    produkt_pk = models.CharField(max_length=30)
     menge = models.SmallIntegerField(blank=True, default=1)
     zeit = models.DateTimeField(
         auto_now_add=True,
@@ -140,13 +108,89 @@ class Kauf(models.Model):
     # falls was schief geht, wird das Guthaben gecached:
     guthaben_davor = models.SmallIntegerField(editable=False)
 
+    
+    # 2 Hilfsfunktionen um pk in drei Teile zu spalten und zurück:
+    @staticmethod
+    def tupel_aus_pk(pk):
+        model_name, obj_pk, art = str(pk).split('+')
+        return model_name, obj_pk, art
+
+    @staticmethod
+    def tupel_zu_pk(tupel_pk):
+        model_name, obj_pk, art = [str(x) for x in tupel_pk]
+        return '+'.join([model_name, obj_pk, art])    
+
+    # von der pk auf's Objekt zugreifen und rückwärts pk kostruieren:
+    @staticmethod
+    def obj_aus_pk(pk):
+        """ Liest Objekt aus dem übergebenen pk aus 
+        pk wird in drei Teile zerlegt und die ersten beiden verwendet
+        um die Tabelle an der richtigen Zeile auszulesen 
+        """
+        model_name, obj_pk, art = Kauf.tupel_aus_pk(pk)
+        objekt = ContentType.objects.get(
+            model=model_name).get_object_for_this_type(
+            pk=obj_pk)
+        return objekt
+
+    @staticmethod
+    def obj_zu_pk(objekt, art=0):
+        """ Erzeugt zu einem Objekt (und art) die Kennung des Produktes 
+        (contenttype, id), und gibt den pk, wie es der Warenkorb-Item 
+        braucht, zurück. 
+        """
+        return Kauf.tupel_zu_pk([
+            objekt.__class__.__name__.lower(), 
+            str(objekt.pk), 
+            str(art),
+        ])
+    
+    def pk_ausgeben(self):
+        """ Gibt pk des 'verknüpften' Objektes als string aus """
+        return self.produkt_pk
+
+    def model_ausgeben(self):
+        """ Gibt den model-Namen des 'verknüpften' Objektes aus """
+        return self.tupel_aus_pk(self.pk_ausgeben())[0]
+
+    def art_ausgeben(self):
+        """ Gibt die Nr der Art des 'verknüpften' Objektes aus """
+        return self.tupel_aus_pk(self.pk_ausgeben())[2]
+    
+    def objekt_ausgeben(self, mit_art=False):
+        """ Gibt das 'verknüpfte' Objekt zurück, das was django bei einem 
+        ForeignKey sonst automatisch erledigen würde """
+        if mit_art:
+            return self.obj_aus_pk(self.produkt_pk), self.art_ausgeben()
+        else:
+            return self.obj_aus_pk(self.produkt_pk)
+    
+    @staticmethod
+    def kauf_ausfuehren(nutzer, pk, ware):
+        """ Führt die Kaufabwicklung aus, d.h. legt ein neues Kauf-Objekt
+        an und zieht dem Nutzer Guthaben ab. Muss einen Warenkorb-Item 
+        übergeben bekommen, da dort die Menge steht und .total() genutzt
+        wird für den Preis. """
+        guthaben = nutzer.guthaben
+        kauf = Kauf.objects.create(
+            nutzer=nutzer,
+            produkt_pk=pk,
+            menge=ware.quantity,
+            guthaben_davor=guthaben)
+        nutzer.guthaben = guthaben - ware.total
+        nutzer.save()
+        return kauf
+        
     def __str__(self):
-        return 'Kauf von {} am {}: {} Nr. {} im Format {}'.format(
+        objekt, art = self.objekt_ausgeben(mit_art=True)
+        text = '{} hat am {} gekauft: {}'.format(
             self.nutzer.user.__str__(),
             self.zeit.strftime('%x, %H:%M'),
-            self.produkt_model.__str__(), 
-            self.produkt_id, 
-            self.produkt_art)
+            objekt.__str__())
+        if art != 0:
+            text += ' im Format {}'.format(art)
+        
+        return text
 
     class Meta():
         verbose_name_plural = 'Käufe'

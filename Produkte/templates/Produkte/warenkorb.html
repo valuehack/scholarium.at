@@ -6,20 +6,20 @@
   <div class="separator">
     <h2>Ihr Warenkorb</h2>
   </div>
-  <table class="warenkorb"> 
+  <table class="warenkorb">
     <thead>
       <th></th>
       <th>Kosten</th>
       <th>Menge</th>
     </thead>
     <tbody>
-      {% for item in cart.list_items %}
+      {% for paar in cart.items_ausgeben %}{% with pk=paar.0 ware=paar.1 %}
       <tr>
-        <td>{% include "Produkte/warenkorb_item.html" %}</td>
-        <td>{{ item.price }}<img class='dropdown_coin' src="{% static 'img/coin.png' %}"></td>
-        <td>{{ item.quantity }}</td>
+        <td>{% include "Produkte/warenkorb_"|add:ware.model_ausgeben|add:".html" with pk=pk obj=ware.obj %}</td>
+        <td>{{ ware.price }}<img class='dropdown_coin' src="{% static 'img/coin.png' %}"></td>
+        <td>{{ ware.quantity }}</td>
       </tr>
-      {% endfor %}
+      {% endwith %}{% endfor %}
     </tbody>
     <tfoot>
       <td>Summe {{ cart.item_count }} Artikel:</td>

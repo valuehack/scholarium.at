@@ -770,6 +770,27 @@ a.blog_linkbutton:visited {
 }
 
 
+/* Scholienbüchlein */
+div.scholienbuechlein {
+    display: flex;
+    display: -webkit-flex;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+    -webkit-justify-content: space-around; 
+    justify-content: space-around;
+    -webkit-align-items: center; 
+    align-items: center;
+}
+
+div.scholienbuechlein > img {
+    width: 16%;
+    height: auto;
+}
+
+div.scholienbuechlein > div {
+    width: 75%;
+}
+
 /* Veranstaltungen */
 
 div.veranstaltungen {
@@ -862,6 +883,29 @@ p.linie img {
 	text-transform: uppercase;
 	margin-top: 0;
 }
+
+/*übernommen*/
+.salon_info {
+	width: 800px;
+	padding-top: 0px;
+	padding-bottom: 30px;
+	margin: auto;
+}
+
+.salon_info h1 {
+	font-size: 20pt;
+	color: rgba(0,0,0,0.9);
+	margin: 50px 0 30px 0;
+	text-align: center;
+}
+
+.salon_info p {
+	line-height: 1.6em;
+	font-size: 16pt;
+	text-align: justify;
+	margin: 20px 0;
+}
+
 
 /*============== fuer detail-view, uebernommen =============*/
 .salon_content {
