@@ -46,10 +46,10 @@ def erstelle_liste_menue(user=None):
             {'bezeichnung': 'Vortrag', 'slug': 'media-vortrag'},
             ]),
             ({'bezeichnung': 'Studium', 'slug': 'studium'}, [
-            {'bezeichnung': 'Studium Generale', 'slug': 'studium'},
-            {'bezeichnung': 'craftprobe', 'slug': 'craftprobe'},
-            {'bezeichnung': 'Stipendium', 'slug': 'baader-stipendium'},
-            {'bezeichnung': 'Beratung', 'slug': 'beratung'},
+            {'bezeichnung': 'Studium Generale', 'slug': 'studium/generale'},
+            {'bezeichnung': 'craftprobe', 'slug': 'studium/craftprobe'},
+            {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
+            {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
             ]),
             ({'bezeichnung': 'Projekte', 'slug': 'projekte'}, [
             ]),
@@ -83,7 +83,8 @@ def index(request):
         liste_artikel = Artikel.objects.order_by('-datum_publizieren')[:4]
         veranstaltungen = Veranstaltung.objects.order_by('-datum')[:3]
         medien = []
-        buecher = Buch.objects.order_by('-zeit_erstellt')[:3]
+        mehr_buecher = Buch.objects.order_by('-zeit_erstellt')[:50]
+        buecher = random.sample(list(mehr_buecher), 3)
         return TemplateMitMenue.as_view(
             template_name='startseite.html',
             extra_context={
@@ -167,7 +168,7 @@ def aus_datei_mitglieder_einlesen(request):
     erstelle Liste von Nutzern und speichere sie (wegen Profil und Signup)
     füge für jeden Nutzer alle Attribute hinzu, speichere
     """
-    con = lite.connect('../alte_db.sqlite3')
+    con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
     with con:
         con.row_factory = lite.Row
         cur = con.cursor()
@@ -207,15 +208,23 @@ def aus_datei_mitglieder_einlesen(request):
     ])
     
     zeilen = zeilen[:]
-    Nutzer.objects.filter(id__gt=6).delete()    
+    Nutzer.objects.filter(id__gt=3).delete()    
         
     letzte_id = max(Nutzer.objects.all().values_list('id', flat=True))
-    liste_nutzer = Nutzer.objects.bulk_create(
-        [Nutzer(
-            username='alteDB_%s' % zeile['user_id'], 
-            id=letzte_id+1+i
-        ) for i, zeile in enumerate(zeilen)])
-        
+    
+    liste_nutzer = []
+    with transaction.atomic():
+        for i, zeile in enumerate(zeilen):
+            nutzer = Nutzer.leeren_anlegen()
+            nutzer.username = 'alteDB_%s' % zeile['user_id']
+            nutzer.is_active = True
+            nutzer.save()
+            print('alte id {} angelegt: {} vom {}'.format(
+                zeile['user_id'], 
+                zeile['user_email'], 
+                zeile['user_registration_datetime']))
+            liste_nutzer.append(nutzer)
+    
     for zeile in zeilen: # falls None drin steht, gäbe es sonst Fehler
         zeile['Vorname'] = zeile['Vorname'] or ''
         zeile['Nachname'] = zeile['Nachname'] or ''
@@ -239,14 +248,12 @@ def aus_datei_mitglieder_einlesen(request):
             eintragen_nutzer(nutzer, zeile)
             pw_alt = zeile['user_password_hash']
             nutzer.password = 'bcrypt$$2b$10${}'.format(pw_alt.split('$')[-1])
-            signup = MeinUserenaSignup.objects.get_or_create(user=nutzer)[0]
-            signup.activation_key = USERENA_ACTIVATED
-            signup.activation_notification_send = True
-            profil = ScholariumProfile.objects.create(user=nutzer)
+            nutzer.save()
+            profil = nutzer.my_profile
             eintragen_profil(profil, zeile)
             profil.save()
-            signup.save()
-            nutzer.save()
+    
+    return 'fertig'
 
 def aus_alter_db_einlesen():
     """ liest Mitwirkende aus alter db (als .sqlite exportiert) aus 

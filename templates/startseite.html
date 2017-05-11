@@ -5,7 +5,7 @@
   <div class="jubilaeum_banner">
     <a href="http://www.scholarium.at/jubilaeum">Sehen Sie sich hier die Fotos unseres vergangenen Jubiläums an</a>
   </div>
-                
+
   <div style="padding: 10px 15% 20px 15%; width: 70%; display: inline-block; color: rgb(20,20,20); margin-bottom: 30px;">
     <div class="startseite_letzter_artikel">
       {% with artikel=liste_artikel.0 %}
@@ -36,7 +36,7 @@
       </div>
       <p><a href="{% url 'Veranstaltungen:liste_alle' %}">Mehr Veranstaltungen</a></p>
     </div>
-    
+
     <div>
       <h1>Scholien</h1>
       <div>
@@ -64,13 +64,13 @@
       </div>
       <p><a href="{% url 'Veranstaltungen:liste_alle' %}">Mehr Medien</a></p>
     </div>
-    
+
     <div>
       <h1>Bücher</h1>
       <div>
         {% for buch in buecher %}
         <p>
-          <a href="{% url 'Bibliothek:liste_alle' %}">{{ buch.bezeichnung|safe }}</a>
+          <a href="{% url 'Bibliothek:detail_buch' buch.slug %}">{{ buch.bezeichnung|safe }}</a>
           <br>{{ buch.jahr }}
         </p>
         {% endfor %}

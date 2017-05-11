@@ -1,0 +1,16 @@
+{% load static humanize produkttags %}
+
+{% with dings=obj %}
+  <div class="warenkorb_veranstaltung">
+    <span> </span>
+    <span>
+      <a href="{% url 'studium_detail' dings.slug %}">{{ dings.bezeichnung }}</a>
+    </span>
+    <span></span>
+    <form action="{% url 'Produkte:cart-remove' %}" method="post">
+    	{% csrf_token %}
+      <input type="hidden" name="pk" value={{ pk }}>
+      <input type="submit" value="Entfernen">
+    </form>
+  </div>
+{% endwith %}

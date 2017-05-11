@@ -73,7 +73,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         Wird vom Templatetag {% produkt_pk <art> %} genutzt.
         """
         return Kauf.obj_zu_pk(self, art)
-            
+        
     def preis_ausgeben(self, art=0):
         """ Default-Implementation einer Preis-Funktion, die vom Warenkorb-
         Item verwendet wird. Kann bei jeder Klasse überschrieben werden. 
@@ -85,7 +85,6 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     
     class Meta:
         abstract = True
-        ordering = ['bezeichnung']
 
 
 class Kauf(models.Model):

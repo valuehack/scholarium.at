@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from datetime import date
 
 from .models import *
-from Grundgeruest.views import ListeMitMenue, DetailMitMenue
+from Grundgeruest.views import ListeMitMenue, DetailMitMenue, TemplateMitMenue
 
 
 class ListeAlle(ListeMitMenue):
@@ -83,6 +83,17 @@ def studiumdings_detail(request, slug):
             model=Studiumdings,
             context_object_name = 'studiumdings')(request, slug=slug)
 
+def vortrag(request):
+    if request.user.is_authenticated():
+        vortrag = get_object_or_404(Studiumdings, bezeichnung='Vortrag')
+        extra_context = {'vortrag': vortrag}
+    else:
+        extra_context = {}
+    return TemplateMitMenue.as_view(
+        template_name='Gast/vortrag.html', 
+        extra_context=extra_context)(request)
+
+    
 def daten_einlesen(request):
     """ wird von url aufgerufen und ruft standalone-Fkt auf """
     aus_alter_db_einlesen()
@@ -98,28 +109,45 @@ def aus_alter_db_einlesen():
     from django.conf import settings
     import os, pdb
     from django.http import HttpResponseRedirect
-
+    
+    # Seminare, Salons, Vorlesungen, Vorträge einlesen
     Veranstaltung.objects.all().delete()
     
     con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
     with con:
         con.row_factory = lite.Row
         cur = con.cursor()
-        cur.execute("SELECT * FROM produkte WHERE type in ('salon', 'seminar');")
+        cur.execute("SELECT * FROM produkte WHERE type in ('salon'," + 
+            " 'seminar', 'media-vortrag', 'media-vorlesung');")
 
         zeilen = [dict(zeile) for zeile in cur.fetchall()]
     
-    arten = {'salon': ArtDerVeranstaltung.objects.get(bezeichnung='Salon'),
-        'seminar': ArtDerVeranstaltung.objects.get(bezeichnung='Seminar')}
+    arten = {'salon': ArtDerVeranstaltung.objects.get(
+            bezeichnung='Salon'),
+        'seminar': ArtDerVeranstaltung.objects.get(
+            bezeichnung='Seminar'),
+        'media-vortrag': ArtDerVeranstaltung.objects.get(
+            bezeichnung='Vortrag'),
+        'media-vorlesung': ArtDerVeranstaltung.objects.get(
+            bezeichnung='Vorlesung'),}
     
     with transaction.atomic():
         for zeile in zeilen:
+            if zeile['type'] in ['seminar', 'salon']:
+                datum = zeile['start'] or '1111-01-01 00-00'
+            else:
+                if zeile['last_donation'] in ['0000-00-00 00:00:00', None]:
+                    datum = '1111-01-01 00-00'
+                else:
+                    datum = zeile['last_donation']
+                    
+            datum = datum.split(' ')[0]
             v = Veranstaltung.objects.create(
                 bezeichnung=zeile['title'],
                 slug=zeile['id'],
                 beschreibung=zeile['text'],
                 art_veranstaltung=arten[zeile['type']],
-                datum=zeile['start'].split(' ')[0], 
+                datum=datum, 
                 link=zeile['livestream'])
 
     # Studiendinger einlesen

@@ -3,12 +3,12 @@
 
 {% block content %}
   <div class="veranstaltungen" style="width: 600px;">
-  {% for studium in studien %}
+  {% for studium in studien %}{% if studium.reihenfolge %}
     <div class="veranstaltung">
       <h1><a href='{{ studium.slug }}'>{{ studium.bezeichnung }}</a></h1>
       {{ studium.beschreibung1|safe }}
       <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
     </div>
-  {% endfor %}
+  {% endif %}{% endfor %}
   </div>
 {% endblock content %}

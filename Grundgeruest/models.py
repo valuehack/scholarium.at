@@ -69,36 +69,33 @@ class Nutzer(AbstractUser):
         return bool(self.my_profile.guthaben)
     
     @classmethod
-    def neuen_erstellen(cls, email):
-        """ Erstellt neuen Nutzer mit angegebener Mailadresse 
-        
-        Es wird die Methode von UserenaSignup verwendet, sodass gleich-
-        zeitig ein signup-Objekt für den Nutzer sowie alle UserObjectPer-
-        missions erzeugt werden. 
-        Ich erstelle auch gleich ein Profil dazu, zur Vollständigkeit. 
-        Es wird ein Passwort per Zufall gesetzt und an die confirmation
-        mail übergeben. 
-        """
+    def leeren_anlegen(cls):
         username = cls.erzeuge_username()
-        password = cls.erzeuge_pw()
 
         nutzer = UserenaSignup.objects.create_user(username,
-                                                     email,
-                                                     password,
+                                                     email='spam@spam.de',
+                                                     password='spam',
                                                      active=False,
                                                      send_email=False)
-        
+
         signup = nutzer.userena_signup
         salt, hash = generate_sha1(nutzer.username)
         signup.activation_key = hash
         signup.save()
         
-        # confirmation Mail mit pw versenden
+        return nutzer
+
+    def versende_activation(self):
+        """ Autogeneriere pw und versende activation mail incl. pw """
+        # activation Mail mit pw versenden
         from userena.mail import UserenaConfirmationMail
         import userena.settings as userena_settings
         from django.contrib.sites.models import Site
         from userena.utils import get_protocol
-
+        
+        signup = self.userena_signup
+        password = self.erzeuge_pw()
+        
         context = {'user': signup.user,
                   'without_usernames': userena_settings.USERENA_WITHOUT_USERNAMES,
                   'protocol': get_protocol(),
@@ -111,9 +108,25 @@ class Nutzer(AbstractUser):
         mailer.generate_mail("activation")
         mailer.send_mail(signup.user.email)
 
-        nutzer.save()
-        return nutzer
+        self.set_password(password)
+        self.save()
 
+    @classmethod
+    def neuen_erstellen(cls, email):
+        """ Erstellt neuen Nutzer mit angegebener Mailadresse 
+        
+        Es wird die Methode von UserenaSignup verwendet, sodass gleich-
+        zeitig ein signup-Objekt für den Nutzer sowie alle UserObjectPer-
+        missions erzeugt werden. 
+        Ich erstelle auch gleich ein Profil dazu, zur Vollständigkeit. 
+        Es wird ein Passwort per Zufall gesetzt und an die confirmation
+        mail übergeben. 
+        """
+        nutzer = Nutzer.leeren_anlegen()
+        nutzer.email = email
+        nutzer.save()
+        nutzer.versende_activation()
+        return nutzer
     
     def save(self, *args, **kwargs):
         if not self.username:

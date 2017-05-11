@@ -41,13 +41,18 @@ class Veranstaltung(KlasseMitProdukten):
         elif self.art_veranstaltung.bezeichnung == 'Seminar':
             return '/seminar/%s' % self.slug
     
+    def __str__(self):
+        return self.art_veranstaltung.bezeichnung+': '+self.bezeichnung
+    
 
 class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()
     beschreibung2 = models.TextField()
+    reihenfolge = models.SmallIntegerField(null=True)
     arten_liste = ['teilnahme', ]
     class Meta:
         verbose_name_plural = "Studiendinger"
+        ordering = ['reihenfolge']
         
 
 class ArtDerVeranstaltung(Grundklasse):
