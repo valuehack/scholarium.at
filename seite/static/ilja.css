@@ -175,6 +175,19 @@ a {
 	text-decoration: none;
 }
 
+.disc_w_space {
+	margin: 40px 0px 40px 60px;
+	list-style-position: outside;
+	list-style-type: disc !important;
+}
+
+.disc_w_space li {
+	padding-bottom: 0.75em;
+	line-height: 1.6;
+    font-family: "Garamond", Georgia, Times, sans-serif;
+    font-size: 14pt;
+}
+
 /*==================================================*/
 /*                   Header                    		*/
 /*==================================================*/
