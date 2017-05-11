@@ -16,7 +16,7 @@ import sqlite3 as lite
 import os, pdb
 from .models import *
 from Scholien.models import Artikel
-from Veranstaltungen.models import Veranstaltung, Medium
+from Veranstaltungen.models import Veranstaltung
 from Bibliothek.models import Buch
 from .forms import ZahlungFormular
 from datetime import date
@@ -82,7 +82,7 @@ def index(request):
     if request.user.is_authenticated():
         liste_artikel = Artikel.objects.order_by('-datum_publizieren')[:4]
         veranstaltungen = Veranstaltung.objects.order_by('-datum')[:3]
-        medien = Medium.objects.order_by('-zeit_erstellt')[:3]
+        medien = []
         buecher = Buch.objects.order_by('-zeit_erstellt')[:3]
         return TemplateMitMenue.as_view(
             template_name='startseite.html',

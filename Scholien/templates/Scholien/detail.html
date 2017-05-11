@@ -10,7 +10,10 @@
   </div>
   <div class="salon_content">
     {{ scholie.inhalt|safe }}
+    {% if request.user.my_profile.nicht_abgelaufen %}
     {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
+    {% else %} <a href="{% url 'gast_spende' %}">Bitte unterstützen sie uns um alle Scholien wieder in voller Länge zu lesen</a>
+    {% endif %}
     <p style="text-align: right;">
       <a href="{% url 'Scholien:index' %}">zurück zu den Scholienartikeln</a>
     </p>

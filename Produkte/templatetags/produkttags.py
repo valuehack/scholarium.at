@@ -1,4 +1,5 @@
 from django import template
+from Produkte.models import Kauf
 
 register = template.Library()
 
@@ -13,6 +14,10 @@ def produkt_pk(produkt, art=0):
 @register.simple_tag
 def ware_model(ware):
     return ware.obj.__class__.__name__.lower()
+
+@register.simple_tag
+def art_aus_pk(pk):
+    return Kauf.tupel_aus_pk(pk)[2]
 
 @register.simple_tag
 def max_anzahl_zu_liste(max_anzahl=1):

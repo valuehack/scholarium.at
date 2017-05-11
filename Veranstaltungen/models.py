@@ -18,8 +18,10 @@ class Veranstaltung(KlasseMitProdukten):
     beschreibung = models.TextField()
     datum = models.DateField()
     art_veranstaltung = models.ForeignKey('ArtDerVeranstaltung')
+    datei = models.FileField(null=True, blank=True) # für Aufzeichnung
+    link = models.URLField(null=True, blank=True) # youtube-link
     
-    arten_liste = ['teilnahme', ]
+    arten_liste = ['teilnahme', 'livestream', 'aufzeichnung']
 
     class Meta:
         verbose_name_plural = "Veranstaltungen"
@@ -46,32 +48,6 @@ class Studiumdings(KlasseMitProdukten):
     arten_liste = ['teilnahme', ]
     class Meta:
         verbose_name_plural = "Studiendinger"
-        
-
-class Medium(KlasseMitProdukten):
-    gehoert_zu = models.ForeignKey(Veranstaltung, null=True, blank=True)
-    datei = models.FileField(null=True, blank=True)
-    link = models.URLField(null=True, blank=True)
-    arten_liste = ['livestream', 'aufzeichnung']
-    # folgendes v.a. relevant wenn keine Veranstaltung verknüpft ist:
-    typ = models.CharField(max_length=30, null=True, blank=True)
-    beschreibung = models.TextField(max_length=2000, null=True, blank=True)
-    datum = models.DateField(blank=True, null=True)
-    
-    class Meta:
-        verbose_name_plural = "Medien"
-    
-    def __str__(self):
-        return '{} ({})'.format(self.bezeichnung, self.slug) 
-        
-    def save(self, *args, **kwargs):
-        self.beschreibung = self.beschreibung or self.gehoert_zu.beschreibung
-        self.bezeichnung = self.bezeichnung or self.gehoert_zu.bezeichnung
-        self.typ = self.typ or self.gehoert_zu.art_veranstaltung.bezeichnung
-        self.datum = self.datum or self.gehoert_zu.datum
-        if not self.pk:
-            self.slug = ''.join(random.sample(string.ascii_lowercase, 12))
-        super().save(*args, **kwargs)
         
 
 class ArtDerVeranstaltung(Grundklasse):

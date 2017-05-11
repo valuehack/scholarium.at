@@ -85,6 +85,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     
     class Meta:
         abstract = True
+        ordering = ['bezeichnung']
 
 
 class Kauf(models.Model):

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="veranstaltung">
+    <h1>{{ buch.titel|safe }}</h1>
+    <div>
+      {{ buch.autor }}
+    </div>
+  </div>
+  <div class="salon_content">
+    <ul style="margin: 1em 4em; text-size: 120%;">
+      <li> ISBN: {{ buch.isbn }} </li>
+      <li> Jahr: {{ buch.jahr }} </li>
+      <li> Sprache: {{ buch.sprache }} </li>
+      <li> Zusammenfassung: {{ buch.zusammenfassung }} </li>
+      <li> ..., sind nur Beispiele </li>
+    </ul>
+    <div style="text-align: center;">
+      <div class="salon_reservation">
+        <div class="sinfo">
+          <h2 style="margin-top: 0;">Ausleihen</h2>
+          {% include 'Produkte/in_den_warenkorb.html' with produkt=buch art='leihen' %}
+        </div>
+      </div>
+    </div>
+    <div style="text-align: center;">
+      <div class="salon_reservation">
+        <div class="sinfo">
+          <h2 style="margin-top: 0;">Kaufen</h2>
+          {% include 'Produkte/in_den_warenkorb.html' with produkt=buch art='kaufen' %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

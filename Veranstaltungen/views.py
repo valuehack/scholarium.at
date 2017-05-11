@@ -84,6 +84,7 @@ def studiumdings_detail(request, slug):
             context_object_name = 'studiumdings')(request, slug=slug)
 
 def daten_einlesen(request):
+    """ wird von url aufgerufen und ruft standalone-Fkt auf """
     aus_alter_db_einlesen()
     return HttpResponseRedirect('/veranstaltungen')
     
@@ -99,7 +100,6 @@ def aus_alter_db_einlesen():
     from django.http import HttpResponseRedirect
 
     Veranstaltung.objects.all().delete()
-    Medium.objects.all().delete()
     
     con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
     with con:
@@ -119,7 +119,25 @@ def aus_alter_db_einlesen():
                 slug=zeile['id'],
                 beschreibung=zeile['text'],
                 art_veranstaltung=arten[zeile['type']],
-                datum=zeile['start'].split(' ')[0])
-            m = Medium.objects.create(gehoert_zu=v)
-            m.link = zeile['livestream']
-            m.save()
+                datum=zeile['start'].split(' ')[0], 
+                link=zeile['livestream'])
+
+    # Studiendinger einlesen
+    Studiumdings.objects.all().delete()
+    
+    con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
+    with con:
+        con.row_factory = lite.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM produkte WHERE type='programm';")
+
+        zeilen = [dict(zeile) for zeile in cur.fetchall()]
+        
+    with transaction.atomic():
+        for zeile in zeilen:
+            dings = Studiumdings.objects.create(
+                bezeichnung=zeile['title'],
+                slug=zeile['id'],
+                beschreibung1=zeile['text'],
+                beschreibung2=zeile['text2'],
+                preis_teilnahme=zeile['price'],)

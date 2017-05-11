@@ -42,10 +42,10 @@ urlpatterns = [
     	    template_name='Veranstaltungen/liste_studien.html',
 	        context_object_name = 'studien'
         ),
-        name='liste_gast_studium'),
+        name='liste_studium'),
     url(r'^studium/(?P<slug>[-\w]+)/$', 
         studiumdings_detail, 
-        name='studium_gast_detail'),
+        name='studium_detail'),
     url(r'^vortrag/',
         TemplateMitMenue.as_view(
             template_name='Gast/vortrag.html'),

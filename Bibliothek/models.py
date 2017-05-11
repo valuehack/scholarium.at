@@ -3,9 +3,10 @@
 """
 
 from django.db import models
-from seite.models import Grundklasse
+from Produkte.models import KlasseMitProdukten
 
-class Buch(Grundklasse):
+class Buch(KlasseMitProdukten):
+    arten_liste = ['kaufen', 'leihen']
     titel = models.CharField(
         max_length=40,
         null=True, blank=True)
@@ -44,6 +45,12 @@ class Buch(Grundklasse):
         null=True, blank=True)
     zusammenfassung = models.TextField(
         null=True, blank=True)
+    
+    def preis_ausgeben(self, art):
+        if art=='leihen':
+            return self.finde_preis(art) or 13
+        elif art=='kaufen':
+            return self.finde_preis(art) or 37
     
     class Meta:
         verbose_name_plural = 'Bücher'

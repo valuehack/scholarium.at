@@ -186,11 +186,11 @@ class ScholariumProfile(UserenaBaseProfile):
     alt_registration_ip = models.GenericIPAddressField(
         editable=False, null=True)
 
-    def darf_scholien_sehen(self):
-        if self.guthaben < 20:
+    def nicht_abgelaufen(self):
+        if self.stufe > 1:
             return True
         else:
-            raise TypeError('Guthaben zu hoch, editiere ScholariumProfile.darf_scholien_sehen()')
+            raise TypeError('Bitte unterstützen')
     
     def guthaben_aufladen(self, betrag):
         """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """
@@ -205,7 +205,8 @@ class Mitwirkende(models.Model):
     level_choices = [(1, 'Rektor'), 
         (2, 'Gründer'), 
         (3, 'Mitarbeiter'), 
-        (4, 'Mentor')]
+        (4, 'Mentor'),
+        (8, 'Student')]
     
     name = models.CharField(max_length=100)
     alt_id = models.PositiveSmallIntegerField(default=0)

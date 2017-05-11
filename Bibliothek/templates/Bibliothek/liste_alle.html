@@ -2,9 +2,10 @@
 {% load static %}
 
 {% block content %}
-  <ul>
+{% include "paginationsleiste.html" %}
+  <ul style="margin: 1em 4em; text-size: 120%;">
   {% for buch in buecher %}
-    <li>{{ buch }}</li>
+    <li><a href="{% url 'Bibliothek:detail_buch' buch.slug %}">{{ buch }}</a></li>
   {% endfor %}
   </ul>
 {% endblock content %}

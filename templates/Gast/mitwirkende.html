@@ -7,29 +7,29 @@
 			<h1>Mitwirkende</h1>
 		</header>
 		<div class="blog_text_fragen">
-            
+
             {% for mitwirkender in mitwirkende %}
-            
+
             {% ifchanged %}
             <p class="crew_levels">{{ mitwirkender.get_level_display }}</p>
             {% endifchanged %}
-            
+
             <div class="crew">
 				<div class="crew__col-1">
-					<img src="http://www.craftprobe.com/img/{{ mitwirkender.id_old }}.jpg">
+					<img src="http://www.craftprobe.com/img/{{ mitwirkender.alt_id }}.jpg">
 					<a href="http://{{ mitwirkender.link }}">{{ mitwirkender.link }}</a>
 				</div>
 				<div class="crew__col-4">
-					<h1>{{ mitwirkender.name }}</h1>
+					<h1>{{ mitwirkender.name|safe }}</h1>
 					<p>{{ mitwirkender.text_de|safe }}</p>
 				</div>
 			</div>
-            
+
             {% endfor %}
-			
+
 
 {% include 'Gast/kostenlos_eintragen.html' with von_wo='mitwirkende' %}
 
-		</div>		
+		</div>
 	</div>
 {% endblock content %}

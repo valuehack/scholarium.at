@@ -42,14 +42,11 @@ def liste_buechlein(request):
             )(request)             
 
 
-@login_required
 def ein_artikel(request, slug):
-    if request.user.my_profile.darf_scholien_sehen():
-        #pdb.set_trace()
-        return DetailMitMenue.as_view(
-            template_name='Scholien/detail.html',
-            model=models.Artikel,
-            context_object_name = 'scholie')(request, slug=slug)
+    return DetailMitMenue.as_view(
+        template_name='Scholien/detail.html',
+        model=models.Artikel,
+        context_object_name = 'scholie')(request, slug=slug)
 
 def daten_einlesen(request):
     aus_alter_db_einlesen()
@@ -80,7 +77,8 @@ def aus_alter_db_einlesen():
                 bezeichnung=scholie['title'],
                 inhalt=scholie['public_text'],
                 inhalt_nur_fuer_angemeldet=scholie['private_text'],
-                datum_publizieren=scholie['publ_date'])
+                datum_publizieren=scholie['publ_date'], 
+                slug=scholie['id'])
 
     # und Büchlein auslesen
     # es fehlt einiges, insb. die pdfs einzutragen
@@ -99,7 +97,8 @@ def aus_alter_db_einlesen():
             buch = models.Buechlein.objects.create(
                 bezeichnung=scholie['title'],
                 beschreibung=scholie['text'],
-                alte_nr=scholie['n'])
+                alte_nr=scholie['n'], 
+                slug=scholie['id'])
             
             dateiname = scholie['id']+'.jpg'
             buch.bild_holen(
