@@ -11,6 +11,7 @@ from django.db import models
 from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
 from django.core.urlresolvers import reverse
+from datetime import date
 import random, string
     
 
@@ -44,6 +45,18 @@ class Veranstaltung(KlasseMitProdukten):
     def __str__(self):
         return self.art_veranstaltung.bezeichnung+': '+self.bezeichnung
     
+    def hat_medien(self):
+        if (self.finde_anzahl('livestream') or 
+            self.finde_anzahl('aufzeichnung')):
+            return True
+        else:
+            return False
+    
+    def ist_vergangen(self):
+        return self.datum <= date.today()
+
+    def ist_zukunft(self):
+        return self.datum >= date.today()
 
 class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()

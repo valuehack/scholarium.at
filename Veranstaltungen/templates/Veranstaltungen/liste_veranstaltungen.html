@@ -14,32 +14,7 @@
     </div>
   {% endfor %}
   </div>
-  <div class="separator">
-    <h2>Verfügbare Aufzeichnungen</h2>
-  </div>
-  <table class="veranstaltungen">
-    {% for medium in medien %}{% with veranstaltung=medium.gehoert_zu %}
-    <tr>
-      <td>
-        <a href="{{ veranstaltung.get_url }}">
-          {{ veranstaltung.art_veranstaltung }}: {{ veranstaltung.bezeichnung }}
-        </a>
-      </td>
-      <td>
-        <p>{{ veranstaltung.beschreibung|safe|truncatewords:28 }}</p>
-      </td>
-      <td>
-        {{ veranstaltung.datum }}
-      </td>
-      <td>
-        <form action="{% url 'Produkte:cart-add' %}" method="post">
-        	{% csrf_token %}
-          <input type="hidden" name="pk" value="{{ produkt.id }}">
-          <input class="inputbutton" type="submit" value="Auswählen">
-        </form>
-      </td>
-    </tr>
-    {% endwith %}{% endfor %}
-  </table>
-  {% include "paginationsleiste.html" %}
+  {% if medien %}
+    {% include "Veranstaltungen/medien.html" %}
+  {% endif %}
 {% endblock content %}

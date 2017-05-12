@@ -31,27 +31,19 @@ def erstelle_liste_menue(user=None):
             {'bezeichnung': 'Artikel', 'slug': 'scholien'},
             {'bezeichnung': 'Büchlein', 'slug': 'scholienbuechlein'}
             ]),
-            ({'bezeichnung': 'Veranstaltungen', 'slug': 'veranstaltungen'}, [
-            {'bezeichnung': 'Alle', 'slug': 'veranstaltungen'},
-            {'bezeichnung': 'Salon', 'slug': 'salons'},
-            {'bezeichnung': 'Seminare', 'slug': 'seminare'},
-            {'bezeichnung': 'Vortrag', 'slug': 'vortrag'},
+            ({'bezeichnung': 'Salons', 'slug': 'salons'}, [
+            ]),
+            ({'bezeichnung': 'Seminare', 'slug': 'seminare'}, [
+            ]),
+            ({'bezeichnung': 'Vortrag', 'slug': 'vortrag'}, [
             ]),
             ({'bezeichnung': 'Bücher', 'slug': 'buecher'}, [
-            ]),
-            ({'bezeichnung': 'Medien', 'slug': 'medien'}, [
-            {'bezeichnung': 'Alle', 'slug': 'medien'},
-            {'bezeichnung': 'Salon', 'slug': 'media-salon'},
-            {'bezeichnung': 'Vorlesung', 'slug': 'media-vorlesung'},
-            {'bezeichnung': 'Vortrag', 'slug': 'media-vortrag'},
             ]),
             ({'bezeichnung': 'Studium', 'slug': 'studium'}, [
             {'bezeichnung': 'Studium Generale', 'slug': 'studium/generale'},
             {'bezeichnung': 'craftprobe', 'slug': 'studium/craftprobe'},
             {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
             {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
-            ]),
-            ({'bezeichnung': 'Projekte', 'slug': 'projekte'}, [
             ]),
         ]
     liste_punkte = []

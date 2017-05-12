@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from datetime import date
 
 from .models import *
 from Grundgeruest.views import ListeMitMenue, DetailMitMenue, TemplateMitMenue
@@ -44,11 +43,12 @@ class ListeArt(ListeAlle):
     context_object_name = 'medien'
     paginate_by = 3
     def get_queryset(self, **kwargs):
-        medien = [medium for medium in Medium.objects.all()
-            if medium.gehoert_zu.art_veranstaltung==self.art_model
-            and medium.gehoert_zu.datum <= date.today()]
-        medien.sort(key = lambda m: m.datum, reverse=True)
-        return medien
+        mit_medien = [v for v in Veranstaltung.objects.all()
+            if v.art_veranstaltung==self.art_model
+            and v.ist_vergangen()
+            and v.hat_medien()]
+        mit_medien.sort(key = lambda m: m.datum, reverse=True)
+        return mit_medien
 
 class VeranstaltungDetail(DetailMitMenue):
     template_name = 'Veranstaltungen/detail_veranstaltung.html'
@@ -86,7 +86,14 @@ def studiumdings_detail(request, slug):
 def vortrag(request):
     if request.user.is_authenticated():
         vortrag = get_object_or_404(Studiumdings, bezeichnung='Vortrag')
-        extra_context = {'vortrag': vortrag}
+        arten_wahl = [
+            get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vortrag'),
+            get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vorlesung')
+        ]
+        medien = [v for v in Veranstaltung.objects.all() if
+            v.art_veranstaltung in arten_wahl
+            and v.hat_medien()]
+        extra_context = {'vortrag': vortrag, 'medien': medien}
     else:
         extra_context = {}
     return TemplateMitMenue.as_view(
