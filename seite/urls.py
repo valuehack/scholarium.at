@@ -77,6 +77,14 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Grundgeruest/projekte.html'),
         name='projekte'),
+    url(r'^eltern/',
+        TemplateMitMenue.as_view(
+            template_name='Gast/eltern.html'),
+        name='gast_eltern'),
+    url(r'^en/',
+        TemplateMitMenue.as_view(
+            template_name='Gast/englisch.html'),
+        name='gast_englisch'),
     url(r'^geheim_db$',
         db_runterladen,
         name='bitte_bald_loeschen'),

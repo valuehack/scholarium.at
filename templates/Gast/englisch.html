@@ -1,0 +1,38 @@
+{% extends "Grundgeruest/ilja.html" %}
+{% load static %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block kopfleiste %}
+  <div class="login">
+    {% include "Grundgeruest/kopfleiste_englisch.html" %}
+  </div>
+{% endblock kopfleiste %}
+
+
+{% block menueleiste %}
+  <div class="menueleiste">
+  </div>
+{% endblock menueleiste %}
+
+
+{% block content %}
+	<div class="blog">
+		<div class="blog_text_fragen">
+        
+        <p><i>scholarium</i> is a learning enterprise based in Vienna, Austria. It is one of the last remaining research centers where the original Austrian School of economics is alive, boasting the largest library on this tradition in Europe. The Austrian school is frequently misunderstood as an ideological program, while it is in fact a research tradition closely linked to other traditions arising in the old Vienna &ndash; formerly one of the most important hubs of science, culture and entrepreneurship. What makes the Austrian School special is its realistic, no-nonsense approach, its philosophical scope, and its focus on entrepreneurship and the dynamics of complex systems. This research tradition in its original scope and depth cannot be studied at university, because it is interdisciplinary and has to be applied to real-life, entrepreneurial decisions. <i>scholarium</i> offers a limited number of selected participants a <a href="http://craftprobe.com/">unique educational program in Vienna</a>, where they can develop, with the support of some of the best brains and tools and through entrepreneurial projects, practical experiments and profound reflection, the necessary skills and ideas to create real value. Alternatively, for those more inclined towards theory, students of all age and occupation can study full-time or part-time at the <i>scholarium</i> to immerse themselves in the living Austrian tradition of realistic economics, philosophy and politics. We are happy to answer your questions via e-mail: <a href="mailto:&#105;nf&#111;&#064;&#115;&#99;ho&#108;&#97;ri&#117;&#109;.&#97;&#116;">&#105;nf&#111;&#064;&#115;&#99;ho&#108;&#97;ri&#117;&#109;.&#97;&#116;</a>.</p>
+        
+        <div style="text-align: center;">
+        	<div class="blog_subscribe">
+        		<form method="post" action="/accounts/signup/" name="registerform">
+        			{% csrf_token %}
+        			<input class="inputfield" id="user_email" type="email" placeholder=" Email" name="email" required>
+        			<input type=hidden name="first_reg" value="englisch">
+        			<input class="inputbutton" type="submit" name="eintragen_submit" value="Sign In">
+        		</form>
+        	</div>
+        </div>
+        
+        </div>		
+	</div>
+{% endblock content %}
