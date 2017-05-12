@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Studium{% endblock %}
+
 {% block content %}
   <div class="veranstaltungen" style="width: 600px;">
   {% for studium in studien %}{% if studium.reihenfolge %}

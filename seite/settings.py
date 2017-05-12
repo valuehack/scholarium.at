@@ -117,7 +117,7 @@ EASYCART_CART_CLASS = 'Produkte.views.Warenkorb'
 
 # django-countries
 
-COUNTRIES_FIRST = ['DE', 'AT', 'CH', 'LI']
+COUNTRIES_FIRST = ['AT', 'DE', 'CH', 'LI']
 COUNTRIES_FIRST_REPEAT = True
 COUNTRIES_FIRST_BREAK = 20*'-'
 

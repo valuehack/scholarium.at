@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="veranstaltung">
-    <h1>{{ scholie.bezeichnung|safe }}</h1>
+    <h1>{% block title %}{{ scholie.bezeichnung|safe }}{% endblock %}</h1>
     <div>
       {{ scholie.datum_publizieren | date:"l, d. F Y" }}
     </div>
@@ -12,7 +12,7 @@
     {{ scholie.inhalt|safe }}
     {% if request.user.my_profile.nicht_abgelaufen %}
     {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
-    {% else %} <a href="{% url 'gast_spende' %}">Bitte unterstützen sie uns um alle Scholien wieder in voller Länge zu lesen</a>
+    {% else %} <a href="{% url 'gast_spende' %}">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, erneuern Sie bitte Ihre Unterstützung</a>
     {% endif %}
     <p style="text-align: right;">
       <a href="{% url 'Scholien:index' %}">zurück zu den Scholienartikeln</a>
