@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="veranstaltung">
-    <h1 style="margin-bottom: 3em; font-size: 250%;">{{ studiumdings.bezeichnung }}</h1>
+    <h1 style="margin-bottom: 3em; font-size: 250%;">{% block title %}{{ studiumdings.bezeichnung }}{% endblock %}</h1>
   </div>
   <div class="separator">
     <h2>Inhalt und Informationen</h2>

@@ -4,7 +4,7 @@
 {% block content %}
 	<div class="blog">
 		<header>
-			<h1>Häufige Fragen</h1>
+			<h1>{% block title %}Häufige Fragen{% endblock %}</h1>
 		</header>
 		<div class="blog_text_fragen">
 			
@@ -19,8 +19,7 @@
 <h2>Warum ist das scholarium in Wien?</h2><p>Wien war einst das weltweite Zentrum realistischer Sozial-, Wirtschafts- und Politikwissenschaft, handwerklich und geistig hochstehender Kultur sowie geistigen und wirtschaftlichen Austauschs zwischen Ost und West. Davon ist wenig &uuml;brig, aber das Wenige lohnt noch, an die historischen Bez&uuml;ge anzukn&uuml;pfen. Das scholarium ist kein &ouml;sterreichisches Institut, sondern eine Bildungs- und Forschungsst&auml;tte, die in die gesamte Welt wirkt, mit Vorzug der deutschen Sprache, doch polyglott, und Teilnehmer, Mitwirkende, Studierende, Besucher aus aller Welt anzieht. Wien liegt daf&uuml;r hinreichend zentral und ist als Standort hinreichend attraktiv. Wir wehren uns aber nicht gegen einen besseren Standort und freuen uns auf Anregungen und Einladungen. Die meisten unserer Inhalte sind aus der Ferne zug&auml;nglich, aber Wien lohnt auch einen Besuch.</p>
 <h2>Ich bin nicht in Wien zuhause, ist also nichts f&uuml;r mich?</h2><p>Die wenigsten unserer Unterst&uuml;tzer sind in Wien zuhause, sondern in Deutschland und der Schweiz, darum richten wir unsere Arbeit besonders auf Nicht-Wiener aus: Wir &uuml;bertragen alle Veranstaltungen live oder zeichnen sie auf, wir publizieren vieles und bieten intensive Wochenendseminare, die sich perfekt mit einem Wienbesuch verbinden lassen. Wir sind ein prim&auml;r deutschsprachiges B&uuml;rgerinstitut &ndash; solange Sie diese Sprache verstehen, sind Sie bei uns richtig. Auch englischsprachig hingegen ist unser <a href="http://craftprobe.com">Bildungsprogramm f&uuml;r Jugendliche</a>.</p>		
 {% include 'Gast/kostenlos_eintragen.html' with von_wo='faq' %}
-
-			 
+	 
 		</div>		
 	</div>
 {% endblock content %}

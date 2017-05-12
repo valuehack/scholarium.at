@@ -4,7 +4,7 @@
 {% block content %}
   <div class="blog">
     <header>
-      <h1>Vortrag</h1>
+      <h1>{%block title%}Vortrag{%endblock%}</h1>
     </header>
 	  <div class="blog_text_fragen">
       {{ vortrag.beschreibung1|safe }}

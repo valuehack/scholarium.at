@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="veranstaltung">
-    <h1>{{ buch.titel|safe }}</h1>
+    <h1>{% block title %}{{ buch.titel|safe }}{% endblock %}</h1>
     <div>
       {{ buch.autor }}
     </div>
