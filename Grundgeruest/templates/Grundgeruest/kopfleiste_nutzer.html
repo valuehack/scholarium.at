@@ -13,16 +13,16 @@
 </script>
 
 <div class="dropdown">
-  <button 
-    class="login_button" 
-    type="button" 
+  <button
+    class="login_button"
+    type="button"
     onclick="menue_nutzer_umklappen(this)"
     >{{ user.email }}<span class="caret"></span>
   </button>
-  <ul 
-    style="border: 1px solid black;" 
-    class="dropdown_menu unsichtbar" 
-    id="menue_nutzer" 
+  <ul
+    style="border: 1px solid black;"
+    class="dropdown_menu unsichtbar"
+    id="menue_nutzer"
     onmouseleave="menue_nutzer_umklappen(this)">
     <li class="dropdown_header dropdown_name"
       >{{ user.first_name }} {{ user.last_name }}
@@ -30,23 +30,23 @@
     <li class="dropdown_header dropdown_level"
       >{{ user.my_profile.get_stufe_display }}
     </li>
-    <li><a href="/accounts/{{ user.username }}/">Profil</a></li>
+    <li><a href="{% url 'userena_profile_detail' user.username %}">Profil</a></li>
     <li><a href="/spende/">Unterstützen</a></li>
     <li class="divider"></li>
     <li class="dropdown-header dropdown_credits"
-      >Guthaben: {{ user.my_profile.guthaben }} <img 
+      >Guthaben: {{ user.my_profile.guthaben }} <img
       class='dropdown_coin' src="{% static 'img/coin.png' %}">
     </li>
     <li><a href="{% url 'Produkte:warenkorb' %}"
       >Warenkorb <span class="badge">{{ cart.item_count }}</span></a>
-    </li> 
+    </li>
     <li><a href="{% url 'Produkte:bestellungen' %}">Bestellungen</a></li>
     <li class="divider"></li>
-    <li><a href="/accounts/signout/">Abmelden</a></li>        			               		
+    <li><a href="{% url 'userena_signout %}">Abmelden</a></li>
   </ul>
 </div>
 <div class="login_button">
-  <a 
+  <a
     href="{% url 'Produkte:warenkorb' %}"
     >Warenkorb <span class="badge">{{ cart.item_count }}</span>
   </a>
