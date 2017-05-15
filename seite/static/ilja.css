@@ -1050,6 +1050,13 @@ p.linie img {
 	font-weight: bold;
 	background-color: rgb(46,74,98);
 	color: #fff;
+    /* es gab bei seite=3 einen Fehler, da die CSS von 
+    "div.warenkorb_veranstaltung span:nth-child(3), span:nth-child(4)"
+    übernommen wurden; da ich nicht genau wusste, weshalb, habe ich die drei
+    folgenden Parameter hier hinzugefügt, gk */
+    font-size: 16pt;
+    font-style: normal;
+    display: inline;
 }
 
 .pagination span.disabled {
