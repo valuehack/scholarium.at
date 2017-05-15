@@ -2,15 +2,12 @@
 {% load static %}
 
 {% block content %}
-  <div class="jubilaeum_banner">
-    <a href="http://www.scholarium.at/jubilaeum">Sehen Sie sich hier die Fotos unseres vergangenen Jubiläums an</a>
-  </div>
 
   <div style="padding: 10px 15% 20px 15%; width: 70%; display: inline-block; color: rgb(20,20,20); margin-bottom: 30px;">
     <div class="startseite_letzter_artikel">
       {% with artikel=liste_artikel.0 %}
       <h1>
-        <a href="{{ artikel.slug }}">{{ artikel.bezeichnung|safe }}</a>
+        <a href="/scholien/{{ artikel.slug }}">{{ artikel.bezeichnung|safe }}</a>
       </h1>
       <br>
       <div>
@@ -18,7 +15,7 @@
         <span>{{ artikel.datum_publizieren }}</span>
       </div>
       <br>
-      <p>{{ artikel.inhalt|safe|truncatewords:42 }} [<a href="{{ artikel.slug }}">Weiterlesen</a>]</p>
+      <p>{{ artikel.inhalt|safe|truncatewords:42 }} [<a href="/scholien/{{ artikel.slug }}">Weiterlesen</a>]</p>
       {% endwith %}
     </div>
   </div>
