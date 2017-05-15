@@ -105,9 +105,9 @@ AUTHENTICATION_BACKENDS = (
 ANONYMOUS_USER_ID = -1
 
 USERENA_WITHOUT_USERNAMES = True
-USERENA_SIGNIN_REDIRECT_URL = '/accounts/%(username)s/'
-LOGIN_URL = '/accounts/signin/'
-LOGOUT_URL = '/accounts/signout/'
+USERENA_SIGNIN_REDIRECT_URL = '/nutzer/%(username)s/'
+LOGIN_URL = '/nutzer/anmelden/'
+LOGOUT_URL = '/nutzer/abmelden/'
 
 SITE_ID = 2 # für localhost in der ursprünglichen DB
 
