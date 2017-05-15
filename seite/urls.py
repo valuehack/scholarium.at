@@ -20,6 +20,7 @@ from django.contrib import admin
 from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen, zahlen, ListeAktiveMitwirkende
 from Grundgeruest.forms import Anmeldeformular
 from Grundgeruest.models import Mitwirkende
+import Grundgeruest.userena_urls as userena_urls
 from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
@@ -47,13 +48,13 @@ urlpatterns = [
         studiumdings_detail, 
         name='studium_detail'),
     url(r'^vortrag/', vortrag, name='vortrag'), 
-    url(r'^accounts/signup/$',
+    url(r'^nutzer/eintragen/$',
         signup,
         {'signup_form': Anmeldeformular}),
-    url(r'^accounts/e$',
+    url(r'^nutzer/e$',
         aus_datei_mitglieder_einlesen,
         name='mitglieder_einlesen'),
-    url(r'^accounts/', include('userena.urls')),
+    url(r'^nutzer/', include(userena_urls)),
     url(r'^warenkorb/', include('Produkte.urls')),
     url(r'^veranstaltungen/', include(
         veranstaltungen_urls, 
