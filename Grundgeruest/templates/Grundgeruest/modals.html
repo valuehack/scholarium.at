@@ -1,0 +1,134 @@
+<style>
+.modal {
+  	position: fixed;
+  	top: 0;
+  	right: 0;
+  	bottom: 0;
+  	left: 0;
+  	z-index: 1050;
+  	display: none;
+  	overflow: hidden;
+  	-webkit-overflow-scrolling: touch;
+  	outline: 0;
+}
+
+.modal-backdrop.fade {
+  	filter: alpha(opacity=0);
+  	opacity: 0;
+}
+
+.modal-dialog-login {
+	position: relative;
+  	width: 420px;
+  	margin: 50px auto;
+}
+
+.modal-content-login {
+  	position: relative;
+  	background-color: rgb(250,250,250);
+  	-webkit-background-clip: padding-box;
+          	background-clip: padding-box;
+  	border: 1px solid #999;
+  	border: 1px solid rgba(0, 0, 0, .2);
+  	border-radius: 6px;
+  	outline: 0;
+  	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+          	box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+    padding: 10px 40px;
+}
+
+.modal-header {
+  	min-height: 16.42857143px;
+ 	padding: 15px;
+  	text-align: center;
+}
+
+.modal-header .close {
+  	margin-top: -2px;
+}
+
+.modal-title {
+	font-size: 18pt;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-body {
+  position: relative;
+  padding: 15px;
+  text-align: justify;
+	font-size: 14pt;
+	line-height: 1.6;
+	padding: 0px;
+	-ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto
+}
+
+.modal-body p {
+	margin: 20px 0;
+}
+
+</style>
+
+<script type="text/javascript">
+  function modal_sichtbar_umschalten(id) {
+    var s = document.getElementById(id);
+    if (s.classList.toggle("unsichtbar")) {
+      s.style.display = 'none';
+    } else {
+      s.style.display = 'block';
+    }
+  }
+</script>
+
+<!-- Login (Anmelden) Modal -->
+<!-- Design hab' ich komplett übernommen, Funktion nicht: ich schicke an die entsprechende userena-url (wie es ursprünglich gelöst war verstehe ich nicht) und sichtbar gemacht wird auch durch eine eigene Funktion -->
+
+  <div class="modal unsichtbar" id="login" tabindex="-1">
+    <div class="modal-dialog-login">
+      <div class="modal-content-login">
+                  <button type="button" class="close" onclick="modal_sichtbar_umschalten('login')"><span aria-hidden="true">&times;</span></button>
+        <div class="modal-header">
+
+          <h2 class="modal-title" id="myModalLabel">Anmelden</h2>
+          <p class="tologin">Sie haben noch keinen Zugang? <br><a data-toggle="modal" data-target="#signup" data-dismiss="modal" aria-label="Close" value="Anmelden">Dann können Sie sich hier eintragen.</a></p>
+        </div>
+        <div class="modal-body">
+          <p>
+            <form method="post" action="{% url 'userena_signin' %}" name="registerform">
+              {% csrf_token %}
+              <input class="inputfield_login" id="user_email_login" type="text" placeholder=" E-Mail-Adresse" name="identification" autocomplete="on" autofocus required><br>
+              <input class="inputfield_login" id="user_password" type="password" name="password" placeholder=" Passwort" required><br>
+              <input class="inputbutton_login" id="inputbutton" name="anmelden_submit" type="submit" value="Anmelden">
+            </form>
+            <p class="password_login"><a href="{% url 'userena_password_reset %}">Passwort vergessen?</a></p>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign Up (Eintragen) Modal -->
+    <div class="modal unsichtbar" id="signup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-login">
+        <div class="modal-content-login">
+                    <button type="button" class="close" onclick="modal_sichtbar_umschalten('signup')"><span aria-hidden="true">&times;</span></button>
+          <div class="modal-header">
+
+            <h2 class="modal-title" id="myModalLabel">Eintragen</h2>
+            <p class="tologin">Sie sind bereits eingetragen? <br><a data-toggle="modal" data-target="#login" data-dismiss="modal" aria-label="Close" value="Anmelden">Dann melden Sie sich hier mit ihrer E-Mail-Adresse an.</a></p>
+          </div>
+          <div class="modal-body">
+            <p>
+              <form method="post" action="{% url 'userena_signup' %}" name="registerform">
+                  {% csrf_token %}
+                  <input class="inputfield_login" id="user_email_signup" type="email" placeholder=" E-Mail-Adresse" name="email" required><br>
+                  <input class="inputbutton_login" id="inputbutton" name="eintragen_submit" type="submit" value="Kostenlos eintragen">
+              </form>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
