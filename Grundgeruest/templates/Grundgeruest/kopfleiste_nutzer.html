@@ -31,7 +31,7 @@
       >{{ user.my_profile.get_stufe_display }}
     </li>
     <li><a href="{% url 'userena_profile_detail' user.username %}">Profil</a></li>
-    <li><a href="/spende/">Unterstützen</a></li>
+    <li><a href="{% url 'gast_spende' %}">Unterstützen</a></li>
     <li class="divider"></li>
     <li class="dropdown-header dropdown_credits"
       >Guthaben: {{ user.my_profile.guthaben }} <img
