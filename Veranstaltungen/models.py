@@ -36,6 +36,18 @@ class Veranstaltung(KlasseMitProdukten):
         else: # das ändern, falls es mehrere Arten gibt
             return self.art_veranstaltung.preis_praesenz
     
+    def ob_aktiv(self, art='teilnahme'):
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+        elif art == 'teilnahme':
+            return bool(self.finde_anzahl(art))
+        elif art == 'livestream':
+            return bool(self.link)
+        elif art == 'aufzeichnung':
+            return bool(self.datei)    
+        else: 
+            return ValueError('Art %s habe ich noch nicht beachtet' % art)
+    
     def get_url(self):
         if self.art_veranstaltung.bezeichnung == 'Salon':
             return '/salon/%s' % self.slug
@@ -46,8 +58,7 @@ class Veranstaltung(KlasseMitProdukten):
         return self.art_veranstaltung.bezeichnung+': '+self.bezeichnung
     
     def hat_medien(self):
-        if (self.finde_anzahl('livestream') or 
-            self.finde_anzahl('aufzeichnung')):
+        if (self.ob_aktiv('livestream') or self.ob_aktiv('aufzeichnung')):
             return True
         else:
             return False

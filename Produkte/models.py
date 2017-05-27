@@ -82,6 +82,15 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             raise ValueError('Bitte gültige Art angeben')
         else: 
             return self.finde_preis(art)
+
+    def ob_aktiv(self, art=0):
+        """ Funktion zum Prüfen, ob eine Art des Produktes aktiv ist. Ist 
+        verschieden abhängig vom Model, beim Livestream guckt man nach dem 
+        Link, bei Teilnahmen nach der Anzahl, etc. """
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+        else: 
+            return False
     
     class Meta:
         abstract = True
