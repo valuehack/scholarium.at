@@ -13,6 +13,14 @@ import os, pdb
 # Create your views here.
 
 def liste_artikel(request):
+    """ Gibt Übersichtsseite mit Artikeln aus; oder, wenn GET-Daten da
+    sind, ein Detail-view zu dem Artikel (rückwärtskompatibel) """
+    
+    slug = request.GET.get('q')
+    if slug: # erst prüfen, ob was da ist
+        return ein_artikel(request, slug)
+    
+    # nur wenn kein 'q' im GET, wird Liste ausgegeben:    
     if request.user.is_authenticated() and request.user.hat_guthaben():
         return ListeMitMenue.as_view(
             model=models.Artikel,
