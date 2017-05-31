@@ -50,9 +50,14 @@ class PreiseMetaklasse(ModelBase):
                 NeueKlasse.add_to_class(
                     'preis_%s' % art, 
                     models.SmallIntegerField(null=True, blank=True))
-                NeueKlasse.add_to_class(
-                    'anzahl_%s' % art, 
-                    models.SmallIntegerField(default=0, blank=True))
+                if arten_attribute[art][0]: # wenn beschränkt
+                    NeueKlasse.add_to_class(
+                        'anzahl_%s' % art, 
+                        models.SmallIntegerField(default=0, blank=True))
+                else: # sonst keine Anzahl, sondern boolean ob aktiv
+                    NeueKlasse.add_to_class(
+                        'ob_%s' % art, 
+                        models.BooleanField(default=0, blank=True))
                 for fkt in fkts:
                     setattr(NeueKlasse, 
                         fkt.__name__+'_'+art, 
@@ -60,6 +65,20 @@ class PreiseMetaklasse(ModelBase):
         
         return NeueKlasse
 
+
+# globale Attribute für Produktarten; zu jeder Art ein Tupel aus 
+# ob_beschränkt, button_text
+arten_attribute = {
+    'teilnahme': (True, 'Auswählen'),  
+    'livestream': (False, 'Livestream buchen'),
+    'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen - ja, ist ein langer Button! :)'),
+    'pdf': (False, 'pdf'),
+    'epub': (False, 'epub'),
+    'mobi': (False, 'mobi'),
+    'druck': (True, 'Druck'),
+    'kaufen': (True, 'Zum Kauf auswählen'),
+    'leihen': (True, 'Zum Verleih auswählen'),
+}
 
 class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     """ Von dieser Klasse erbt alles, was man in den Warenkorb legen kann 
@@ -89,9 +108,15 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         Link, bei Teilnahmen nach der Anzahl, etc. """
         if art not in self.arten_liste:
             raise ValueError('Bitte gültige Art angeben')
-        else: 
-            return False
-    
+        elif arten_attribute[art][0]: # wenn beschränkt 
+            return bool(self.finde_anzahl(art))
+        else:
+            return getattr(self, 'ob_%s' % art)
+
+    def button_text(self, art=0):
+        """ Gibt Beschriftung für Button zum in-den-Warenkorb-Legen aus """
+        return arten_attribute[art][1]
+        
     class Meta:
         abstract = True
 
@@ -179,7 +204,8 @@ class Kauf(models.Model):
         """ Führt die Kaufabwicklung aus, d.h. legt ein neues Kauf-Objekt
         an und zieht dem Nutzer Guthaben ab. Muss einen Warenkorb-Item 
         übergeben bekommen, da dort die Menge steht und .total() genutzt
-        wird für den Preis. """
+        wird für den Preis. 
+        *** offen: Sollte der Ware Anzahl abziehen, falls beschränkt! """
         guthaben = nutzer.guthaben
         kauf = Kauf.objects.create(
             nutzer=nutzer,

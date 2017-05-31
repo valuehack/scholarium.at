@@ -12,6 +12,10 @@ def produkt_pk(produkt, art=0):
     return produkt.pk_ausgeben(art)
 
 @register.simple_tag
+def button_text(produkt, art=0):
+    return produkt.button_text(art)
+
+@register.simple_tag
 def ware_model(ware):
     return ware.obj.__class__.__name__.lower()
 
