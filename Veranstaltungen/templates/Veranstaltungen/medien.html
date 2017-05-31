@@ -5,7 +5,7 @@
   {% for medium in medien %}
   <tr>
     <td>
-      <a href="{{ veranstaltung.get_url }}">
+      <a href="{{ medium.get_url }}">
         {{ medium.art_veranstaltung }}: {{ medium.bezeichnung }}
       </a>
     </td>
