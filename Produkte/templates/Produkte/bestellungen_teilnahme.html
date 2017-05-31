@@ -1,0 +1,13 @@
+{% load static humanize %}
+
+{% with v=obj %}
+
+  <div class="warenkorb_veranstaltung">
+    <span>{{ v.art_veranstaltung.bezeichnung }}</span>
+    <span>
+      <a href="{% url 'Veranstaltungen:veranstaltung_detail' v.slug %}">{{ v.bezeichnung }}</a>
+    </span>
+    <span>{{ v.datum|naturalday:"l, d.m.Y" }}</span>
+    <span>Vor Ort</span>
+  </div>
+{% endwith %}

@@ -222,12 +222,21 @@ def bestellungen(request):
     liste_kaeufe = Kauf.objects.filter(nutzer=nutzer)
     # verteile Käufe nach model:
     kaeufe = {}
+    def hinzufuegen(kauf, key):
+        if not key in kaeufe:
+            kaeufe[key] = [kauf, ]
+        else: 
+            kaeufe[key].append(kauf)
+        
     for kauf in liste_kaeufe:
         model = kauf.model_ausgeben() # ein string
-        if not model in kaeufe:
-            kaeufe[model] = [kauf, ]
-        else: 
-            kaeufe[model].append(kauf)
+        hinzufuegen(kauf, model)
+    
+    if 'veranstaltung' in kaeufe: # verteile auf vor-Ort und medien
+        liste_v = kaeufe.pop('veranstaltung')
+        for k in liste_v:
+            art = k.art_ausgeben()
+            hinzufuegen(k, art)
     
     return render(request, 
         'Produkte/bestellungen.html', 

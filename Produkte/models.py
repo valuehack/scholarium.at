@@ -116,7 +116,13 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     def button_text(self, art=0):
         """ Gibt Beschriftung für Button zum in-den-Warenkorb-Legen aus """
         return arten_attribute[art][1]
-        
+    
+    anzahlen_ausgeben(self, art=0):
+        """ Gibt range der Anzahlen für dropdown im Template zurück """
+        if arten_attribute[art][0]: # falls beschränkt
+            return
+
+    
     class Meta:
         abstract = True
 

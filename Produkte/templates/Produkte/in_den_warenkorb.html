@@ -1,5 +1,5 @@
 {% load static produkttags %}
-{% max_anzahl_zu_liste max_anzahl as anzahlen %}
+{% produkt.anzahlen_ausgeben as anzahlen %}
 {% preis produkt art as preis %}
 <form action="{% url 'Produkte:cart-add' %}" method="post">
   {% csrf_token %}

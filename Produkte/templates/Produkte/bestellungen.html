@@ -6,7 +6,7 @@
 
   <h1> Übersicht Ihrer Bestellungen</h1>
 
-  {% if kaeufe.veranstaltung %}{% with liste_v=kaeufe.veranstaltung %}
+  {% if kaeufe.teilnahme %}{% with teilnahmen=kaeufe.teilnahme %}
   <div class="separator">
     <h2>Ihre Veranstaltungen</h2>
   </div>
@@ -14,12 +14,12 @@
     <table>
       <tr>
         <th/>
-        <th>Zeit</th>
+        <th>Zeit gebucht</th>
         <th>Plätze</th>
       </tr>
-      {% for kauf in liste_v %}
+      {% for kauf in teilnahmen %}
       <tr>
-        <td>{% include "Produkte/warenkorb_veranstaltung.html" with obj=kauf.objekt_ausgeben %}</td>
+        <td>{% include "Produkte/bestellungen_teilnahme.html" with obj=kauf.objekt_ausgeben %}</td>
         <td>{{ kauf.zeit|naturaltime }}</td>
         <td>{{ kauf.menge }}</td>
       </tr>
@@ -32,69 +32,57 @@
   </div>
   {% endif %}
 
-  {% if kaeufe.medium %}{% with liste_v=kaeufe.veranstaltung %}
-  <div class="separator">
-    <h2>Ihre Schriften und Medien</h2>
-  </div>
-  <div class="container">
-    <table>
-      <tr>
-        <th/>
-        <th/>
-        <th>Download</th>
-      </tr>
-      {% for kauf in medien %}
-      <tr>
-        <td>{{ kauf.zeit|naturaltime }}</td>
-        <td>{{ kauf.produkt }}</td>
-        <td> Preis später </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-  {% endwith %}{% else %}
-  <div class="separator" style="margin-bottom: 100px">
-    <h2>Keine Medien gebucht</h2>
-  </div>
-  {% endif %}
-
-  <div class="separator">
-    <h2>Ihre Spenden und Programme</h2>
-  </div>
-  <div class="container">
-    <h2>Spenden</h2>
-
-    <table>
+    {% if kaeufe.aufzeichnung or kaeufe.livestream %}{% with a=kaeufe.aufzeichnung l=kaeufe.livestream %}
+    <div class="separator">
+      <h2>Ihre Aufzeichnungen und Medien</h2>
+    </div>
+    <div class="container">
+      <table>
         <tr>
-            <th/>
-            <th>Ihre Spende</th>
-            <th>Status</th>
+          <th/>
+          <th/>
+          <th>Download</th>
         </tr>
         {% for kauf in medien %}
         <tr>
-            <td>{{ kauf.zeit|naturaltime }}</td>
-            <td>{{ kauf.produkt }}</td>
-            <td> Preis später </td>
+          <td>{{ kauf.zeit|naturaltime }}</td>
+          <td>{{ kauf.produkt }}</td>
+          <td> Preis später </td>
         </tr>
         {% endfor %}
-    </table>
+      </table>
+    </div>
+    {% endwith %}{% else %}
+    <div class="separator" style="margin-bottom: 100px">
+      <h2>Keine gebuchten Aufzeichnungen</h2>
+    </div>
+    {% endif %}
 
-    <h2>Programme</h2>
-
-    <table>
+    {% if kaeufe.buch %}{% with b=kaeufe.buch %}
+    <div class="separator">
+      <h2>Ihre Aufzeichnungen und Medien</h2>
+    </div>
+    <div class="container">
+      <table>
         <tr>
-            <th/>
-            <th>Plätze</th>
-            <th>Status</th>
+          <th/>
+          <th/>
+          <th>Download</th>
         </tr>
-        {% for kauf in medien %}
+        {% for kauf in b %}
         <tr>
-            <td>{{ kauf.zeit|naturaltime }}</td>
-            <td>{{ kauf.produkt }}</td>
-            <td> Preis später </td>
+          <td>{{ kauf.zeit|naturaltime }}</td>
+          <td>{{ kauf.produkt }}</td>
+          <td> Preis später </td>
         </tr>
         {% endfor %}
-    </table>
+      </table>
+    </div>
+    {% endwith %}{% else %}
+    <div class="separator" style="margin-bottom: 100px">
+      <h2>Keine gebuchten Bücher</h2>
+    </div>
+    {% endif %}
 
 </div>
 
