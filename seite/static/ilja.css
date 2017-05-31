@@ -687,6 +687,7 @@ td {
 	font-size: 16pt;
 	font-family: "Futura Book", Helvetica, Arial, serif;
 	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
 }
 
 .inputbutton:hover {
@@ -837,6 +838,30 @@ div.scholienbuechlein > div {
 	width: 40%;
 	text-align: right;
 	padding-right: 15%;
+}
+
+.buecher_form {
+	padding: 5px;
+}
+
+.buecher-coin {
+    display: inline;
+    font-style: normal;
+}
+
+.buecher-coin-span {
+	font-size: 18pt;
+    padding-left: 8px;
+}
+
+.buecher-coin-span1 {
+	font-size: 18pt;
+	padding-left: 18px;
+}
+
+.buecher-coin-span__img {
+	width: 1.4em;
+	margin: 0.5em  0 -.4em 0.5em !important;
 }
 
 .schriften_type {

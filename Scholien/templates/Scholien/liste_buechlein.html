@@ -7,7 +7,7 @@
   <div class="veranstaltungen">
     {% for band in buechlein %}
     <div class="scholienbuechlein">
-      <img src="{{ band.bild.url }}">
+      <img src="{% if band.bild %}{{ band.bild.url }}{% endif %}">
       <div class="veranstaltung" style="margin-top: 0;">
         <div>Scholie</div>
         <h1><a href='{{ band.slug }}'>{{ band.bezeichnung }}</a></h1>

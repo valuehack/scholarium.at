@@ -20,8 +20,10 @@ class Artikel(Grundklasse):
         ordering = ['-datum_publizieren']
 
 class Buechlein(KlasseMitProdukten):
-    pdf = models.FileField(upload_to='scholienbuechlein', null=True)
-    bild = models.ImageField(upload_to='scholienbuechlein', null=True)
+    pdf = models.FileField(upload_to='scholienbuechlein', null=True, blank=True)
+    epub = models.FileField(upload_to='scholienbuechlein', null=True, blank=True)
+    mobi = models.FileField(upload_to='scholienbuechlein', null=True, blank=True)
+    bild = models.ImageField(upload_to='scholienbuechlein', null=True, blank=True)
     beschreibung = models.TextField(max_length=2000, null=True, blank=True)
     alte_nr = models.SmallIntegerField(null=True, editable=False)
     arten_liste = ['druck', 'pdf', 'epub', 'mobi']
@@ -38,4 +40,3 @@ class Buechlein(KlasseMitProdukten):
     class Meta:
         verbose_name_plural = "Büchlein"
         ordering = ['-alte_nr']
-
