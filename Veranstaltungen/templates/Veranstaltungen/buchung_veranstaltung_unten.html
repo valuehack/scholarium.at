@@ -2,8 +2,7 @@
     <div class="salon_reservation">
       <div class="sinfo">
         <h2 style="margin-top: 0;">Vor Ort</h2>
-        <p>Anzahl gewünschter Teilnehmer:</p>
-        {% include 'Produkte/in_den_warenkorb.html' with produkt=veranstaltung art='teilnahme' %}
+        {% include 'Produkte/in_den_warenkorb.html' with produkt=veranstaltung art='teilnahme' max_anzahl=5 %}
       </div>
     </div>
   </div>
