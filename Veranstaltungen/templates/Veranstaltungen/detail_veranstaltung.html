@@ -15,7 +15,7 @@
     <p>{{ veranstaltung.beschreibung|safe }}</p>
     {{ veranstaltung.art_veranstaltung.beschreibung|safe }}
     <div class="medien_anmeldung">
-    <a href="/veranstaltungen/">zurück zu den Veranstaltungen</a>
+    <a href="{% url 'Veranstaltungen:liste_alle' %}">zurück zu den Veranstaltungen</a>
     </div>
     {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' %}
   </div>

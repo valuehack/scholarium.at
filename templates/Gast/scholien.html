@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{%block title%}Scholien{%endblock%}
+{% block title %}Scholien{% endblock %}
 
 {% block content %}
   <article class="blog">
@@ -13,7 +13,7 @@
 
       {% if request.user.is_authenticated %}
       <p>Wir freuen uns, dass Sie Druckausgaben der Scholien beziehen m&ouml;chten. Allerdings stehen diese nur unseren Unterst&uuml;tzern zur Verf&uuml;gung, die einen kleinen Kostenbeitrag (mindestens 6,25&euro; im Monat) f&uuml;r das Bestehen des <i>scholarium</i> leisten.</p>
-      <a class="blog_linkbutton" href="../spende/">Unterst&uuml;tzen & Zugang erhalten</a>
+      <a class="blog_linkbutton" href="{% url 'gast_spende' %}">Unterst&uuml;tzen & Zugang erhalten</a>
       {% else %}
       <p>Wenn Sie sich angesprochen f&uuml;hlen, treten Sie doch bitte zun&auml;chst einen Schritt weit aus der Anonymit&auml;t und tragen Sie hier kostenlos Ihre E-Mail-Adresse ein, Sie k&ouml;nnen dann die letzten Scholien-Beitr&auml;ge anlesen.</p>
     </div>

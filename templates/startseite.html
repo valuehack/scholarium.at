@@ -2,15 +2,12 @@
 {% load static %}
 
 {% block content %}
-  <div class="jubilaeum_banner">
-    <a href="http://www.scholarium.at/jubilaeum">Sehen Sie sich hier die Fotos unseres vergangenen Jubiläums an</a>
-  </div>
 
   <div style="padding: 10px 15% 20px 15%; width: 70%; display: inline-block; color: rgb(20,20,20); margin-bottom: 30px;">
     <div class="startseite_letzter_artikel">
       {% with artikel=liste_artikel.0 %}
       <h1>
-        <a href="{{ artikel.slug }}">{{ artikel.bezeichnung|safe }}</a>
+        <a href="{% url 'Scholien:artikel_detail' artikel.slug %}">{{ artikel.bezeichnung|safe }}</a>
       </h1>
       <br>
       <div>
@@ -18,7 +15,7 @@
         <span>{{ artikel.datum_publizieren }}</span>
       </div>
       <br>
-      <p>{{ artikel.inhalt|safe|truncatewords:42 }} [<a href="{{ artikel.slug }}">Weiterlesen</a>]</p>
+      <p>{{ artikel.inhalt|safe|truncatewords:42 }} [<a href="{% url 'Scholien:artikel_detail' artikel.slug %}">Weiterlesen</a>]</p>
       {% endwith %}
     </div>
   </div>
@@ -29,7 +26,7 @@
       <div>
         {% for veranstaltung in veranstaltungen %}
         <p>
-          <a href="{% url 'Veranstaltungen:veranstaltung_detail' slug=veranstaltung.slug %}">{{ veranstaltung.bezeichnung|safe }}</a>
+          <a href="{% url 'Veranstaltungen:veranstaltung_detail' veranstaltung.slug %}">{{ veranstaltung.bezeichnung|safe }}</a>
           <br>{{ veranstaltung.datum }}<span>{{ veranstaltung.art_veranstaltung.bezeichnung }}</span>
         </p>
         {% endfor %}
@@ -42,7 +39,7 @@
       <div>
         {% for artikel in liste_artikel|slice:"1:4" %}
         <p>
-          <a href="{% url 'Scholien:artikel_detail' slug=artikel.slug %}">{{ artikel.bezeichnung|safe }}</a>
+          <a href="{% url 'Scholien:artikel_detail' artikel.slug %}">{{ artikel.bezeichnung|safe }}</a>
           <br>{{ artikel.datum_publizieren }}
         </p>
         {% endfor %}
@@ -57,7 +54,7 @@
       <div>
         {% for medium in medien %}
         <p>
-          <a href="{% url 'Veranstaltungen:veranstaltung_detail' slug=medium.slug %}">{{ medium.bezeichnung|safe }}</a>
+          <a href="{% url 'Veranstaltungen:veranstaltung_detail' medium.slug %}">{{ medium.bezeichnung|safe }}</a>
           <br>{{ medium.typ }}
         </p>
         {% endfor %}
@@ -77,7 +74,7 @@
       </div>
       <p>
         <a href="{% url 'Bibliothek:liste_alle' %}">Mehr Bücher</a>
-        <a href="/scholienbuechlein/">Mehr Scholienbüchlein</a>
+        <a href="{% url 'Scholien:buechlein_liste' %}">Mehr Scholienbüchlein</a>
       </p>
     </div>
   </div>

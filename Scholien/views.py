@@ -56,6 +56,12 @@ def ein_artikel(request, slug):
         model=models.Artikel,
         context_object_name = 'scholie')(request, slug=slug)
 
+def ein_buechlein(request, slug):
+    return DetailMitMenue.as_view(
+        template_name='Scholien/detail_buechlein.html',
+        model=models.Buechlein,
+        context_object_name = 'scholienbuechlein')(request, slug=slug)
+
 def daten_einlesen(request):
     aus_alter_db_einlesen()
     return HttpResponseRedirect('/scholien')

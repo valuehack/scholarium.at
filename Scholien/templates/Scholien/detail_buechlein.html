@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="buecher_head">
+    <h1>{% block title %}{{ scholienbuechlein.bezeichnung|safe }}{% endblock %}</h1>
+    <div class="buecher_img">
+      <img src="{{ scholienbuechlein.bild.url }}" alt="{{ scholienbuechlein.bezeichnung|safe }}">
+    </div>
+    <div class="buecher_bestellen">
+        <span class="schriften_type">Scholie</span>
+    </div>
+  </div>
+  <div class="separator">
+    <h2>Inhalt</h2>
+  </div>
+  <div class="salon_content">
+    {{ scholienbuechlein.beschreibung|safe }}
+    {% if request.user.my_profile.nicht_abgelaufen %}
+    {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
+    {% else %} <a href="{% url 'gast_spende' %}">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, erneuern Sie bitte Ihre Unterstützung</a>
+    {% endif %}
+    <p style="text-align: right;">
+      <a href="{% url 'Scholien:buechlein_liste' %}">zurück zu den Scholienbüchlein</a>
+    </p>
+  </div>
+{% endblock content %}

@@ -7,7 +7,7 @@
     <span>
       <a href="{% url 'Veranstaltungen:veranstaltung_detail' v.slug %}">{{ v.bezeichnung }}</a>
     </span>
-    <span>{{ v.datum|naturalday }}</span>
+    <span>{{ v.datum|naturalday:"l, d.m.Y" }}</span>
     <span>Vor Ort</span>
     <form action="{% url 'Produkte:cart-remove' %}" method="post">
     	{% csrf_token %}

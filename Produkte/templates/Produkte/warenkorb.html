@@ -22,7 +22,7 @@
       {% endwith %}{% endfor %}
     </tbody>
     <tfoot>
-      <td>Summe {{ cart.item_count }} Artikel:</td>
+      <td>Summe:</td>
       <td>{{ cart.total_price }}<img src="{% static 'img/coin.png' %}"></td>
       <td></td>
     </tfoot>
@@ -31,11 +31,11 @@
   <div style="display: table;">
     <form action="{% url 'Produkte:kaufen' %}" method="post">
       {% csrf_token %}
-      <input type="submit" value="Auschecken!" />
+      <input type="submit" value="Jetzt bestellen" />
     </form>
     <form action="{% url 'Produkte:cart-empty' %}" method="post">
       {% csrf_token %}
-      <input type="submit" value="Warenkorb leeren!" />
+      <input type="submit" value="Korb leeren" />
     </form>
   </div>
 
