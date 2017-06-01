@@ -4,29 +4,29 @@
 {% load static produkttags %}
 {% block content %}
   <div class="buecher_head">
-      
+
     <h1>{% block title %}{{ scholienbuechlein.bezeichnung|safe }}{% endblock %}</h1>
-    
+
     {% if scholienbuechlein.bild %}
     <div class="buecher_img">
       <img src="{{ scholienbuechlein.bild.url }}" alt="{{ scholienbuechlein.bezeichnung|safe }}">
     </div>
     {% endif %}
-    
+
     <div class="buecher_bestellen">
         <span class="schriften_type">Scholie</span>
-        
-        {% for buechleinformat in scholienbuechlein.arten_liste %}
-                
+
+        {% for buechleinformat in scholienbuechlein.arten_aktiv %}
+
         {% include 'Produkte/in_den_warenkorb.html' with produkt=scholienbuechlein art=buechleinformat max_anzahl=10 %}
-        
+
         {% endfor %}
-        
+
         {% comment %}
         <form class="buecher_form" action="{% url 'Produkte:cart-add' %}" method="post">
         {% csrf_token %}
          <input type="hidden" name="pk" value="produkt_pk produkt art">
-         
+
          {% if forloop.first %}
          <select class="input-select" name="quantity" onchange="changePrice(this.value, '{{ scholienbuechlein.preis_druck }}')">
              {% for i in "0123456789" %}
@@ -34,7 +34,7 @@
              {% endfor %}
          </select>
           {% endif %}
-          
+
          <input class="inputbutton" type="submit" value="{{ buechleinformat|upper }}"> <!-- <? if(($itm_info->spots - $itm_info->spots_sold) == 0 OR $itm_info->format == "1110" OR $itm_info->format == "1010" OR $itm_info->format == "1100" OR $itm_info->format == "1000" OR $itm_info->format == "0110" OR $itm_info->format == "0100" OR $itm_info->format == "0010") echo "disabled"?>> -->
          <div class="buecher-coin">
              <span {% if forloop.first %} id="change" class="buecher-coin-span">
@@ -55,19 +55,19 @@
             <input type="hidden" name="pk" value="">
             <input type="hidden" name="quantity" value="1">
             <input type="hidden" name="format" value="1">
-            <input type="submit" class="inputbutton" value="PDF" /> <?php if ($itm_info->format == "0111" OR $itm_info->format == "0011" OR $itm_info->format == "0101" OR $itm_info->format == "0100" OR $itm_info->format == "0010" OR $itm_info->format == "0110") { ?> disabled <?php } ?> > 
+            <input type="submit" class="inputbutton" value="PDF" /> <?php if ($itm_info->format == "0111" OR $itm_info->format == "0011" OR $itm_info->format == "0101" OR $itm_info->format == "0100" OR $itm_info->format == "0010" OR $itm_info->format == "0110") { ?> disabled <?php } ?> >
                 <span id="change" class="buecher-coin-span1">{{ scholienbuechlein.preis_pdf }}</span><img class="buecher-coin-span__img" src="{% static 'img/coin.png' %}">
         </form>
-        
+
         <form class="buecher_form" action="{% url 'Produkte:cart-add' %}" method="post">
         {% csrf_token %}
             <input type="hidden" name="pk" value="">
             <input type="hidden" name="quantity" value="1">
             <input type="hidden" name="format" value="1">
-            <input type="submit" class="inputbutton" value="EPUB" /> <?php if ($itm_info->format == "0111" OR $itm_info->format == "0011" OR $itm_info->format == "0101" OR $itm_info->format == "0100" OR $itm_info->format == "0010" OR $itm_info->format == "0110") { ?> disabled <?php } ?> > 
+            <input type="submit" class="inputbutton" value="EPUB" /> <?php if ($itm_info->format == "0111" OR $itm_info->format == "0011" OR $itm_info->format == "0101" OR $itm_info->format == "0100" OR $itm_info->format == "0010" OR $itm_info->format == "0110") { ?> disabled <?php } ?> >
                 <span id="change" class="buecher-coin-span1">{{ scholienbuechlein.preis_epub }}</span><img class="buecher-coin-span__img" src="{% static 'img/coin.png' %}">
         </form>
-        
+
         <form class="buecher_form" action="{% url 'Produkte:cart-add' %}" method="post">
         {% csrf_token %}
             <input type="hidden" name="pk" value="">
@@ -78,7 +78,7 @@
         </form> -->
         {% endcomment %}
     </div>
-    
+
   </div>
   <div class="separator">
     <h2>Inhalt</h2>
@@ -93,5 +93,5 @@
       <a href="{% url 'Scholien:buechlein_liste' %}">zurück zu den Scholienbüchlein</a>
     </p>
   </div>
-  
+
 {% endblock content %}

@@ -69,15 +69,15 @@ class PreiseMetaklasse(ModelBase):
 # globale Attribute für Produktarten; zu jeder Art ein Tupel aus 
 # ob_beschränkt, button_text
 arten_attribute = {
-    'teilnahme': (True, 'Auswählen'),  
+    'teilnahme': (5, 'Auswählen'),  
     'livestream': (False, 'Livestream buchen'),
     'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen - ja, ist ein langer Button! :)'),
     'pdf': (False, 'PDF'),
     'epub': (False, 'EPUB'),
     'mobi': (False, 'Kindle'),
-    'druck': (True, 'Druck'),
-    'kaufen': (True, 'Zum Kauf auswählen'),
-    'leihen': (True, 'Zum Verleih auswählen'),
+    'druck': (10, 'Druck'),
+    'kaufen': (1, 'Zum Kauf auswählen'),
+    'leihen': (1, 'Zum Verleih auswählen'),
 }
 
 class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
@@ -86,6 +86,13 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     
     """ Liste aller möglichen Formate der Produktklasse """ 
     arten_liste = ['spam'] # Liste von <art> str
+    
+    def arten_aktiv(self):
+        aktiv = []
+        for art in self.arten_liste:
+            if self.ob_aktiv(art):
+                aktiv.append(art)
+        return aktiv
     
     def pk_ausgeben(self, art=0):
         """ Gibt die pk (für Warenkorb-Item) zurück
@@ -117,11 +124,13 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         """ Gibt Beschriftung für Button zum in-den-Warenkorb-Legen aus """
         return arten_attribute[art][1]
     
-    anzahlen_ausgeben(self, art=0):
+    def anzahlen_ausgeben(self, art=0):
         """ Gibt range der Anzahlen für dropdown im Template zurück """
         if arten_attribute[art][0]: # falls beschränkt
-            return
-
+            anz = 1 + min(arten_attribute[art][0], self.finde_anzahl(art))
+            return range(1, anz)
+        else:
+            return None
     
     class Meta:
         abstract = True

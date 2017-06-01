@@ -24,10 +24,7 @@ def art_aus_pk(pk):
     return Kauf.tupel_aus_pk(pk)[2]
 
 @register.simple_tag
-def max_anzahl_zu_liste(max_anzahl=1):
-    """ gibt Liste der Anzahlen 1..max zurück, bzw. die leere Liste, falls
-    max_anzahl 1 oder False/None/etc ist """
-    if max_anzahl and max_anzahl > 1:
-        return range(1, max_anzahl+1)
-    else: 
-        return []
+def max_anzahl_zu_liste(produkt, art=0):
+    """ gibt Liste der Anzahlen 1..max zurück, falls das Produkt beschränkt
+    ist, sonst None """
+    return produkt.anzahlen_ausgeben(art)

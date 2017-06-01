@@ -111,6 +111,7 @@ def aus_alter_db_einlesen():
             buch = models.Buechlein.objects.create(
                 bezeichnung=scholie['title'],
                 beschreibung=scholie['text'],
+                anzahl_druck=3,
                 alte_nr=scholie['n'], 
                 slug=scholie['id'])
             

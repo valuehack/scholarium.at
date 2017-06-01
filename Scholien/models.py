@@ -27,6 +27,17 @@ class Buechlein(KlasseMitProdukten):
     beschreibung = models.TextField(max_length=2000, null=True, blank=True)
     alte_nr = models.SmallIntegerField(null=True, editable=False)
     arten_liste = ['druck', 'pdf', 'epub', 'mobi']
+
+    def preis_ausgeben(self, art='druck'):
+        """ Preis ausgeben, default wenn kein individueller gesetzt """
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+        elif self.finde_preis(art):
+            return self.finde_preis(art)
+        elif art=='druck': 
+            return 15
+        else:
+            return 5
     
     def bild_holen(self, bild_url, dateiname):
         response = urlopen(bild_url)

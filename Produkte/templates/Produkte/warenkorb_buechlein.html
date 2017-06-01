@@ -1,16 +1,24 @@
-{% load static humanize %}
+{% load static produkttags %}
 
 {% with b=obj %}
 
-  <div class="warenkorb_veranstaltung">
-    <span>Scholienbüchlein</span>
-    <span>
-      <a href="{% url 'Scholien:ein_buechlein' b.slug %}">{{ b.bezeichnung }}</a>
-    </span>
-    <form action="{% url 'Produkte:cart-remove' %}" method="post">
-    	{% csrf_token %}
-      <input type="hidden" name="pk" value={{ pk }}>
-      <input type="submit" value="Entfernen">
-    </form>
+  <div class="warenkorb_veranstaltung" style="display: inline;">
+    {% if b.bild %}
+    <div class="buecher_img">
+      <img style="height: 200px;" src="{{ b.bild.url }}" alt="{{ b.bezeichnung|safe }}">
+    </div>
+    {% endif %}
+    <div>
+      <span>Scholienbüchlein</span>
+      <span>
+        <a href="{% url 'Scholien:buechlein_detail' b.slug %}">{{ b.bezeichnung }}</a>
+      </span>
+      <span>Format: {% art_aus_pk pk %}</span>
+      <form action="{% url 'Produkte:cart-remove' %}" method="post">
+      	{% csrf_token %}
+        <input type="hidden" name="pk" value={{ pk }}>
+        <input type="submit" value="Entfernen">
+      </form>
+    </div>
   </div>
 {% endwith %}
