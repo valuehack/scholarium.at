@@ -90,7 +90,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     def arten_aktiv(self):
         aktiv = []
         for art in self.arten_liste:
-            if self.ob_aktiv(art):
+            if not self.anzahlen_ausgeben(art) is None:
                 aktiv.append(art)
         return aktiv
     
@@ -109,26 +109,21 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         else: 
             return self.finde_preis(art)
 
-    def ob_aktiv(self, art=0):
-        """ Funktion zum Prüfen, ob eine Art des Produktes aktiv ist. Ist 
-        verschieden abhängig vom Model, beim Livestream guckt man nach dem 
-        Link, bei Teilnahmen nach der Anzahl, etc. """
-        if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
-        elif arten_attribute[art][0]: # wenn beschränkt 
-            return bool(self.finde_anzahl(art))
-        else:
-            return getattr(self, 'ob_%s' % art)
-
     def button_text(self, art=0):
         """ Gibt Beschriftung für Button zum in-den-Warenkorb-Legen aus """
         return arten_attribute[art][1]
     
     def anzahlen_ausgeben(self, art=0):
         """ Gibt range der Anzahlen für dropdown im Template zurück """
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+
         if arten_attribute[art][0]: # falls beschränkt
-            anz = 1 + min(arten_attribute[art][0], self.finde_anzahl(art))
-            return range(1, anz)
+            if self.finde_anzahl(art) == 0:
+                return 0
+            else:
+                anz = 1 + min(arten_attribute[art][0], self.finde_anzahl(art))
+                return range(1, anz)
         else:
             return None
     

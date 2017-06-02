@@ -696,6 +696,7 @@ td {
 
 .inputbutton:disabled {
 	background: rgb(200,200,200);
+    cursor: default;
 }
 
 a.blog_linkbutton {
@@ -846,7 +847,6 @@ div.scholienbuechlein > div {
 
 .buecher-coin {
     display: inline;
-    font-style: normal;
 }
 
 .buecher-coin-span {
