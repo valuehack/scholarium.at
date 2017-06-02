@@ -69,7 +69,7 @@ class PreiseMetaklasse(ModelBase):
 # globale Attribute für Produktarten; zu jeder Art ein Tupel aus 
 # ob_beschränkt, button_text
 arten_attribute = {
-    'teilnahme': (5, 'Auswählen'),  
+    'teilnahme': (5, 'Auswählen'),
     'livestream': (False, 'Livestream buchen'),
     'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen - ja, ist ein langer Button! :)'),
     'pdf': (False, 'PDF'),
@@ -87,10 +87,28 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     """ Liste aller möglichen Formate der Produktklasse """ 
     arten_liste = ['spam'] # Liste von <art> str
     
+    def anzeigemodus(self, art=0):
+        """ gibt einen Code für den Anzeigemodus in Templates aus; also ob
+        es gar nicht angezeigt, oder ausgegraut, oder richtig """
+        if art not in self.arten_liste:
+            raise ValueError('Bitte gültige Art angeben')
+        if arten_attribute[art][0]: # falls beschränkt
+            if self.finde_anzahl(art) == 0 and art=='teilnahme':
+                modus = 'ausgegraut' # ausgebuchte Veranstaltung
+            elif art=='teilnahme':
+                modus = 'mit_menge' # Veranstaltung mit select-box
+            else:
+                modus = 'inline' # alle außer Veranstaltung, z.B. Büchlein
+        else:
+            if getattr(self, 'ob_'+art):
+                modus = 'ohne_menge'
+            else:
+                modus = 'verbergen'
+    
     def arten_aktiv(self):
         aktiv = []
         for art in self.arten_liste:
-            if not self.anzahlen_ausgeben(art) is None:
+            if self.anzeigemodus(art) <> 'verbergen':
                 aktiv.append(art)
         return aktiv
     
