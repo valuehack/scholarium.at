@@ -16,6 +16,10 @@ def button_text(produkt, art=0):
     return produkt.button_text(art)
 
 @register.simple_tag
+def anzeigemodus(produkt, art=0):
+    return produkt.anzeigemodus(art)
+
+@register.simple_tag
 def ware_model(ware):
     return ware.obj.__class__.__name__.lower()
 

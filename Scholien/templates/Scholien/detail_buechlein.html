@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% load static produkttags %}
+
 {% block content %}
   <div class="buecher_head">
 
@@ -17,12 +16,13 @@
         <span class="schriften_type">Scholie</span>
 
         {% for buechleinformat in scholienbuechlein.arten_aktiv %}
-
-        {% include 'Produkte/in_den_warenkorb.html' with produkt=scholienbuechlein art=buechleinformat %}
+        
+        {% anzeigemodus scholienbuechlein buechleinformat as modus %}
+        {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=scholienbuechlein art=buechleinformat %}
 
         {% endfor %}
 
-        {% comment %}
+        {% comment %} "|add:ware.model_ausgeben|add:".html"
         <form class="buecher_form" action="{% url 'Produkte:cart-add' %}" method="post">
         {% csrf_token %}
          <input type="hidden" name="pk" value="produkt_pk produkt art">

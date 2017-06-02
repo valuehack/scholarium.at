@@ -92,18 +92,26 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         es gar nicht angezeigt, oder ausgegraut, oder richtig """
         if art not in self.arten_liste:
             raise ValueError('Bitte gültige Art angeben')
+        if self.__class__.__name__ == "Buechlein": 
+            if art=="druck" and self.finde_anzahl(art) == 0:
+                return "verbergen"
+            elif art!="druck" and getattr(self, "ob_"+art)==False:
+                return "verbergen"
+            else:
+                return "inline" # unabhängig von der art
+        
         if arten_attribute[art][0]: # falls beschränkt
             if self.finde_anzahl(art) == 0 and art=='teilnahme':
                 modus = 'ausgegraut' # ausgebuchte Veranstaltung
             elif art=='teilnahme':
                 modus = 'mit_menge' # Veranstaltung mit select-box
-            else:
-                modus = 'inline' # alle außer Veranstaltung, z.B. Büchlein
         else:
             if getattr(self, 'ob_'+art):
                 modus = 'ohne_menge'
             else:
                 modus = 'verbergen'
+        
+        return modus
     
     def arten_aktiv(self):
         aktiv = []
@@ -123,7 +131,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         Item verwendet wird. Kann bei jeder Klasse überschrieben werden. 
         Wird auch vom Templatetag {% preis <art> %} genutzt. """
         if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
+            raise ValueError('Bitte gültige Art für Preis angeben')
         else: 
             return self.finde_preis(art)
 
@@ -134,7 +142,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     def anzahlen_ausgeben(self, art=0):
         """ Gibt range der Anzahlen für dropdown im Template zurück """
         if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
+            raise ValueError('Bitte gültige Art für Menge angeben')
 
         if arten_attribute[art][0]: # falls beschränkt
             if self.finde_anzahl(art) == 0:
