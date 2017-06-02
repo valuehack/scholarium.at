@@ -108,7 +108,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     def arten_aktiv(self):
         aktiv = []
         for art in self.arten_liste:
-            if self.anzeigemodus(art) <> 'verbergen':
+            if self.anzeigemodus(art) != 'verbergen':
                 aktiv.append(art)
         return aktiv
     
