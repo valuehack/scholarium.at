@@ -6,9 +6,9 @@
 
   <h1> Übersicht Ihrer Bestellungen</h1>
 
-  {% if kaeufe.teilnahme %}{% with teilnahmen=kaeufe.teilnahme %}
+  {% if kaeufe.teilnahmen %}{% with teilnahmen=kaeufe.teilnahmen %}
   <div class="separator">
-    <h2>Ihre Veranstaltungen</h2>
+    <h2>Ihre kommenden Veranstaltungen</h2>
   </div>
   <div class="container">
     <table>
@@ -32,57 +32,32 @@
   </div>
   {% endif %}
 
-    {% if kaeufe.aufzeichnung or kaeufe.livestream %}{% with a=kaeufe.aufzeichnung l=kaeufe.livestream %}
-    <div class="separator">
-      <h2>Ihre Aufzeichnungen und Medien</h2>
-    </div>
-    <div class="container">
-      <table>
-        <tr>
-          <th/>
-          <th/>
-          <th>Download</th>
-        </tr>
-        {% for kauf in medien %}
-        <tr>
-          <td>{{ kauf.zeit|naturaltime }}</td>
-          <td>{{ kauf.produkt }}</td>
-          <td> Preis später </td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    {% endwith %}{% else %}
-    <div class="separator" style="margin-bottom: 100px">
-      <h2>Keine gebuchten Aufzeichnungen</h2>
-    </div>
-    {% endif %}
+  {% if kaeufe.digital %}{% with medien=kaeufe.digital %}
+  <div class="separator">
+    <h2>Ihre elektronischen Medien</h2>
+  </div>
+  <div class="container">
+    <table>
+      <tr>
+        <th><th/>
+        <th>Zeit gebucht</th>
+        <th>Herunterladen</th>
+      </tr>
+      {% for kauf in medien %}
+      <tr>
+        <td>{% include "Produkte/warenkorb_buechlein.html" with pk=kauf.produkt_pk obj=kauf.objekt_ausgeben %}</td>
+        <td>{{ kauf.zeit|naturaltime }}</td>
+        <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endwith %}{% else %}
+  <div class="separator" style="margin-bottom: 100px">
+    <h2>Keine elektronischen Bücher oder Aufzeichnungen</h2>
+  </div>
+  {% endif %}
 
-    {% if kaeufe.buch %}{% with b=kaeufe.buch %}
-    <div class="separator">
-      <h2>Ihre Aufzeichnungen und Medien</h2>
-    </div>
-    <div class="container">
-      <table>
-        <tr>
-          <th/>
-          <th/>
-          <th>Download</th>
-        </tr>
-        {% for kauf in b %}
-        <tr>
-          <td>{{ kauf.zeit|naturaltime }}</td>
-          <td>{{ kauf.produkt }}</td>
-          <td> Preis später </td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    {% endwith %}{% else %}
-    <div class="separator" style="margin-bottom: 100px">
-      <h2>Keine gebuchten Bücher</h2>
-    </div>
-    {% endif %}
 
 </div>
 

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -217,27 +217,31 @@ class Warenkorb(BaseCart):
 
 @login_required
 def bestellungen(request):
+    """ Übersicht der abgeschlossenen Bestellungen 
+    
+    Es werden die Käufe vom Nutzer gesucht und in einem dict nach 
+    Kategorien geordnet ausgegeben, folgende Kategorien:
+     - kommende Veranstaltungen
+     - elektronische Medien
+     - unkategorisiert
+    (später noch bestellte Bücher)
+    """
     nutzer = request.user.my_profile
     liste_menue = erstelle_liste_menue(request.user)
-    liste_kaeufe = Kauf.objects.filter(nutzer=nutzer)
-    # verteile Käufe nach model:
-    kaeufe = {}
-    def hinzufuegen(kauf, key):
-        if not key in kaeufe:
-            kaeufe[key] = [kauf, ]
-        else: 
-            kaeufe[key].append(kauf)
+    liste_kaeufe = list(Kauf.objects.filter(nutzer=nutzer))
+    # verteile Käufe nach Kategorie:
+    kaeufe = {'teilnahmen': [], 'digital': [], 'rest': []}
         
-    for kauf in liste_kaeufe:
-        model = kauf.model_ausgeben() # ein string
-        hinzufuegen(kauf, model)
-    
-    if 'veranstaltung' in kaeufe: # verteile auf vor-Ort und medien
-        liste_v = kaeufe.pop('veranstaltung')
-        for k in liste_v:
-            art = k.art_ausgeben()
-            hinzufuegen(k, art)
-    
+    while liste_kaeufe:
+        kauf = liste_kaeufe.pop()
+        if (kauf.model_ausgeben() == 'veranstaltung' and 
+            kauf.art_ausgeben() == 'teilnahme'):
+            kaeufe['teilnahmen'].append(kauf)
+        elif kauf.art_ausgeben() in ['pdf', 'epub', 'mobi', 'aufzeichnung']:
+            kaeufe['digital'].append(kauf)
+        else:
+            kaeufe['rest'].append(kauf)
+            
     return render(request, 
         'Produkte/bestellungen.html', 
         {'kaeufe': kaeufe, 'liste_menue': liste_menue})
@@ -253,8 +257,35 @@ def kaufen(request):
     
     warenkorb.empty()
                 
-    return HttpResponseRedirect(reverse('Produkte:warenkorb'))
+    return HttpResponseRedirect(reverse('Produkte:bestellungen'))
 
+
+def medien_runterladen(request):
+    """ bekommt als POST, welches Objekt heruntergeladen werden soll, prüft 
+    ob der user das darf, und gibt response mit Anhang zurück """
+    from django.utils.encoding import smart_str
+    import os
+    from seite.settings import MEDIA_ROOT
+    
+    kauf = get_object_or_404(Kauf, id=request.POST['kauf_id'])
+    if not kauf.nutzer.user == request.user:
+        return 404
+    # sonst setze fort, falls der Nutzer das darf:
+    
+    obj, art = kauf.objekt_ausgeben(mit_art=True)
+    filefield = getattr(obj, art)
+    with open(filefield.path, 'rb') as datei:
+        medium = datei.read()
+    
+    name, ext = os.path.splitext(filefield.name)
+    print(ext)
+
+    response = HttpResponse(medium, content_type='application/force-download') 
+    response['Content-Disposition'] = ('attachment; filename=' + 
+        obj.__str__() + ext)
+    
+    return response
+    
 
 from easycart.views import CartView
 from easycart.cart import CartException
@@ -289,4 +320,4 @@ class AddItem(CartView):
         except CartException as exc:
             return JsonResponse(dict({'error': exc.__class__.__name__},
                                      **exc.kwargs))
-        return cart.encode()
+        return HttpResponseRedirect(reverse('Produkte:warenkorb'))
