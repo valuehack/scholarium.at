@@ -15,7 +15,7 @@
     <tbody>
       {% for paar in cart.items_ausgeben %}{% with pk=paar.0 ware=paar.1 %}
       <tr>
-        <td>{% include "Produkte/warenkorb_"|add:ware.model_ausgeben|add:".html" with pk=pk obj=ware.obj %}</td>
+        <td>{% include "Produkte/warenkorb_"|add:ware.model_ausgeben|add:".html" with pk=pk obj=ware.obj art=ware.art %}</td>
         <td>{{ ware.price }}<img class='dropdown_coin' src="{% static 'img/coin.png' %}"></td>
         <td>{{ ware.quantity }}</td>
       </tr>

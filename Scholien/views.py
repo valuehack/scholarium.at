@@ -68,7 +68,7 @@ def daten_einlesen(request):
     
 def pdfs_etc_einlesen():
     liste = Buechlein.objects.all()
-    os.system(("rsync -a --files-from=" + files + " wertewirt@scholarium.at:~/" + 
+    os.system("rsync -a --files-from=" + files + " wertewirt@scholarium.at:~/" + 
         "html/production/down_secure/content_secure/ " + out_dir)
 
 def aus_alter_db_einlesen():

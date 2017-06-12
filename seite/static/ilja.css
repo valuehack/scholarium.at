@@ -1473,6 +1473,7 @@ table.warenkorb + div form:first-child input {
 	font-size: 16pt;
 	font-family: "Garamond", Georgia, Times, sans-serif;
 	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
 }
 
 div.warenkorb_veranstaltung {

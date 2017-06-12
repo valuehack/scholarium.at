@@ -69,9 +69,9 @@ class PreiseMetaklasse(ModelBase):
 # globale Attribute für Produktarten; zu jeder Art ein Tupel aus 
 # ob_beschränkt, button_text
 arten_attribute = {
-    'teilnahme': (5, 'Auswählen'),
-    'livestream': (False, 'Livestream buchen'),
-    'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen - ja, ist ein langer Button! :)'),
+    'teilnahme': (5, 'Auswählen', 'Vor Ort'),
+    'livestream': (False, 'Livestream buchen', 'Livestream'),
+    'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen', 'MP3'),
     'pdf': (False, 'PDF'),
     'epub': (False, 'EPUB'),
     'mobi': (False, 'Kindle'),
@@ -91,7 +91,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         """ gibt einen Code für den Anzeigemodus in Templates aus; also ob
         es gar nicht angezeigt, oder ausgegraut, oder richtig """
         if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
+            raise ValueError('Anzeigemodus: Bitte gültige Art angeben')
         if self.__class__.__name__ == "Buechlein": 
             if art=="druck" and self.finde_anzahl(art) == 0:
                 return "verbergen"
@@ -152,7 +152,11 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
                 return range(1, anz)
         else:
             return None
-    
+
+    def format_text(self, art=0):
+        """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""
+        return arten_attribute[art][2]
+        
     class Meta:
         abstract = True
 

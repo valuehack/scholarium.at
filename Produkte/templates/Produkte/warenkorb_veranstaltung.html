@@ -1,14 +1,20 @@
 {% load static humanize %}
+{% load static produkttags %}
 
 {% with v=obj %}
+{% format_text v art as format_text %}
+
 
   <div class="warenkorb_veranstaltung">
     <span>{{ v.art_veranstaltung.bezeichnung }}</span>
     <span>
       <a href="{% url 'Veranstaltungen:veranstaltung_detail' v.slug %}">{{ v.bezeichnung }}</a>
     </span>
-    <span>{{ v.datum|naturalday:"l, d.m.Y" }}</span>
-    <span>Vor Ort</span>
+    <span>{{ v.datum|naturalday:"l, d.m.Y" }},
+          {{ v.art_veranstaltung.zeit_beginn }} &ndash;
+          {{ v.art_veranstaltung.zeit_ende }} Uhr
+    </span>
+    <span>{{ format_text }}</span>
     <form action="{% url 'Produkte:cart-remove' %}" method="post">
     	{% csrf_token %}
       <input type="hidden" name="pk" value={{ pk }}>

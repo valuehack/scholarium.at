@@ -84,8 +84,8 @@ def studiumdings_detail(request, slug):
             context_object_name = 'studiumdings')(request, slug=slug)
 
 def vortrag(request):
+    vortrag = get_object_or_404(Studiumdings, bezeichnung='Vortrag')
     if request.user.is_authenticated():
-        vortrag = get_object_or_404(Studiumdings, bezeichnung='Vortrag')
         arten_wahl = [
             get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vortrag'),
             get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vorlesung')
@@ -95,7 +95,7 @@ def vortrag(request):
             and v.hat_medien()]
         extra_context = {'vortrag': vortrag, 'medien': medien}
     else:
-        extra_context = {}
+        extra_context = { 'vortrag': vortrag }
     return TemplateMitMenue.as_view(
         template_name='Gast/vortrag.html', 
         extra_context=extra_context)(request)
