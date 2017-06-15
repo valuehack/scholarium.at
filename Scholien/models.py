@@ -28,6 +28,15 @@ class Buechlein(KlasseMitProdukten):
     alte_nr = models.SmallIntegerField(null=True, editable=False)
     arten_liste = ['druck', 'pdf', 'epub', 'mobi']
     
+    def preis_ausgeben(self, art):
+        if self.finde_preis(art):
+            return self.finde_preis(art)
+        else:
+            if art == 'druck':
+                return 15
+            else: 
+                return 5
+    
     def bild_holen(self, bild_url, dateiname):
         response = urlopen(bild_url)
         datei_tmp = io.BytesIO(response.read())

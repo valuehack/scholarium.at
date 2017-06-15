@@ -282,7 +282,7 @@ def medien_runterladen(request):
 
     response = HttpResponse(medium, content_type='application/force-download') 
     response['Content-Disposition'] = ('attachment; filename=' + 
-        obj.__str__() + ext)
+        obj.slug + ext)
     
     return response
     
