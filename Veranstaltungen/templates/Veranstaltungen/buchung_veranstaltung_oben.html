@@ -1,10 +1,15 @@
+{% load static produkttags %}
+
 {% for m in veranstaltung.medium_set.all %}
   <div style="text-align: center;">
     <div class="salon_reservation">
       <span class="salon_reservation_span_a">
 		    Die Aufzeichnung buchen: </span><br>
-        {% include 'Produkte/in_den_warenkorb.html' with produkt=m art='livestream' %}
-      </div>
+        {% for veranstaltungsart in m.arten_aktiv %}
+        {% anzeigemodus veranstaltung veranstaltungsart as modus %}
+        {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=veranstaltung art=veranstaltungsart %}
+        {% endfor %}
     </div>
+  </div>
   </div>
 {% endfor %}

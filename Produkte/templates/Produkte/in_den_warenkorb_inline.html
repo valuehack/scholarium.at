@@ -1,0 +1,31 @@
+{% load static produkttags %}
+{% max_anzahl_zu_liste produkt art as anzahlen %}
+{% preis produkt art as preis %}
+{% button_text produkt art as button_text %}
+<form class="buecher_form" action="{% url 'Produkte:cart-add' %}" method="post">
+  {% csrf_token %}
+  <input type="hidden" name="pk" value="{% produkt_pk produkt art %}">
+  {% if anzahlen %}
+    <script type="text/javascript">
+      function preis_berechnen_{{ art }}() {
+      var p = document.getElementById('gesamtpreis_{{ art }}');
+      var m = document.getElementById('menge_{{ art }}');
+      p.innerHTML = m.value*{{ preis }}
+    }
+    </script>
+    <select class="input-select" name="quantity" id="menge_{{ art }}" onchange="preis_berechnen_{{ art }}()">
+      {% for i in anzahlen %}
+        <option value="{{ i }}" {% if forloop.first %}selected{% endif %}>{{ i }}</option>
+      {% endfor %}
+    </select>
+    <input class="inputbutton" type="submit" value="{{ button_text }}">
+    <div class="buecher-coin">
+        <span id="gesamtpreis_{{ art }}" class="buecher-coin-span"><script>preis_berechnen_{{ art }}()</script></span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
+    </div>
+  {% else %}
+  <input class="inputbutton" type="submit" value="{{ button_text }}">
+  <div class="buecher-coin">
+    <span id="gesamtpreis_{{ art }}" class="buecher-coin-span1">{{ preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
+  </div>
+  {% endif %}
+</form>

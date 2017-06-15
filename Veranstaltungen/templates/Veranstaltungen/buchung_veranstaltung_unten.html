@@ -1,8 +1,16 @@
+{% load static produkttags %}
+
   <div style="text-align: center;">
     <div class="salon_reservation">
+      {% for veranstaltungsart in veranstaltung.arten_aktiv %}
       <div class="sinfo">
-        <h2 style="margin: 0 0 10px 0;">Vor Ort</h2>
-        {% include 'Produkte/in_den_warenkorb.html' with produkt=veranstaltung art='teilnahme' %}
-      </div>
+          <h2 style="margin: 0 0 10px 0;">
+              {% format_text veranstaltung veranstaltungsart as format_text %}
+              {{ format_text }}
+          </h2>
+        {% anzeigemodus veranstaltung veranstaltungsart as modus %}
+        {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=veranstaltung art=veranstaltungsart %}
+    </div>
+      {% endfor %}
     </div>
   </div>

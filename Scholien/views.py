@@ -70,6 +70,7 @@ from seite.settings import BASE_DIR, MEDIA_ROOT
 from Grundgeruest.models import Nutzer
     
 def pdfs_etc_einlesen():
+<<<<<<< HEAD
     liste = models.Buechlein.objects.all()[2:4]
     namen = [b.slug+ext for b in liste for ext in ['.pdf', '.mobi', '.epub']]
     with open(os.path.join(BASE_DIR, 'hey'), 'w') as f:

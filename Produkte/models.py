@@ -69,9 +69,9 @@ class PreiseMetaklasse(ModelBase):
 # globale Attribute für Produktarten; zu jeder Art ein Tupel aus 
 # ob_beschränkt, button_text
 arten_attribute = {
-    'teilnahme': (5, 'Auswählen'),
-    'livestream': (False, 'Livestream buchen'),
-    'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen - ja, ist ein langer Button! :)'),
+    'teilnahme': (5, 'Auswählen', 'Vor Ort'),
+    'livestream': (False, 'Livestream buchen', 'Livestream'),
+    'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen', 'MP3'),
     'pdf': (False, 'PDF'),
     'epub': (False, 'EPUB'),
     'mobi': (False, 'Kindle'),
@@ -91,19 +91,27 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         """ gibt einen Code für den Anzeigemodus in Templates aus; also ob
         es gar nicht angezeigt, oder ausgegraut, oder richtig """
         if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
+            raise ValueError('Anzeigemodus: Bitte gültige Art angeben')
+        if self.__class__.__name__ == "Buechlein": 
+            if art=="druck" and self.finde_anzahl(art) == 0:
+                return "verbergen"
+            elif art!="druck" and getattr(self, "ob_"+art)==False:
+                return "verbergen"
+            else:
+                return "inline" # unabhängig von der art
+        
         if arten_attribute[art][0]: # falls beschränkt
             if self.finde_anzahl(art) == 0 and art=='teilnahme':
                 modus = 'ausgegraut' # ausgebuchte Veranstaltung
             elif art=='teilnahme':
                 modus = 'mit_menge' # Veranstaltung mit select-box
-            else:
-                modus = 'inline' # alle außer Veranstaltung, z.B. Büchlein
         else:
             if getattr(self, 'ob_'+art):
                 modus = 'ohne_menge'
             else:
                 modus = 'verbergen'
+        
+        return modus
     
     def arten_aktiv(self):
         aktiv = []
@@ -123,7 +131,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         Item verwendet wird. Kann bei jeder Klasse überschrieben werden. 
         Wird auch vom Templatetag {% preis <art> %} genutzt. """
         if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
+            raise ValueError('Bitte gültige Art für Preis angeben')
         else: 
             return self.finde_preis(art)
 
@@ -134,7 +142,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     def anzahlen_ausgeben(self, art=0):
         """ Gibt range der Anzahlen für dropdown im Template zurück """
         if art not in self.arten_liste:
-            raise ValueError('Bitte gültige Art angeben')
+            raise ValueError('Bitte gültige Art für Menge angeben')
 
         if arten_attribute[art][0]: # falls beschränkt
             if self.finde_anzahl(art) == 0:
@@ -144,7 +152,11 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
                 return range(1, anz)
         else:
             return None
-    
+
+    def format_text(self, art=0):
+        """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""
+        return arten_attribute[art][2]
+        
     class Meta:
         abstract = True
 

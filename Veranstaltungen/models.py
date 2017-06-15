@@ -73,7 +73,7 @@ class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()
     beschreibung2 = models.TextField()
     reihenfolge = models.SmallIntegerField(null=True)
-    arten_liste = ['teilnahme', ]
+    arten_liste = ['teilnahme']
     class Meta:
         verbose_name_plural = "Studiendinger"
         ordering = ['reihenfolge']

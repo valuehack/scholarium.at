@@ -5,7 +5,6 @@
 <form class="buecher_form" action="{% url 'Produkte:cart-add' %}" method="post">
   {% csrf_token %}
   <input type="hidden" name="pk" value="{% produkt_pk produkt art %}">
-  {% if anzahlen %}
     <script type="text/javascript">
       function preis_berechnen_{{ art }}() {
       var p = document.getElementById('gesamtpreis_{{ art }}');
@@ -19,29 +18,6 @@
       {% endfor %}
     </select>
     <input class="inputbutton" type="submit" value="{{ button_text }}">
-        {% if art in scholienbuechlein.arten_liste %}
-        <div class="buecher-coin">
-            <span id="gesamtpreis_{{ art }}" class="buecher-coin-span"><script>preis_berechnen_{{ art }}()</script></span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
-        </div>
-        {% else %}
         <br />
         <span id="gesamtpreis_{{ art }}" class="coin-span"><script>preis_berechnen_{{ art }}()</script></span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
-        {% endif %}
-  {% elif anzahlen == 0 %}
-  <input class="inputbutton" type="submit" value="{{ button_text }}" disabled>
-  <br />
-  <p>
-      Diese Veranstaltung ist bereits ausgebucht.
-  </p>
-  {% else %}
-  <input class="inputbutton" type="submit" value="{{ button_text }}">
-    {% if art in scholienbuechlein.arten_liste %}
-    <div class="buecher-coin">
-        <span id="gesamtpreis_{{ art }}" class="buecher-coin-span1">{{ preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
-    </div>
-    {% else %}
-    <br />
-    <span id="gesamtpreis_{{ art }}" class="coin-span">{{ preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
-    {% endif %}
-  {% endif %}
 </form>
