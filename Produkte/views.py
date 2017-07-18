@@ -10,7 +10,7 @@ import pdb
 
 from easycart import BaseCart, BaseItem
 from Grundgeruest.views import erstelle_liste_menue
-from .models import Kauf
+from .models import Kauf, arten_attribute
 
 """
 Integration des Pakets easycart - keine Modelle, über session Variablen
@@ -92,7 +92,7 @@ class Ware(BaseItem):
 
 class Warenkorb(BaseCart):
     item_class = Ware
-    
+        
     @staticmethod
     def tupel_aus_pk(pk):
         return Kauf.tupel_aus_pk(pk)
@@ -213,6 +213,38 @@ class Warenkorb(BaseCart):
         if len(items) < len(session_items):
             self._stale_pks = set(session_items).difference(items)
         return items
+    
+    def update(self):
+        """ Habe ich kopiert, nur ob_versand hinzugefügt """
+        # das stand außerhalb der Funktion/class auf module-level
+        from django.conf import settings
+        session_key = getattr(settings, 'EASYCART_SESSION_KEY', 'easycart')
+        # das schreibe ich dazu:
+        self.ob_versand = False
+        for item in self.items.values():
+            if arten_attribute[item.art][0]: # wenn max. Anzahl angegeben
+                self.ob_versand = True
+        # und der Rest stand so in der Funktion
+        
+        self.item_count = self.count_items()
+        self.total_price = self.count_total_price()
+        # Update the session
+        session = self.request.session
+        session_items = {}
+        for pk, item in self.items.items():
+            session_items[pk] = dict(quantity=item.quantity, **item._kwargs)
+        session_data = session[session_key]
+        session_data['items'] = session_items
+        session_data['itemCount'] = self.item_count
+        # The price can be of a type that can't be serialized to JSON
+        session_data['totalPrice'] = str(self.total_price)
+        session.modified = True    
+    
+    def count_total_price(self):
+        """ kopiert; berechnet die Summe. Änderung: addiere 5 wenn unter
+        den Bestellungen Drucksachen sind """
+        summe = sum((item.total for item in self.items.values()))
+        return summe + self.ob_versand * 5
 
 
 @login_required
@@ -287,8 +319,41 @@ def medien_runterladen(request):
     return response
     
 
-from easycart.views import CartView
 from easycart.cart import CartException
+from django.views.generic import View
+
+class CartView(View):
+    """ kopiert aus easycart.views um den return-Wert zu ändern - statt 
+    cart.encode wird ein Redirect an warenkorb ausgegeben
+    """
+    action = None
+    required_params = ()
+    optional_params = {}
+
+    def post(self, request):
+        # Extract parameters from the post data
+        params = {}
+        for param in self.required_params:
+            try:
+                params[param] = request.POST[param]
+            except KeyError:
+                return JsonResponse({
+                    'error': 'MissingRequestParam',
+                    'param': param,
+                })
+        for param, fallback in self.optional_params.items():
+            params[param] = request.POST.get(param, fallback)
+        # Perform an action on the cart using these parameters
+        cart = Warenkorb(request)
+        action = getattr(cart, self.action)
+        try:
+            action(**params)
+        except CartException as exc:
+            return JsonResponse(dict({'error': exc.__class__.__name__},
+                                     **exc.kwargs))
+
+        return HttpResponseRedirect(reverse('Produkte:warenkorb'))
+
 
 class AddItem(CartView):
     """ habe 'post()' fast aus easycart.views.CartView kopiert, etwas 
@@ -321,3 +386,19 @@ class AddItem(CartView):
             return JsonResponse(dict({'error': exc.__class__.__name__},
                                      **exc.kwargs))
         return HttpResponseRedirect(reverse('Produkte:warenkorb'))
+
+class RemoveItem(CartView):
+    """ kopiert aus easycart.views, nutzt lokales CartView """
+    action = 'remove'
+    required_params = ('pk',)
+
+
+class EmptyCart(CartView):
+    """ kopiert aus easycart.views, nutzt lokales CartView """
+    action = 'empty'
+
+
+class ChangeItemQuantity(CartView):
+    """ kopiert aus easycart.views, nutzt lokales CartView """
+    action = 'change_quantity'
+    required_params = ('pk', 'quantity')

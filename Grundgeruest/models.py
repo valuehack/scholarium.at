@@ -200,7 +200,7 @@ class ScholariumProfile(UserenaBaseProfile):
         editable=False, null=True)
 
     def nicht_abgelaufen(self):
-        if self.stufe > 1:
+        if self.stufe > 0:
             return True
         else:
             raise TypeError('Bitte unterstützen')

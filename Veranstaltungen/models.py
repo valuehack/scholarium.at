@@ -17,6 +17,7 @@ import random, string
 
 class Veranstaltung(KlasseMitProdukten):
     beschreibung = models.TextField()
+    beschreibung2 = models.TextField()
     datum = models.DateField()
     art_veranstaltung = models.ForeignKey('ArtDerVeranstaltung')
     datei = models.FileField(null=True, blank=True) # für Aufzeichnung
@@ -42,9 +43,9 @@ class Veranstaltung(KlasseMitProdukten):
         elif art == 'teilnahme':
             return bool(self.finde_anzahl(art))
         elif art == 'livestream':
-            return bool(self.link)
+            return bool(self.link) and bool(self.ob_livestream)
         elif art == 'aufzeichnung':
-            return bool(self.datei)    
+            return bool(self.datei) and bool(self.ob_aufzeichnung)
         else: 
             return ValueError('Art %s habe ich noch nicht beachtet' % art)
     
@@ -58,10 +59,11 @@ class Veranstaltung(KlasseMitProdukten):
         return self.art_veranstaltung.bezeichnung+': '+self.bezeichnung
     
     def hat_medien(self):
-        if (self.ob_aktiv('livestream') or self.ob_aktiv('aufzeichnung')):
-            return True
-        else:
-            return False
+        """ gibt Liste der art-Namen, die aktiv sind, zurück; also insb.
+        leere Liste die in if-Abfrage False gibt """
+        medien = [art for art in ['livestream', 'aufzeichnung'] 
+            if self.ob_aktiv(art)]
+        return medien
     
     def ist_vergangen(self):
         return self.datum <= date.today()
