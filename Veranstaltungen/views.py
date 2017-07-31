@@ -37,7 +37,9 @@ class ListeArt(ListeAlle):
             art_veranstaltung=self.art_model).order_by('datum')
         self.extra_context = {
             'veranstaltungen': veranstaltungen, 
-            'art_veranstaltung': self.art_model}
+            'art_veranstaltung': self.art_model,
+            'url_hier': {'Seminar': '/seminare', 'Salon': '/salons'}[self.art],
+        }
     
     art = 'Salon'
     context_object_name = 'medien'
@@ -53,10 +55,15 @@ class ListeArt(ListeAlle):
 class VeranstaltungDetail(DetailMitMenue):
     template_name = 'Veranstaltungen/detail_veranstaltung.html'
     context_object_name = 'veranstaltung'
-    def get_object(self, **kwargs):
+    def get_object(self, **kwargs):        
         art_name = self.kwargs['art']
         slug = self.kwargs['slug']
-        art = get_object_or_404(ArtDerVeranstaltung, bezeichnung=art_name)
+        
+        # das in der Funktion weil Zugriff aus self, eig. Missbrauch
+        self.url_hier = '/%s/%s' % (art_name.lower(), slug)
+        
+        # bestimmt die Instanz für den detail-view
+        art = get_object_or_404(ArtDerVeranstaltung, bezeichnung=art_name)        
         return Veranstaltung.objects.filter(
             art_veranstaltung=art).get(slug=slug)
         
@@ -81,6 +88,7 @@ def studiumdings_detail(request, slug):
     return DetailMitMenue.as_view(
             template_name=template_name,
             model=Studiumdings,
+            url_hier='/studium/%s/' % slug,
             context_object_name = 'studiumdings')(request, slug=slug)
 
 def vortrag(request):
@@ -95,7 +103,7 @@ def vortrag(request):
             and v.hat_medien()]
         extra_context = {'vortrag': vortrag, 'medien': medien}
     else:
-        extra_context = { 'vortrag': vortrag }
+        extra_context = { 'vortrag': vortrag, 'url_hier': '/vortrag/'}
     return TemplateMitMenue.as_view(
         template_name='Gast/vortrag.html', 
         extra_context=extra_context)(request)

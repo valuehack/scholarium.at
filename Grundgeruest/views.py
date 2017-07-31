@@ -54,10 +54,12 @@ def erstelle_liste_menue(user=None):
 
 class MenueMixin():
     extra_context = {}
+    url_hier = '/'
     def get_context_data(self, **kwargs):
         liste_menue = erstelle_liste_menue(self.request.user)
         context = super().get_context_data(**kwargs)
         context['liste_menue'] = liste_menue
+        context['url_hier'] = self.url_hier
         context.update(self.extra_context)
         return context        
 
