@@ -14,7 +14,7 @@ import os, pdb
 
 def liste_artikel(request):
     """ Gibt Übersichtsseite mit Artikeln aus; oder, wenn GET-Daten da
-    sind, ein Detail-view zu dem Artikel (rückwärtskompatibel) """
+    sind, ein Detail-view zu dem Artikel (Rückwärtskompatibilität!) """
     
     slug = request.GET.get('q')
     if slug: # erst prüfen, ob was da ist
@@ -34,6 +34,7 @@ def liste_artikel(request):
     else:
         return TemplateMitMenue.as_view(
             template_name='Gast/scholien.html', 
+            url_hier='/scholien',
             )(request) 
             
 def liste_buechlein(request):

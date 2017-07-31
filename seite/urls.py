@@ -41,7 +41,8 @@ urlpatterns = [
         ListeMitMenue.as_view(
             model=Studiumdings,
     	    template_name='Veranstaltungen/liste_studien.html',
-	        context_object_name = 'studien'
+            url_hier='/studium/',
+	        context_object_name = 'studien',
         ),
         name='liste_studium'),
     url(r'^studium/(?P<slug>[-\w]+)/$', 
