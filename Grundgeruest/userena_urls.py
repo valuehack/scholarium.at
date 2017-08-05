@@ -5,6 +5,8 @@ from userena import settings as userena_settings
 from userena import views as userena_views
 from userena.compat import auth_views_compat_quirks, password_reset_uid_kwarg
 
+from .forms import Anmeldeformular, ProfilFormular
+from userena.forms import EditProfileForm
 
 def merged_dict(dict_a, dict_b):
     """Merges two dicts and returns output. It's purpose is to ease use of
@@ -17,6 +19,7 @@ urlpatterns = [
     # Signup, signin and signout
     url(r'^eintragen/$',
        userena_views.signup,
+       {'signup_form': Anmeldeformular},
        name='userena_signup'),
     url(r'^anmelden/$',
        userena_views.signin,
@@ -99,11 +102,14 @@ urlpatterns = [
     # Edit profile
     url(r'^(?P<username>[\@\.\w-]+)/edit/$',
        userena_views.profile_edit,
+       {'edit_profile_form': ProfilFormular,
+            'template_name': 'userena/profile_form.html'},
        name='userena_profile_edit'),
 
     # View profiles
     url(r'^(?P<username>(?!(signout|signup|signin)/)[\@\.\w-]+)/$',
        userena_views.profile_detail,
+       {'template_name': userena_settings.USERENA_PROFILE_DETAIL_TEMPLATE},
        name='userena_profile_detail'),
     url(r'^page/(?P<page>[0-9]+)/$',
        userena_views.ProfileListView.as_view(),

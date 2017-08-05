@@ -18,10 +18,8 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen, zahlen, ListeAktiveMitwirkende
-from Grundgeruest.forms import Anmeldeformular
 from Grundgeruest.models import Mitwirkende
 import Grundgeruest.userena_urls as userena_urls
-from userena.views import signup
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
 from Veranstaltungen.views import studiumdings_detail, vortrag
@@ -49,9 +47,6 @@ urlpatterns = [
         studiumdings_detail, 
         name='studium_detail'),
     url(r'^vortrag/', vortrag, name='vortrag'), 
-    url(r'^nutzer/eintragen/$',
-        signup,
-        {'signup_form': Anmeldeformular}),
     url(r'^nutzer/e$',
         aus_datei_mitglieder_einlesen,
         name='mitglieder_einlesen'),
