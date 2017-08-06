@@ -86,4 +86,5 @@ urlpatterns = [
         db_runterladen,
         name='bitte_bald_loeschen'),
     url(r'^', include('Grundgeruest.urls')),
+    url(r'^nimda/', include('Workflow.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

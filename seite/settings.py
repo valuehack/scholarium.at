@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'Produkte',
     'Bibliothek',
     'Scholien',
+    'Workflow',
 
     'django.contrib.admin',
     'django.contrib.auth',
