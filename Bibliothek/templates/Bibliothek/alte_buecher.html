@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Bibliothek{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'style_buecher_alt.css' %}">
+{% endblock head %}
+
+{% block content %}
+<div class="buecher_content">
+<h1>Bücher</h1>
+<table class='buecher_table'>
+
+{% for buch in buecher %}
+<tr>
+  <td class="buecher_table_b" style="width: 60%">
+    <a href={{ buch.slug }}>{{ buch.autor_und_titel }}</a>			</td>
+  <td class="buecher_table_d">
+    {% include "Produkte/in_den_warenkorb_inline.html" with produkt=buch art='kaufen' %}
+  </td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock content %}

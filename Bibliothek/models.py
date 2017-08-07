@@ -5,6 +5,15 @@
 from django.db import models
 from Produkte.models import KlasseMitProdukten
 
+class Altes_Buch(KlasseMitProdukten):
+    arten_liste = ['kaufen']
+    autor_und_titel = models.CharField(
+        max_length=255,
+        null=True, blank=True)
+    def button_text(self, _):
+        return 'Auswählen!'
+
+
 class Buch(KlasseMitProdukten):
     arten_liste = ['kaufen', 'leihen']
     titel = models.CharField(
@@ -54,3 +63,5 @@ class Buch(KlasseMitProdukten):
     
     class Meta:
         verbose_name_plural = 'Bücher'
+
+

@@ -1,0 +1,16 @@
+{% load static humanize produkttags %}
+
+{% with buch=obj %}
+  <div class="warenkorb_veranstaltung">
+    <span>{{ buch.autor }}</span>
+    <span>
+      <a href="{% url 'Bibliothek:detail_buch' buch.slug %}">{{ buch.autor_und_titel }}</a>
+    </span>
+    <span>{% art_aus_pk pk %}</span>
+    <form action="{% url 'Produkte:cart-remove' %}" method="post">
+    	{% csrf_token %}
+      <input type="hidden" name="pk" value={{ pk }}>
+      <input type="submit" value="Entfernen">
+    </form>
+  </div>
+{% endwith %}

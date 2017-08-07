@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import re, os
-from .models import Buch
+from . import models
 from django.db import transaction
+import sqlite3 as lite
 from seite.settings import BASE_DIR
 
 attributnamen = {
@@ -34,7 +35,7 @@ def aus_datei_einlesen(request, exlibris=''):
         matches = [teilsplit.match(zeile) for zeile in zeilen[1:]]
         daten = dict([match.groups() for match in matches if match])
     
-        buch = Buch.objects.create(bezeichnung=bezeichnung)
+        buch = models.Buch.objects.create(bezeichnung=bezeichnung)
         buch.exlibris = exlibris
         for key in daten:
             if key in attributnamen:
@@ -42,3 +43,28 @@ def aus_datei_einlesen(request, exlibris=''):
         buch.save()
         
     return HttpResponseRedirect('/warenkorb/')
+
+
+def alte_buecher_aus_db_einlesen():
+    """ liest alte buecher mit Format 0001 (also nicht digital, fast alle) 
+    aus alter db (als .sqlite exportiert) aus """
+    
+    # zuerst Artikel auslesen
+    models.Altes_Buch.objects.all().delete()
+    
+    con = lite.connect(os.path.join(BASE_DIR, 'alte_db.sqlite3'))
+    with con:
+        con.row_factory = lite.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM produkte where type is 'antiquariat' and format is '0001';")
+
+        zeilen = [dict(zeile) for zeile in cur.fetchall()]
+
+    with transaction.atomic():
+        for buch in zeilen:
+            models.Altes_Buch.objects.create(
+                bezeichnung=buch['id'],
+                autor_und_titel=buch['title'],
+                preis_kaufen=buch['price_book'],
+                slug=buch['id'])
+
