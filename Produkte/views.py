@@ -214,32 +214,14 @@ class Warenkorb(BaseCart):
             self._stale_pks = set(session_items).difference(items)
         return items
     
-    def update(self):
-        """ Habe ich kopiert, nur ob_versand hinzugefügt """
-        # das stand außerhalb der Funktion/class auf module-level
-        from django.conf import settings
-        session_key = getattr(settings, 'EASYCART_SESSION_KEY', 'easycart')
-        # das schreibe ich dazu:
-        self.ob_versand = False
+    @property
+    def ob_versand(self):
         for item in self.items.values():
             if arten_attribute[item.art][0]: # wenn max. Anzahl angegeben
-                self.ob_versand = True
-        # und der Rest stand so in der Funktion
+                return True
         
-        self.item_count = self.count_items()
-        self.total_price = self.count_total_price()
-        # Update the session
-        session = self.request.session
-        session_items = {}
-        for pk, item in self.items.items():
-            session_items[pk] = dict(quantity=item.quantity, **item._kwargs)
-        session_data = session[session_key]
-        session_data['items'] = session_items
-        session_data['itemCount'] = self.item_count
-        # The price can be of a type that can't be serialized to JSON
-        session_data['totalPrice'] = str(self.total_price)
-        session.modified = True    
-    
+        return False
+
     def count_total_price(self):
         """ kopiert; berechnet die Summe. Änderung: addiere 5 wenn unter
         den Bestellungen Drucksachen sind """

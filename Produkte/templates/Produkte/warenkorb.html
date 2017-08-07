@@ -22,7 +22,7 @@
       {% endwith %}{% endfor %}
     </tbody>
     <tfoot>
-      <td>Summe{% if cart.ob_versand %} (incl. Versand-Pauschale){% endif %}:</td>
+      <td>Summe{% if cart.ob_versand %} (mit Versandkostenpauschale){% endif %}:</td>
       <td>{{ cart.total_price }}<img src="{% static 'img/coin.png' %}"></td>
       <td></td>
     </tfoot>
