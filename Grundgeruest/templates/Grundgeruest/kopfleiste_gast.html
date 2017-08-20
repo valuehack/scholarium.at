@@ -1,10 +1,10 @@
-<div class="anmelden">
+<!-- <div class="anmelden">
   <button class="login_button" type="button" value="Anmelden" onclick="modal_sichtbar_umschalten('login')">Anmelden_modal</button>
 </div>
 
 <div class="anmelden">
   <button class="login_button" type="button" value="Eintragen" onclick="modal_sichtbar_umschalten('signup')">Eintragen_modal</button>
-</div>
+</div> -->
 
 <div class="anmelden">
   <i><a class="login_button" href="{% url 'gast_englisch' %}">
@@ -12,7 +12,7 @@
   </a></i>
 </div>
 
-<div class="anmelden">
+<!-- <div class="anmelden">
   <a class="login_button" href="{% url 'userena_signin' %}?next={{ url_hier }}">
     Anmelden
   </a>
@@ -22,4 +22,9 @@
   <a class="login_button" href="{% url 'userena_signup' %}">
     Eintragen
   </a>
+</div> -->
+
+<div class="anmelden">
+  <div class="anmelden"><button class="login_button" type="button" data-toggle="modal" data-target="#login" value="Anmelden">Anmelden</button></div>
+  <div class="anmelden"><button class="login_button" type="button" data-toggle="modal" data-target="#signup" value="Anmelden">Eintragen</button></div>
 </div>
