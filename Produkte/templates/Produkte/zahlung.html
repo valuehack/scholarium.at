@@ -6,10 +6,12 @@
     <header>
       <h1>{% block title %}Zahlung{% endblock %}</h1>
     </header>
-    <div class="profil payment_width">
+    <div class="profil payment_width wrapper">
       <form method="post" action="" name="upgrade_account">
+        
+        <div class="center">
         {% csrf_token %}
-        <p>Bitte geben Sie Ihre Daten ein:</p>
+        <p>Bitte geben Sie Ihre Daten ein:</p><br><br>
         {{ formular.email.errors }}
         {{ formular.email.label_tag }}
         {{ formular.email }}
@@ -47,14 +49,16 @@
         {{ formular.ort }}
         <br>
         {{ formular.land.errors }}
-        {{ formular.land.label_tag }}
+        {{ formular.land.label_tag }}&nbsp&nbsp&nbsp&nbsp&nbsp
         {{ formular.land }}
-        <br>
-        <p>Bitte w&auml;hlen Sie Ihre gew&uuml;nschte Zahlungsmethode:</p>
+        <br><br><br>
+        <p>Bitte w&auml;hlen Sie Ihre gew&uuml;nschte Zahlungsmethode:</p><br>
+        <div style="display: inline-block; text-align:left;">
         {{ formular.zahlungsweise.errors }}
         {% for art in formular.zahlungsweise %}
           {{ art.tag }}{{ art.choice_label }}<br>
         {% endfor %}
+      </div>
         <br>
         <input type="hidden" name="ok" value="1">
         <input type="hidden" name="betrag" value="{{ betrag }}">
@@ -62,6 +66,8 @@
         <input type="hidden" name="profile[first_reg]" value="upgrade_buerger">
 
         <input id="weiter_button" type="submit" name="register_from_outside_submit" value="Weiter">
+        
+        </div>
 	  </form>
     </div>
   </div>
