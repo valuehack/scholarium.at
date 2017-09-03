@@ -1,0 +1,38 @@
+{% extends 'userena/base_userena.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Signin" %}{% endblock %}
+
+{% block content %}
+<div class="blog">
+  <h2>{% trans 'Signin' %}</h2>
+  <p class="tologin">Sie haben noch keinen Zugang? <a data-toggle="modal" data-target="#signup" data-dismiss="modal" aria-label="Close" value="Anmelden">Dann können Sie sich hier eintragen.</a></p>
+  <form action="" method="post" style="max-width:400px;" class="center">
+    {% csrf_token %}
+    <fieldset>
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        {{ field.errors }}
+        {% comment %} Displaying checkboxes differently {% endcomment %}
+        {% if field.name == 'identification' %}
+          <input id="user_email" type="email" placeholder="E-Mail-Adresse" name="{{ field.name }}" class="inputfield" style='width: 100%;' required>
+        {% elif field.name == 'password' %}
+          <input id="user_password" type="password" placeholder="Passwort" name="{{ field.name }}" class="inputfield" style='width: 100%;' required>
+        {% elif field.name == 'remember_me' %}
+          <p class="checkbox">
+            <label for="id_{{ field.name }}" class="center" style="text-align: center;">{{ field }} {{ field.label }}</label>
+          </p>
+        {% else %}
+          <p>
+            {{ field.label_tag }}
+            {{ field }}
+          </p>
+        {% endif %}
+      {% endfor %}
+    </fieldset>
+    <input type="submit" value="{% trans 'Signin' %}" class="inputbutton" style='width: 100%;'/>
+    <p class="forgot-password" style="text-align: center;"><a href="{% url 'userena_password_reset' %}" title="{% trans 'Forgot your password?' %}">{% trans "Forgot your password?" %}</a></p>
+    {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+  </form>
+</div>
+{% endblock %}

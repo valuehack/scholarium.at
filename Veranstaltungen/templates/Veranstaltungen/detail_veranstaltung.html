@@ -13,9 +13,11 @@
   <div class="salon_content">
     <p>{{ veranstaltung.beschreibung|safe }}</p>
     {{ veranstaltung.art_veranstaltung.beschreibung|safe }}
-    <div class="medien_anmeldung">
+    
+    {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' %}
+    <div class="medien_anmeldung" style="margin-top: 5%;">
     <a href="{% url 'Veranstaltungen:liste_alle' %}">zurück zu den Veranstaltungen</a>
     </div>
-    {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' %}
   </div>
+  
 {% endblock content %}

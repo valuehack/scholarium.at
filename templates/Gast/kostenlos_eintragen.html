@@ -1,7 +1,7 @@
 {% load static %}
 <div style="text-align: center;">
 	<div class="blog_subscribe">
-		<form method="post" action="/accounts/signup/" name="registerform">
+		<form method="post" action="/nutzer/eintragen/" name="registerform">
 			{% csrf_token %}
 			<input class="inputfield" id="user_email" type="email" placeholder=" E-Mail-Adresse" name="email" required>
 			<input type=hidden name="first_reg" value="{{ von_wo }}">
