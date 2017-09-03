@@ -232,6 +232,29 @@ a {
   	left: auto;
 }
 
+div.basket_message {
+	width: 50%;
+	padding: 10px 2.5%;
+	border: 1px solid #468847;
+	border-radius: 4px;
+	box-shadow: 0 0 1px 0 transparent;
+	margin: -20px 22% 10px 22%;
+	color: #468847;
+	background-color: #DFF0D8;
+	font-size: 16pt;
+	text-align: center;
+	font-family: "Garamond", Georgia, Times, serif;	
+}
+
+div.basket_message a {
+	color: rgb(46,74,98);
+	text-decoration: none;
+}
+
+div.basket_message a:hover {
+	text-decoration: underline;
+}
+
 /*================  Main Navigation  ===============*/
 
 div.menueleiste {
