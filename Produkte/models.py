@@ -223,13 +223,21 @@ class Kauf(models.Model):
         """ Gibt pk des 'verknüpften' Objektes als string aus """
         return self.produkt_pk
 
+    def tupel_ausgeben(self):
+        """ Gibt pk des 'verknüpften' Objektes als string aus """
+        return self.tupel_aus_pk(self.pk_ausgeben())
+
     def model_ausgeben(self):
         """ Gibt den model-Namen des 'verknüpften' Objektes aus """
-        return self.tupel_aus_pk(self.pk_ausgeben())[0]
+        return self.tupel_ausgeben()[0]
+
+    def obj_pk_ausgeben(self):
+        """ Gibt die pk des 'verknüpften' Objektes (nicht des Kaufes!) aus """
+        return self.tupel_ausgeben()[1]
 
     def art_ausgeben(self):
         """ Gibt die Nr der Art des 'verknüpften' Objektes aus """
-        return self.tupel_aus_pk(self.pk_ausgeben())[2]
+        return self.tupel_ausgeben()[2]
     
     def objekt_ausgeben(self, mit_art=False):
         """ Gibt das 'verknüpfte' Objekt zurück, das was django bei einem 

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-  <h1> Übersicht Ihrer Bestellungen</h1>
+  <h1>Übersicht Ihrer Bestellungen</h1>
 
   {% if kaeufe.teilnahmen %}{% with teilnahmen=kaeufe.teilnahmen %}
   <div class="separator">
@@ -55,6 +55,32 @@
   {% endwith %}{% else %}
   <div class="separator" style="margin-bottom: 100px">
     <h2>Keine elektronischen Bücher oder Aufzeichnungen</h2>
+  </div>
+  {% endif %}
+
+  {% if kaeufe.rest %}{% with rest=kaeufe.rest %}
+  <div class="separator">
+    <h2>Ihre restlichen Käufe:</h2>
+  </div>
+  <div class="container">
+    <table>
+      <tr>
+        <th><th/>
+        <th>Zeit der Bestellung</th>
+        <th>Anzahl</th>
+      </tr>
+      {% for kauf in rest %}
+      <tr>
+        <td>{% include "Produkte/warenkorb_buechlein.html" with pk=kauf.produkt_pk obj=kauf.objekt_ausgeben %}</td>
+        <td>{{ kauf.zeit|naturaltime }}</td>
+        <td>{{ kauf.menge }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endwith %}{% else %}
+  <div class="separator" style="margin-bottom: 100px">
+    <h2>Keine sonstigen Bestellungen</h2>
   </div>
   {% endif %}
 
