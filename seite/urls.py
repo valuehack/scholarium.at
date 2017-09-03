@@ -37,7 +37,7 @@ urlpatterns = [
         name='gast_mitwirkende'),
     url(r'^studium/$', 
         ListeMitMenue.as_view(
-            model=Studiumdings,
+            model=Studiumdings, # Achtung, es werden nur die studiendinger mit reihenfolge<>0 angezeigt, darüber auskommentieren!
     	    template_name='Veranstaltungen/liste_studien.html',
             url_hier='/studium/',
 	        context_object_name = 'studien',

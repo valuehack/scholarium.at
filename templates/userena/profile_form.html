@@ -11,7 +11,7 @@
   <h1>Profil</h1>
     {% if request.user.my_profile.datum_ablauf %} <p>Ihr Unterst&uuml;tzer-Zugang l&auml;uft noch bis zum {{ request.user.my_profile.datum_ablauf }}<br><br>
     (Verl&auml;ngerung um ein Jahr nach Spendeneingang.)<br><br>
-    <a href="../spende">&rarr; Unterst&uuml;tzung erneuern.</a>
+    <a href="/spende">&rarr; Unterst&uuml;tzung erneuern.</a>
   </p> {% endif %}
 </div>
 
@@ -19,7 +19,8 @@
   <h2>Ihre Daten ändern</h2>
 </div>
 
-<div class="profil"><form action="" enctype="multipart/form-data" method="post">
+<div class="profil wrapper"><form action="" enctype="multipart/form-data" method="post">
+  <div class="center">
   {% csrf_token %}
   {{ form.email.errors }}
   {{ form.email.label_tag }}
@@ -58,9 +59,11 @@
   {{ form.ort }}
   <br>
   {{ form.land.errors }}
-  {{ form.land.label_tag }}
+  {{ form.land.label_tag }}&nbsp
   {{ form.land }}
+  <br>
   <input type="submit" value="{% trans "Save changes" %}" />
+</div>
 </form>
 <form action="{% url 'userena_password_change' username=request.user.username %}"><input type="submit" value="{% trans "Change password" %}" /></form>
 

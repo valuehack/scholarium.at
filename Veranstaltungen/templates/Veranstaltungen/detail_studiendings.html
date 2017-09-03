@@ -11,9 +11,6 @@
   <div class="salon_content">
     {{ studiumdings.beschreibung1|safe }}
     {{ studiumdings.beschreibung2|safe }}
-    <div class="medien_anmeldung">
-    <a href="{% url 'liste_studium' %}">zurück zu den Studienangeboten</a>
-    </div>
     {% if studiumdings.bezeichnung != "Roland Baader-Stipendium" %}
     <div style="text-align: center;">
       <div class="salon_reservation">
@@ -23,4 +20,8 @@
       </div>
     </div>
     {% endif %}
+    <div class="medien_anmeldung" style="margin-top: 5%;">
+      <a href="{% url 'liste_studium' %}">zurück zu den Studienangeboten</a>
+    </div>
+    
 {% endblock content %}

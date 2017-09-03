@@ -11,6 +11,7 @@ import pdb
 from easycart import BaseCart, BaseItem
 from Grundgeruest.views import erstelle_liste_menue
 from .models import Kauf, arten_attribute
+from Veranstaltungen.models import Veranstaltung
 
 """
 Integration des Pakets easycart - keine Modelle, über session Variablen
@@ -243,19 +244,34 @@ def bestellungen(request):
     nutzer = request.user.my_profile
     liste_menue = erstelle_liste_menue(request.user)
     liste_kaeufe = list(Kauf.objects.filter(nutzer=nutzer))
+    # hack: bestimme, welche pks existieren, sonst gibt's Fehler, wenn die 
+    # Objekte gelöscht wurden; die werden unten in while-Schleife aussortiert
+    liste_models = set([k.model_ausgeben() for k in liste_kaeufe])
+    from django.contrib.contenttypes.models import ContentType
+    pks_zu_model = dict([
+        (name, ContentType.objects.get(model=name).model_class(
+        ).objects.all().values_list('pk', flat=True)) 
+        for name in liste_models
+    ])    
+
     # verteile Käufe nach Kategorie:
     kaeufe = {'teilnahmen': [], 'digital': [], 'rest': []}
         
     while liste_kaeufe:
         kauf = liste_kaeufe.pop()
+        
+        if int(kauf.obj_pk_ausgeben()) not in pks_zu_model[kauf.model_ausgeben()]:
+            continue
+             
         if (kauf.model_ausgeben() == 'veranstaltung' and 
-            kauf.art_ausgeben() == 'teilnahme'):
-            kaeufe['teilnahmen'].append(kauf)
+            kauf.art_ausgeben() == 'teilnahme' and
+            kauf.tupel_aus_pk(kauf.pk_ausgeben())[1] in v_pks):
+            kaeufe['teilnahmen'].append(kauf) 
         elif kauf.art_ausgeben() in ['pdf', 'epub', 'mobi', 'aufzeichnung']:
             kaeufe['digital'].append(kauf)
         else:
             kaeufe['rest'].append(kauf)
-            
+    
     return render(request, 
         'Produkte/bestellungen.html', 
         {'kaeufe': kaeufe, 'liste_menue': liste_menue})

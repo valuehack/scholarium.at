@@ -11,6 +11,7 @@ from userena.utils import generate_sha1
 from guardian.models import UserObjectPermission
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib import messages
 
 from django.db import transaction
 import sqlite3 as lite
@@ -41,7 +42,7 @@ def erstelle_liste_menue(user=None):
             ({'bezeichnung': 'Bücher', 'slug': 'buecher'}, [
             ]),
             ({'bezeichnung': 'Studium', 'slug': 'studium'}, [
-            {'bezeichnung': 'Studium Generale', 'slug': 'studium/generale'},
+            {'bezeichnung': 'Studium Generale', 'slug': 'studium/studium'},
             {'bezeichnung': 'craftprobe', 'slug': 'studium/craftprobe'},
             {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
             {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
@@ -80,6 +81,8 @@ def index(request):
         medien = []
         mehr_buecher = Buch.objects.order_by('-zeit_erstellt')[:50]
         buecher = random.sample(list(mehr_buecher), 3)
+        # Achtung, spam-message als Bsp., später rausnehmen 
+        messages.info(request, 'Willkommen auf der Startseite')
         return TemplateMitMenue.as_view(
             template_name='startseite.html',
             extra_context={

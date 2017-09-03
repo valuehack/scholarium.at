@@ -26,6 +26,13 @@
     {% endblock menueleiste %}
     </header>
     <div class="inhalt">
+      {% if messages %}
+        <div class="basket_message">
+        {% for message in messages %}
+          <i>{{ message }}</i>
+        {% endfor %}
+        </div>
+      {% endif %}
       {% block content %}
         <div style="padding: 0 25%; align-content: center;">{% lorem 7 p %}</div>
       {% endblock content %}
