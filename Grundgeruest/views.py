@@ -54,6 +54,10 @@ def erstelle_liste_menue(user=None):
         liste_punkte.append((punkt, unterpunkte))
     return liste_punkte
 
+def liste_menue_zurueckgeben(request):
+    liste_punkte = erstelle_liste_menue(request.user)
+    return {'liste_menue': liste_punkte}
+
 class MenueMixin():
     extra_context = {}
     url_hier = '/'

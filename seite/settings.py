@@ -83,6 +83,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'easycart.context_processors.cart',
+                'Grundgeruest.views.liste_menue_zurueckgeben'
             ],
         },
     },
