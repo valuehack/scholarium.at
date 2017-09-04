@@ -9,29 +9,25 @@ def buechlein_ebooks_einlesen():
     """ Kopiert die pdfs/epub/mobi der scholienbuechlein aus dem 
     input-Ordner nach media, verändert sicherheitshalber den Dateinamen, 
     und speichert den link in der db """
-    liste = Buechlein.objects.all()
-    buechlein = [(b, {ext: None for ext in ['pdf', 'mobi', 'epub']}) for b in liste]
+    buechlein = Buechlein.objects.all()
+    liste_ext = ['jpg', 'pdf', 'mobi', 'epub']
     
     os.chdir('/home/scholarium/production/')
-    for b, dreinamen in buechlein:
-        for ext in dreinamen.keys():
+    for b in buechlein:
+        for ext in liste_ext:
             nachordner = os.path.join(MEDIA_ROOT, 'scholienbuechlein')
-            dateifeld = getattr(b, ext)
-            if dateifeld and dateifeld.name in os.listdir(nachordner):
+            dateifeld = b.bild if ext=='jpg' else getattr(b, ext)
+            if dateifeld and dateifeld.name.split('/')[-1] in os.listdir(nachordner):
                 continue
             else:
-                von = 'down_secure/content_secure/%s.%s' % (b.slug, ext)
+                von_ordner = 'schriften/' if ext=='jpg' else 'down_secure/content_secure/'
+                von = '%s%s.%s' % (von_ordner, b.slug, ext)
                 name_neu = '%s_%s.%s' % (b.slug, Nutzer.erzeuge_zufall(8, 2), ext)
                 dateifeld.name = 'scholienbuechlein/%s' % name_neu
-                shutil.copy2(von, os.path.join(MEDIA_ROOT, dateifeld.name)
-        
-        b.save()
+                shutil.copy2(von, os.path.join(MEDIA_ROOT, dateifeld.name))
+                setattr(b, 'ob_' + ('bild' if ext=='jpg' else ext), True)
 
-        if not b.bild:
-            bild = b.slug + '.jpg'
-            b.bild_holen('http://www.scholarium.at/schriften/'+bild, bild)
-        
-        b.save()
+            b.save()
         
 
 def veranstaltungen_aus_db():
@@ -103,3 +99,4 @@ def veranstaltungen_aus_db():
                 beschreibung1=zeile['text'],
                 beschreibung2=zeile['text2'],
                 preis_teilnahme=zeile['price'],)
+
