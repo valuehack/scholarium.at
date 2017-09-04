@@ -4,6 +4,9 @@ from Grundgeruest.models import Nutzer
 from Scholien.models import Buechlein
 
 import pdb    
+
+
+os.chdir('/home/scholarium/production/')
     
 def buechlein_ebooks_einlesen():
     """ Kopiert die pdfs/epub/mobi der scholienbuechlein aus dem 
@@ -12,7 +15,6 @@ def buechlein_ebooks_einlesen():
     buechlein = Buechlein.objects.all()
     liste_ext = ['jpg', 'pdf', 'mobi', 'epub']
     
-    os.chdir('/home/scholarium/production/')
     for b in buechlein:
         for ext in liste_ext:
             nachordner = os.path.join(MEDIA_ROOT, 'scholienbuechlein')
@@ -25,7 +27,8 @@ def buechlein_ebooks_einlesen():
                 name_neu = '%s_%s.%s' % (b.slug, Nutzer.erzeuge_zufall(8, 2), ext)
                 dateifeld.name = 'scholienbuechlein/%s' % name_neu
                 shutil.copy2(von, os.path.join(MEDIA_ROOT, dateifeld.name))
-                setattr(b, 'ob_' + ('bild' if ext=='jpg' else ext), True)
+                if ext<>'jpg':
+                    setattr(b, 'ob_' + ext, True)
 
             b.save()
         
@@ -79,7 +82,7 @@ def veranstaltungen_aus_db():
                 art_veranstaltung=arten[zeile['type']],
                 datum=datum, 
                 link=zeile['livestream'])
-
+            
     # Studiendinger einlesen
     Studiumdings.objects.all().delete()
     
@@ -99,4 +102,22 @@ def veranstaltungen_aus_db():
                 beschreibung1=zeile['text'],
                 beschreibung2=zeile['text2'],
                 preis_teilnahme=zeile['price'],)
+
+
+def mediendateien_einlesen():
+    von_ordner = 'down_secure/content_secure/'
+    nach_ordner = os.path.join(MEDIA_ROOT, 'veranstaltungen_mp3')
+    for v in Veranstaltung.objects.all():
+        von_name = 'medien-'+v.slug+'.mp3'
+        dateifeld = getattr(v, 'datei')
+        if dateifeld and dateifeld.name.split('/')[-1] in os.listdir(nach_ordner):
+            continue
+        if von_name in os.listdir(von_ordner):
+            von = von_ordner + von_name
+            dateiname = '%s_%s.mp3' % (v.slug, Nutzer.erzeuge_zufall(8, 2))
+            dateifeld.name = 'veranstaltungen_mp3/' + dateiname
+            shutil.copy2(von, os.path.join(MEDIA_ROOT, dateifeld.name))
+            setattr(v, 'ob_datei', True)
+        
+        v.save()
 
