@@ -10,25 +10,20 @@ def buechlein_ebooks_einlesen():
     input-Ordner nach media, verändert sicherheitshalber den Dateinamen, 
     und speichert den link in der db """
     liste = Buechlein.objects.all()
-    buechlein = [(b.slug, b, [b.slug+ext for ext in ['.pdf', '.mobi', '.epub']]) for b in liste]
+    buechlein = [(b, {ext: None for ext in ['pdf', 'mobi', 'epub']}) for b in liste]
     
-    os.chdir('/home/scholarium/')
-    neue_namen = {}
-    for slug, b, dreinamen in buechlein:
-        for name in dreinamen:
-            von = 'production/down_secure/content_secure/' + name
-            n, ext = os.path.splitext(name)
+    os.chdir('/home/scholarium/production/')
+    for b, dreinamen in buechlein:
+        for ext in dreinamen.keys():
             nachordner = os.path.join(MEDIA_ROOT, 'scholienbuechlein')
             dateifeld = getattr(b, ext)
             if dateifeld and dateifeld.name in os.listdir(nachordner):
-                neue_namen.update([(name, dateifeld.name)])
                 continue
             else:
-                neu = n + '_' + Nutzer.erzeuge_zufall(8, 2) + ext
-                neue_namen.update([(name, neu)])
-                nach = nachordner + neu
-                shutil.copy2(von, nach)
-                dateifeld.name = 'scholienbuechlein/' + neu
+                von = 'down_secure/content_secure/%s.%s' % (b.slug, ext)
+                name_neu = '%s_%s.%s' % (b.slug, Nutzer.erzeuge_zufall(8, 2), ext)
+                dateifeld.name = 'scholienbuechlein/%s' % name_neu
+                shutil.copy2(von, os.path.join(MEDIA_ROOT, dateifeld.name)
 
         if not b.bild:
             bild = b.slug + '.jpg'
