@@ -4,7 +4,7 @@ from Grundgeruest.models import Nutzer
 from Scholien.models import Buechlein
 from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung, Studiumdings
 
-import pdb    
+import pdb
 
 try:
     os.chdir('/home/scholarium/godaddy_daten/')
@@ -56,11 +56,13 @@ def veranstaltungen_aus_db():
         con.row_factory = lite.Row
         cur = con.cursor()
         cur.execute("SELECT * FROM produkte WHERE type in ('salon'," + 
-            " 'seminar', 'media-vortrag', 'media-vorlesung');")
+            " 'media-salon', 'seminar', 'media-vortrag', 'media-vorlesung');")
 
         zeilen = [dict(zeile) for zeile in cur.fetchall()]
     
     arten = {'salon': ArtDerVeranstaltung.objects.get(
+            bezeichnung='Salon'),
+        'media-salon': ArtDerVeranstaltung.objects.get(
             bezeichnung='Salon'),
         'seminar': ArtDerVeranstaltung.objects.get(
             bezeichnung='Seminar'),
