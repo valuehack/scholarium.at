@@ -6,9 +6,11 @@ from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung, Studiumdi
 
 import pdb    
 
+try:
+    os.chdir('/home/scholarium/godaddy_daten/')
+except FileNotFoundError:
+    pass
 
-os.chdir('/home/scholarium/production/')
-    
 def buechlein_ebooks_einlesen():
     """ Kopiert die pdfs/epub/mobi der scholienbuechlein aus dem 
     input-Ordner nach media, verändert sicherheitshalber den Dateinamen, 
