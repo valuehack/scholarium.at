@@ -105,7 +105,7 @@ def vortrag(request):
     else:
         extra_context = { 'vortrag': vortrag, 'url_hier': '/vortrag/'}
     return TemplateMitMenue.as_view(
-        template_name='Gast/vortrag.html', 
+        template_name='Veranstaltungen/vortrag.html', 
         extra_context=extra_context)(request)
 
 
