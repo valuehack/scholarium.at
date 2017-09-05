@@ -36,3 +36,19 @@ def max_anzahl_zu_liste(produkt, art=0):
     """ gibt Liste der Anzahlen 1..max zurück, falls das Produkt beschränkt
     ist, sonst None """
     return produkt.anzahlen_ausgeben(art)
+
+
+# für pdb tag
+import pdb as pdb_module
+
+from django.template import Node
+
+class PdbNode(Node):
+
+    def render(self, context):
+        pdb_module.set_trace()
+        return ''
+
+@register.tag
+def pdb(parser, token):
+    return PdbNode()

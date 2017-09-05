@@ -22,7 +22,7 @@ def liste_veranstaltungen(request, art):
     
     return ListeArt.as_view(
         template_name=template_name,
-        art=art)(request)
+        art=art)(request, page=request.GET.get('seite'))
     
 class ListeArt(ListeAlle):
     """ Klasse zur Darstellung der Seminare oder Salons

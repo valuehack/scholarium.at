@@ -19,14 +19,14 @@ def liste_artikel(request):
     slug = request.GET.get('q')
     if slug: # erst prüfen, ob was da ist
         return ein_artikel(request, slug)
-    
+        
     # nur wenn kein 'q' im GET, wird Liste ausgegeben:    
     if request.user.is_authenticated() and request.user.hat_guthaben():
         return ListeMitMenue.as_view(
             model=models.Artikel,
             template_name='Scholien/liste_artikel.html',
             context_object_name='liste_artikel',
-            paginate_by = 5)(request)
+            paginate_by = 5)(request, page=request.GET.get('seite'))
     elif request.user.is_authenticated():
         return TemplateMitMenue.as_view(
             template_name='Gast/scholien_angemeldet.html', 
@@ -43,7 +43,7 @@ def liste_buechlein(request):
             model=models.Buechlein,
             template_name='Scholien/liste_buechlein.html',
             context_object_name='buechlein',
-            paginate_by = 5)(request)
+            paginate_by = 5)(request, page=request.GET.get('seite'))
     else:
         # im Template wird Kleinigkeit unterschieden: 
         return TemplateMitMenue.as_view(

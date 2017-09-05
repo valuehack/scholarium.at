@@ -59,6 +59,7 @@ def liste_menue_zurueckgeben(request):
     return {'liste_menue': liste_punkte}
 
 class MenueMixin():
+    from functools import partial
     extra_context = {}
     url_hier = '/'
     def get_context_data(self, **kwargs):
@@ -67,7 +68,8 @@ class MenueMixin():
         context['liste_menue'] = liste_menue
         context['url_hier'] = self.url_hier
         context.update(self.extra_context)
-        return context        
+        return context
+            
 
 class TemplateMitMenue(MenueMixin, TemplateView):
     pass 

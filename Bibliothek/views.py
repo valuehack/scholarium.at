@@ -5,6 +5,16 @@ from . import models
 from django.db import transaction
 import sqlite3 as lite
 from seite.settings import BASE_DIR
+from Grundgeruest.views import ListeMitMenue
+
+def liste_alte_buecher(request):
+    return ListeMitMenue.as_view(
+        template_name='Bibliothek/alte_buecher.html',
+        model=models.Altes_Buch,
+        context_object_name='buecher',
+        paginate_by = 80)(request, page=request.GET.get('seite')) 
+
+
 
 attributnamen = {
     'author': 'autor',
