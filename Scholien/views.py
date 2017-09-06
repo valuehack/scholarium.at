@@ -101,11 +101,11 @@ def pdfs_etc_einlesen():
         b.save()
 
 def aus_alter_db_einlesen():
-    """ liest scholienartikel und scholienbuechlein aus alter db (als 
+    """ liest scholienartikel aus alter db (als 
     .sqlite exportiert) aus 
     !! Achtung, löscht davor die aktuellen Einträge !! """
     
-    # zuerst Artikel auslesen
+    # Artikel auslesen
     models.Artikel.objects.all().delete()
     
     con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
@@ -126,30 +126,3 @@ def aus_alter_db_einlesen():
                 inhalt_nur_fuer_angemeldet=scholie['private_text'],
                 datum_publizieren=scholie['publ_date'], 
                 slug=scholie['id'])
-
-    # und Büchlein auslesen
-    # es fehlt einiges, insb. die pdfs einzutragen
-    models.Buechlein.objects.all().delete()
-    
-    con = lite.connect(os.path.join(settings.BASE_DIR, 'alte_db.sqlite3'))
-    with con:
-        con.row_factory = lite.Row
-        cur = con.cursor()
-        cur.execute("SELECT * FROM produkte WHERE type='scholie';")
-
-        zeilen = [dict(zeile) for zeile in cur.fetchall()]
-
-    with transaction.atomic():
-        for scholie in zeilen:
-            buch = models.Buechlein.objects.create(
-                bezeichnung=scholie['title'],
-                beschreibung=scholie['text'],
-                anzahl_druck=3,
-                alte_nr=scholie['n'], 
-                slug=scholie['id'])
-            
-            dateiname = scholie['id']+'.jpg'
-            buch.bild_holen(
-                'http://www.scholarium.at/schriften/'+dateiname,
-                dateiname)
-            buch.save()

@@ -17,7 +17,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, aus_datei_mitglieder_einlesen, db_runterladen, zahlen, ListeAktiveMitwirkende
+from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, db_runterladen, zahlen, ListeAktiveMitwirkende
 from Grundgeruest.models import Mitwirkende
 import Grundgeruest.userena_urls as userena_urls
 from Veranstaltungen.urls import *
@@ -47,9 +47,6 @@ urlpatterns = [
         studiumdings_detail, 
         name='studium_detail'),
     url(r'^vortrag/', vortrag, name='vortrag'), 
-    url(r'^nutzer/e$',
-        aus_datei_mitglieder_einlesen,
-        name='mitglieder_einlesen'),
     url(r'^nutzer/', include(userena_urls)),
     url(r'^warenkorb/', include('Produkte.urls')),
     url(r'^veranstaltungen/', include(
