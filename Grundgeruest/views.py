@@ -113,27 +113,31 @@ def zahlen(request):
         formular = ZahlungFormular(request.POST)
         # und falls alle Eingaben gültig sind, Daten verarbeiten: 
         if formular.is_valid():
-            if not (request.user.is_authenticated() or
-                Nutzer.objects.filter(email=request.POST['email'])):
-
+            nutzer = None
+            if not (Nutzer.objects.filter(email=request.POST['email'])): #or request.user.is_authenticated()):
                 # erstelle neuen Nutzer mit eingegebenen Daten:
                 nutzer = Nutzer.neuen_erstellen(request.POST['email'])
-                profil = nutzer.my_profile
-                signup = nutzer.userena_signup
-                nutzer.first_name = request.POST['vorname']
-                nutzer.last_name = request.POST['nachname']
-                profil.stufe = int(request.POST['stufe'])
-                profil.guthaben_aufladen(request.POST['betrag'])
-                # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
-                for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
-                    'ort', 'land']:
-                    setattr(profil, attr, request.POST[attr])
 
-                nutzer.save()
-                profil.save()
             else:
                 print('{0}gibts schon{0}'.format(10*'\n'))
+                print(request.POST)
+                nutzer = Nutzer.objects.get(email=request.POST['email'])
                 
+            profil = nutzer.my_profile
+            nutzer.first_name = request.POST['vorname']
+            nutzer.last_name = request.POST['nachname']
+            
+            
+            profil.stufe = int(request.POST['stufe'])+1
+            profil.guthaben_aufladen(request.POST['betrag'])
+            # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
+            for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
+                'ort', 'land']:
+                setattr(profil, attr, request.POST[attr])
+
+            nutzer.save()
+            profil.save()
+            
             # redirect to a new URL:
             return HttpResponseRedirect('/thanks/')
         
@@ -147,9 +151,13 @@ def zahlen(request):
     stufe = request.POST.get('stufe', 'Gast')
     betrag = request.POST.get('betrag', '75')
 
-    return render(request, 'Produkte/zahlung.html', 
-        {'formular': formular, 'betrag': betrag, 'stufe': stufe})    
-        
+    context = {
+        'formular': formular, 
+        'betrag': betrag, 
+        'stufe': stufe
+    }
+    
+    return render(request, 'Produkte/zahlung.html', context)    
 
 
 # profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
