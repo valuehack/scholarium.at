@@ -83,7 +83,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'easycart.context_processors.cart',
-                'Grundgeruest.views.liste_menue_zurueckgeben'
+                'Grundgeruest.views.liste_menue_zurueckgeben',
+                'Grundgeruest.views.pruefen_ob_abgelaufen',
             ],
         },
     },
@@ -190,7 +191,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'seite', 'static'),
 ]
 
-MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
+
+try:
+    MEDIA_ROOT = 'home/scholarium/scholarium_daten/'
+except FileNotFoundError:
+    MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
+
 MEDIA_URL = '/media/'
 
 # EMail-Versand

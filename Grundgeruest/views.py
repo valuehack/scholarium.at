@@ -21,7 +21,7 @@ from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
 from Bibliothek.models import Buch
 from .forms import ZahlungFormular, ProfilEditFormular
-from datetime import date
+from datetime import date, timedelta
 
 
 def erstelle_liste_menue(user=None):
@@ -55,8 +55,21 @@ def erstelle_liste_menue(user=None):
     return liste_punkte
 
 def liste_menue_zurueckgeben(request):
+    """ context-processor """
     liste_punkte = erstelle_liste_menue(request.user)
     return {'liste_menue': liste_punkte}
+
+def pruefen_ob_abgelaufen(request):
+    """ context-processor """
+    #pdb.set_trace()
+    ablauf = request.user.my_profile.datum_ablauf 
+    if not ablauf or ablauf <= date.today():
+        messages.info(request, 'Sie sind abgelaufen!!!')
+    elif ablauf + timedelta(days=24) > date.today():
+        messages.info(request, 'Ihre Unterstützung läuft in wenigen Wochen ab!')
+    else:
+        messages.info(request, 'Ihre Unterstützung läuft noch lange...')
+    return {}
 
 class MenueMixin():
     from functools import partial
@@ -87,8 +100,6 @@ def index(request):
         medien = []
         mehr_buecher = Buch.objects.order_by('-zeit_erstellt')[:50]
         buecher = random.sample(list(mehr_buecher), 3)
-        # Achtung, spam-message als Bsp., später rausnehmen 
-        messages.info(request, 'Willkommen auf der Startseite')
         return TemplateMitMenue.as_view(
             template_name='startseite.html',
             extra_context={
