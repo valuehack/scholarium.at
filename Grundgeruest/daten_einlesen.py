@@ -4,6 +4,7 @@ from Grundgeruest.models import Nutzer
 from Scholien.models import Buechlein
 from Bibliothek.models import Altes_Buch
 from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung, Studiumdings
+from Produkte.models import Kauf
 
 from django.db import transaction
 import sqlite3 as lite
@@ -118,23 +119,42 @@ def veranstaltungen_aus_db():
                 preis_teilnahme=zeile['price'],)
 
 
-def mitglieder_aus_db():
-    """
-    Liest Mitglieder aus der Datenbank im Parent-Ordner
+def mitwirkende_aus_db():
+    """ liest Mitwirkende aus alter db (als .sqlite exportiert) aus 
+    !! Achtung, löscht davor die aktuellen Einträge !! """
     
-    Idee: öffne Datenbank und hole Zeilen als dict Attribut -> Wert
-    erstelle dict für alte Attributnamen -> neue Namen 
-    erstelle Liste von Nutzern und speichere sie (wegen Profil und Signup)
-    füge für jeden Nutzer alle Attribute hinzu, speichere
-    """
+    Mitwirkende.objects.all().delete()
+    
     con = lite.connect(os.path.join(BASE_DIR, 'alte_db.sqlite3'))
     with con:
         con.row_factory = lite.Row
         cur = con.cursor()
-        cur.execute("SELECT * FROM mitgliederExt")
+        cur.execute("SELECT * FROM crew;")
 
         zeilen = [dict(zeile) for zeile in cur.fetchall()]
+
+    with transaction.atomic():
+        for person in zeilen:
+            neu = Mitwirkende.objects.create(alt_id=person['id'])
+                
+            for attr in ['name', 'text_de', 'text_en', 'link', 'level', 
+                'start', 'end']:
+                if person[attr] == '0000-00-00':
+                    person[attr] = '1111-01-01'
+                setattr(neu, attr, person[attr])
             
+            neu.save()
+
+
+### ab hier der große Block zum Eintragen der Käufe; dazu werden Nutzer und
+### Produkte importiert, dabei die Zuordnung der alten id zu den neuen 
+### Instanzen gespeichert, um dann gut Käufe erstellen zu können.
+
+def eintragen_mitglieder(daten):
+    """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
+    mitgliederExt-Tabelle der alten db. Trägt entsprechende Nutzer ein
+    und gibt dict alte user_id -> Profil-Instanz zurück """
+        
     profil_attributnamen = dict([
         ('stufe', 'Mitgliedschaft'),
         ('anrede', 'Anrede'),
@@ -166,25 +186,29 @@ def mitglieder_aus_db():
         ('last_login', 'last_login_time'),
     ])
     
-    zeilen = zeilen[3:15]
-    Nutzer.objects.filter(id__gt=3).delete()    
-        
     letzte_id = max(Nutzer.objects.all().values_list('id', flat=True))
     
-    liste_nutzer = []
+    liste_nutzer = [] # hat dann gleiche Reihenfolge wie daten
+
     with transaction.atomic():
-        for i, zeile in enumerate(zeilen):
-            nutzer = Nutzer.leeren_anlegen()
-            nutzer.username = Nutzer.erzeuge_zufall(12, 3)
+        for i, zeile in enumerate(daten):
+            try:
+                if not zeile['user_email']: # das gibt Konflikt mit django-guardians AnonymousUser, der hat auch leere Mail
+                    raise Nutzer.DoesNotExist
+                nutzer = Nutzer.objects.get(email=zeile['user_email'])
+                print("Nutzer gab's schon: %s" % zeile['user_email'])
+            except Nutzer.DoesNotExist:
+                nutzer = Nutzer.leeren_anlegen() # legt Nutzer mit Profil
+                # und Signup-Objekt an; mit Zufalls-Name und -Passwort
+                print('Neuer Nutzer mit {}, alte id {} vom {}'.format(
+                    zeile['user_email'], 
+                    zeile['user_id'], 
+                    zeile['user_registration_datetime']))
             nutzer.is_active = True
             nutzer.save()
-            print('alte id {} angelegt: {} vom {}'.format(
-                zeile['user_id'], 
-                zeile['user_email'], 
-                zeile['user_registration_datetime']))
             liste_nutzer.append(nutzer)
     
-    for zeile in zeilen: # falls None drin steht, gäbe es sonst Fehler
+    for zeile in daten: # falls None drin steht, gäbe es sonst Fehler
         zeile['Vorname'] = zeile['Vorname'] or ''
         zeile['Nachname'] = zeile['Nachname'] or ''
         for k, v in zeile.items():
@@ -201,9 +225,11 @@ def mitglieder_aus_db():
         for neu, alt in profil_attributnamen.items():
             setattr(profil, neu, zeile[alt])
     
+    id_zu_profil = {}
+    
     with transaction.atomic():
         for i, nutzer in enumerate(liste_nutzer):
-            zeile = zeilen[i]
+            zeile = daten[i]
             eintragen_nutzer(nutzer, zeile)
             pw_alt = zeile['user_password_hash']
             nutzer.password = 'bcrypt$$2b$10${}'.format(pw_alt.split('$')[-1])
@@ -211,34 +237,9 @@ def mitglieder_aus_db():
             profil = nutzer.my_profile
             eintragen_profil(profil, zeile)
             profil.save()
+            id_zu_profil[zeile['user_id']] = profil
     
-    return zeilen
-
-def mitwirkende_aus_db():
-    """ liest Mitwirkende aus alter db (als .sqlite exportiert) aus 
-    !! Achtung, löscht davor die aktuellen Einträge !! """
-    
-    Mitwirkende.objects.all().delete()
-    
-    con = lite.connect(os.path.join(BASE_DIR, 'alte_db.sqlite3'))
-    with con:
-        con.row_factory = lite.Row
-        cur = con.cursor()
-        cur.execute("SELECT * FROM crew;")
-
-        zeilen = [dict(zeile) for zeile in cur.fetchall()]
-
-    with transaction.atomic():
-        for person in zeilen:
-            neu = Mitwirkende.objects.create(alt_id=person['id'])
-                
-            for attr in ['name', 'text_de', 'text_en', 'link', 'level', 
-                'start', 'end']:
-                if person[attr] == '0000-00-00':
-                    person[attr] = '1111-01-01'
-                setattr(neu, attr, person[attr])
-            
-            neu.save()
+    return liste_nutzer, id_zu_profil
 
 def eintragen_veranstaltungen(daten):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
@@ -354,6 +355,14 @@ def eintragen_antiquariat(daten):
             id_zu_objekt[zeile['n']] = buch
     return id_zu_objekt
 
+def eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil):
+    """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
+    registration-Tabelle der alten db. Außerdem ein mapping der produkt_id 
+    der alten db zu model-Instanzen der neuen. Trägt entsprechende Käufe ein
+    und gibt dict produkt_id -> model-Instanz zurück """
+
+    with transaction.atomic():
+        pass
 
 def kaeufe_aus_db():
     """
@@ -378,31 +387,66 @@ def kaeufe_aus_db():
         kaeufe = [dict(zeile) for zeile in cur.fetchall()]
     
     id_zu_objekt = {}
-
-
+    
     Altes_Buch.objects.all().delete()
     id_zu_objekt.update(eintragen_antiquariat(
         [p for p in produkte if p['type']=='antiquariat']))
-
+    
+    print('Antiquariat eingelesen')
+    
     Buechlein.objects.all().delete()
     id_zu_objekt.update(eintragen_buechlein(
         [p for p in produkte if p['type']=='scholie']))
+
+    print('Buechlein eingelesen')
 
     Studiumdings.objects.all().delete()
     id_zu_objekt.update(eintragen_studiendinger(
         [p for p in produkte if p['type'] in 
         ['programm', 'vortrag']]))
-    
+
+    print('Studiumdinger eingelesen')
+
     Veranstaltung.objects.all().delete()
     id_zu_objekt.update(eintragen_veranstaltungen(
         [p for p in produkte if p['type'] in 
         ['salon', 'media-salon', 'seminar', 'media-vortrag', 
         'media-vorlesung']]))
+
+    print('Veranstaltungen eingelesen')
+
+    print('Nutzer geloescht')
     
+    liste_nutzer, id_zu_profil = eintragen_mitglieder(mitglieder)
+    try:
+        liste_nutzer.append(Nutzer.objects.get(username="admin"))
+    except Nutzer.DoesNotExist:
+        pass
+    try:
+        liste_nutzer.append(Nutzer.objects.get(username="AnonymousUser"))
+    except Nutzer.DoesNotExist:
+        pass
+    with transaction.atomic():
+        for nutzer in Nutzer.objects.all():
+            if nutzer not in liste_nutzer:
+                nutzer.delete()
+        
+    print('Nutzer neu eingelesen, alte gelöscht')
     
+    ids_gueltig = id_zu_objekt.keys() # nicht alle wurden eingelesen
+    ids_nutzer = id_zu_profil.keys() # anscheinend in alter db gelöscht
+    kliste = [k for k in kaeufe if k['event_id'] in ids_gueltig and k['user_id'] in ids_nutzer] 
 
-
-
+    print('Gueltige Kaeufe gefunden, beginne Sicherheitspruefung')
+    
+    for k in kliste:
+        if k['user_id'] not in id_zu_profil.keys():
+            print('oh, nein! zu user_id %s im Kauf %s gibt es kein Profil!' % (k['user_id'], k['reg_id']))
+        if k['event_id'] not in id_zu_objekt.keys():
+            print('oh, nein! zu event_id %s im Kauf %s gibt es kein Objekt!' % (k['event_id'], k['reg_id']))
+    
+    print('Pruefung abgeschlossen.')
+    
     pdb.set_trace()        
 
 

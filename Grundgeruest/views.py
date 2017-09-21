@@ -62,13 +62,14 @@ def liste_menue_zurueckgeben(request):
 def pruefen_ob_abgelaufen(request):
     """ context-processor """
     #pdb.set_trace()
-    ablauf = request.user.my_profile.datum_ablauf 
-    if not ablauf or ablauf <= date.today():
-        messages.info(request, 'Sie sind abgelaufen!!!')
-    elif ablauf + timedelta(days=24) > date.today():
-        messages.info(request, 'Ihre Unterstützung läuft in wenigen Wochen ab!')
-    else:
-        messages.info(request, 'Ihre Unterstützung läuft noch lange...')
+    if request.user.is_authenticated():
+        ablauf = request.user.my_profile.datum_ablauf 
+        if not ablauf or ablauf <= date.today():
+            messages.info(request, 'Sie sind abgelaufen!!!')
+        elif ablauf + timedelta(days=24) > date.today():
+            messages.info(request, 'Ihre Unterstützung läuft in wenigen Wochen ab!')
+        else:
+            messages.info(request, 'Ihre Unterstützung läuft noch lange...')
     return {}
 
 class MenueMixin():
