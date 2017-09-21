@@ -174,13 +174,14 @@ class Kauf(models.Model):
         'Grundgeruest.ScholariumProfile',
         on_delete=models.SET_NULL,
         null=True)
-    produkt_pk = models.CharField(max_length=30)
+    produkt_pk = models.CharField(max_length=40)
     menge = models.SmallIntegerField(blank=True, default=1)
     zeit = models.DateTimeField(
         auto_now_add=True,
         editable=False)
+    kommentar = models.CharField(max_length=255, blank=True)
     # falls was schief geht, wird das Guthaben gecached:
-    guthaben_davor = models.SmallIntegerField(editable=False)
+    guthaben_davor = models.SmallIntegerField(editable=False, null=True)
 
     
     # 2 Hilfsfunktionen um pk in drei Teile zu spalten und zurück:
@@ -262,6 +263,20 @@ class Kauf(models.Model):
             guthaben_davor=guthaben)
         nutzer.guthaben = guthaben - ware.total
         nutzer.save()
+        return kauf
+    
+    @classmethod
+    def neuen_anlegen(cls, objekt, art, menge, kunde, kommentar):
+        """ Erstellt neuen Kauf für die Historie. In erster Linie für den 
+        Import aus der alten DB gebraucht. Keine Modifikation der Menge 
+        oder des Guthabens, nur Kauf-objekt. """
+        
+        pk = cls.obj_zu_pk(objekt, art)
+        kauf = cls.objects.create(
+            nutzer=kunde,
+            produkt_pk=pk,
+            menge=menge, 
+            kommentar=kommentar)
         return kauf
         
     def __str__(self):

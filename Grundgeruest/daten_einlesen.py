@@ -220,11 +220,11 @@ def eintragen_mitglieder(daten):
     def eintragen_nutzer(nutzer, zeile):
         for neu, alt in nutzer_attributnamen.items():
             setattr(nutzer, neu, zeile[alt])
-
+        
     def eintragen_profil(profil, zeile):
         for neu, alt in profil_attributnamen.items():
             setattr(profil, neu, zeile[alt])
-    
+        
     id_zu_profil = {}
     
     with transaction.atomic():
@@ -238,6 +238,8 @@ def eintragen_mitglieder(daten):
             eintragen_profil(profil, zeile)
             profil.save()
             id_zu_profil[zeile['user_id']] = profil
+
+    print('Nutzerattribute und Profilattribute eingetragen')
     
     return liste_nutzer, id_zu_profil
 
@@ -280,7 +282,7 @@ def eintragen_veranstaltungen(daten):
             if zeile['livestream']: 
                 v.ob_livestream = True
                 v.save()
-            id_zu_objekt[zeile['n']] = v
+            id_zu_objekt[zeile['n']] = (v, zeile['type'])
     
     return id_zu_objekt
 
@@ -310,7 +312,7 @@ def eintragen_studiendinger(daten):
                     preis_teilnahme=zeile['price'],
                     reihenfolge=0,)
             
-            id_zu_objekt[zeile['n']] = dings
+            id_zu_objekt[zeile['n']] = (dings, zeile['type'])
 
     return id_zu_objekt
 
@@ -330,7 +332,7 @@ def eintragen_buechlein(daten):
                 alte_nr=zeile['n'], 
                 slug=zeile['id'])
             
-            id_zu_objekt[zeile['n']] = buch
+            id_zu_objekt[zeile['n']] = (buch, zeile['type'])
     
     return id_zu_objekt
 
@@ -352,17 +354,64 @@ def eintragen_antiquariat(daten):
                     anzahl_kaufen=zeile['spots'],)
             else:
                 print("da gibt's ein 'antiquariat' mit digitalen Formaten!")
-            id_zu_objekt[zeile['n']] = buch
+            id_zu_objekt[zeile['n']] = (buch, zeile['type'])
     return id_zu_objekt
 
 def eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
     registration-Tabelle der alten db. Außerdem ein mapping der produkt_id 
     der alten db zu model-Instanzen der neuen. Trägt entsprechende Käufe ein
-    und gibt dict produkt_id -> model-Instanz zurück """
+    und gibt dict produkt_id -> model-Instanz zurück 
+    
+    kompliziert ist die Zuordnung von format zu art; es gibt in der alten
+    db folgende formate der Käufe abhängig vom type vom produkt:
+    scholie: PDF, Kindle, ePub, Druck
+    antiquariat: Druck
+    programm: ''
+    seminar: '', vorOrt
+    salon: '', vorOrt, vor Ort, Stream 
+    media-salon: '', Stream
+    media-vortrag: ''
+    media-vorlesung: '' """
+    
+    def reg_zu_kauf(kauf):
+        """ nimmt eine Zeile der kliste und gibt objekt und art für den 
+        zu erstellenden Kauf aus """
+        objekt, type_alt = id_zu_objekt[kauf['event_id']]
+        if type_alt in ['programm', 'seminar']:
+            art = 'teilnahme'
+        elif type_alt == 'antiquariat':
+            art = 'kaufen'
+        elif type_alt == 'scholie':
+            art = {'Druck': 'druck', 
+                'PDF': 'pdf', 
+                'ePub': 'epub', 
+                'Kindle': 'mobi'}[kauf['format']]
+        elif type_alt[:5] == 'media':
+            art = 'aufzeichnung'
+        elif type_alt == 'salon':
+            art = 'aufzeichnung' # ist falsch, aber zum Wohl des Kunden
+        
+        return objekt, art
 
     with transaction.atomic():
-        pass
+        for kauf in kliste:
+            if kauf['reg_datetime'][0] == '0':
+                datum = '1111-11-11 11:11:11'
+            else:
+                datum = kauf['reg_datetime']
+            if kauf['reg_notes']:
+                kommentar = "Alte reg_id %s, notes %s" % (
+                    kauf['reg_id'], kauf['reg_notes'])
+            else:
+                kommentar = "Aus alter DB mit reg_id %s" % kauf['reg_id']
+            objekt, art = reg_zu_kauf(kauf)
+            kunde = id_zu_profil[kauf['user_id']]
+            menge = kauf['quantity']
+            neu = Kauf.neuen_anlegen(objekt, art, menge, kunde, kommentar)
+            neu.zeit = datum
+            neu.save()
+            print('Kauf von %s durch %s angelegt' % (objekt, kunde.user))
 
 def kaeufe_aus_db():
     """
@@ -374,6 +423,18 @@ def kaeufe_aus_db():
     
     Idee: man könnte gleich vorher alle Produkte einlesen und in ein dict
     id -> objekt schreiben
+    
+    Es gibt im Moment 2597 registrations in der alten db. Einlesen derer 
+    mit produkttyp in ['antiquariat', 'scholie', 'programm', 'vortrag',
+    'salon', 'media-salon', 'seminar', 'media-vortrag', 'media-vorlesung']
+    gibt 1940 Käufe
+    Es fehlen: 
+    projekt: 55x 
+    privatseminar: 2x
+    video: 0x
+    buch: 405x
+    analyse: 48x
+    -> Summe 2450???
     """
     con = lite.connect(os.path.join(BASE_DIR, 'alte_db.sqlite3'))
     with con:
@@ -415,9 +476,10 @@ def kaeufe_aus_db():
 
     print('Veranstaltungen eingelesen')
 
-    print('Nutzer geloescht')
-    
     liste_nutzer, id_zu_profil = eintragen_mitglieder(mitglieder)
+    
+    print('Nutzer eingelesen, lösche überschüssige')
+    
     try:
         liste_nutzer.append(Nutzer.objects.get(username="admin"))
     except Nutzer.DoesNotExist:
@@ -431,13 +493,13 @@ def kaeufe_aus_db():
             if nutzer not in liste_nutzer:
                 nutzer.delete()
         
-    print('Nutzer neu eingelesen, alte gelöscht')
+    print('Alte Nutzer gelöscht')
     
     ids_gueltig = id_zu_objekt.keys() # nicht alle wurden eingelesen
     ids_nutzer = id_zu_profil.keys() # anscheinend in alter db gelöscht
     kliste = [k for k in kaeufe if k['event_id'] in ids_gueltig and k['user_id'] in ids_nutzer] 
 
-    print('Gueltige Kaeufe gefunden, beginne Sicherheitspruefung')
+    print('Gültige Käufe gefunden, beginne Sicherheitspruefung')
     
     for k in kliste:
         if k['user_id'] not in id_zu_profil.keys():
@@ -445,7 +507,10 @@ def kaeufe_aus_db():
         if k['event_id'] not in id_zu_objekt.keys():
             print('oh, nein! zu event_id %s im Kauf %s gibt es kein Objekt!' % (k['event_id'], k['reg_id']))
     
-    print('Pruefung abgeschlossen.')
+    print('Prüfung abgeschlossen.')
+    
+    Kauf.objects.all().delete()
+    eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil)
     
     pdb.set_trace()        
 
