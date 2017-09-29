@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
 
 from .models import *
+from Produkte.models import Kauf
 from Grundgeruest.views import ListeMitMenue, DetailMitMenue, TemplateMitMenue
 
 
@@ -107,6 +109,32 @@ def vortrag(request):
     return TemplateMitMenue.as_view(
         template_name='Veranstaltungen/vortrag.html', 
         extra_context=extra_context)(request)
+
+
+def livestream(request):
+    """ soll das nächste salon-Objekt ans livestream-Template geben, falls 
+    Termin nah genug und link aktiviert. Sonst später Extraseite, erstmal 
+    Link auf nächsten Salon und message, dass zu lange hin """
+    
+    artsalon = ArtDerVeranstaltung.objects.filter(bezeichnung='Salon')
+    
+    try:
+        salon = Veranstaltung.objects.filter(
+            datum__gte=date.today()).filter(
+            art_veranstaltung=artsalon).order_by('datum')[0]
+    except IndexError:
+        messages.warning(request, ('Momentan sind die nächsten Salons noch nicht eingetragen.'))
+        return HttpResponseRedirect("/salons/")
+    
+    if not (salon.ob_bald(30) and salon.ob_aktiv(art='livestream')):
+        messages.warning(request, ('Zum nächsten Salon gibt es noch keinen Livestream!'))
+        return HttpResponseRedirect("/salon/" + salon.slug)
+
+    for k in request.user.my_profile.kauf_set.all():
+        if k.art_ausgeben()=='livestream' and k.objekt_ausgeben()==salon:
+            return TemplateMitMenue.as_view(
+                template_name='Veranstaltungen/livestream.html')(request)
+
 
 
 from Grundgeruest.daten_einlesen import veranstaltungen_aus_db

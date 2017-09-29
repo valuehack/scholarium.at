@@ -34,8 +34,8 @@ class Veranstaltung(KlasseMitProdukten):
             raise ValueError('Bitte gültige Art angeben')
         elif self.finde_preis(art):
             return self.finde_preis(art)
-        else: # das ändern, falls es mehrere Arten gibt
-            return self.art_veranstaltung.preis_praesenz
+        else: # kein individueller Preis, gucke nach Art
+            return getattr(self.art_veranstaltung, 'preis_'+art)
     
     def ob_aktiv(self, art='teilnahme'):
         if art not in self.arten_liste:
@@ -48,6 +48,9 @@ class Veranstaltung(KlasseMitProdukten):
             return bool(self.datei) and bool(self.ob_aufzeichnung)
         else: 
             return ValueError('Art %s habe ich noch nicht beachtet' % art)
+    
+    def ob_bald(self, tage=4):
+        return True if 0 <= (self.datum - date.today()).days < tage else False
     
     def get_url(self):
         if self.art_veranstaltung.bezeichnung == 'Salon':
@@ -85,7 +88,7 @@ class ArtDerVeranstaltung(Grundklasse):
     beschreibung = models.TextField(
         max_length=1200, 
         null=True, blank=True)    
-    preis_praesenz = models.SmallIntegerField()
+    preis_teilnahme = models.SmallIntegerField()
     # Achtung, hier Felder einfügen wenn mehr Arten von Medien dazukommen
     preis_livestream = models.SmallIntegerField(null=True, blank=True)
     preis_aufzeichnung = models.SmallIntegerField(null=True, blank=True)
