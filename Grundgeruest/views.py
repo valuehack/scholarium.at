@@ -119,6 +119,14 @@ def zahlen(request):
     #if request.method=='POST' and 'von_spende' in request.POST:
     #    formular = ZahlungFormular(request.POST)
     
+    def formular_init():
+        if request.user.is_authenticated():
+            return ZahlungFormular(instance=request.user.my_profile, 
+                    initial = {'vorname': request.user.first_name, 
+                               'nachname': request.user.last_name})
+        else:
+            return ZahlungFormular()
+            
     # falls POST von hier, werden Daten verarbeitet:
     if request.method=='POST':
         # eine form erstellen, insb. um sie im Fehlerfall zu nutzen:
@@ -154,11 +162,11 @@ def zahlen(request):
             return HttpResponseRedirect('/thanks/')
         
         if 'von_spende' in request.POST:
-            formular = ZahlungFormular()
-    
+            formular = formular_init()
+                
     # if a GET (or any other method) we'll create a blank form
     else:
-        formular = ZahlungFormular()
+        formular = formular_init()
 
     stufe = request.POST.get('stufe', 'Gast')
     betrag = request.POST.get('betrag', '75')
