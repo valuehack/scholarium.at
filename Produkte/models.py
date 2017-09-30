@@ -153,6 +153,12 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         else:
             return None
 
+    def ob_gekauft_von(self, kunde, art):
+        for k in kunde.kauf_set.all():
+            if k.art_ausgeben()==art and k.objekt_ausgeben()==self:
+                return True
+        return False
+
     def format_text(self, art=0):
         """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""
         return arten_attribute[art][2]
