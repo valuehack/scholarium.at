@@ -48,10 +48,7 @@ class Veranstaltung(KlasseMitProdukten):
             return bool(self.datei) and bool(self.ob_aufzeichnung)
         else: 
             return ValueError('Art %s habe ich noch nicht beachtet' % art)
-    
-    def ob_bald(self, tage=4):
-        return True if 0 <= (self.datum - date.today()).days < tage else False
-    
+        
     def get_url(self):
         if self.art_veranstaltung.bezeichnung == 'Salon':
             return '/salon/%s' % self.slug
@@ -68,11 +65,18 @@ class Veranstaltung(KlasseMitProdukten):
             if self.ob_aktiv(art)]
         return medien
     
+    def embed_link(self):
+        return self.link.replace('watch?v=', 'embed/')
+    
     def ist_vergangen(self):
-        return self.datum <= date.today()
+        return self.datum < date.today()
 
     def ist_zukunft(self):
         return self.datum >= date.today()
+
+    def ist_bald(self, tage=4):
+        return True if 0 <= (self.datum - date.today()).days < tage else False
+
 
 class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()

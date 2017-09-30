@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static produkttags %}
 
 {% block title %}{{ veranstaltung }}{% endblock %}
 
@@ -7,17 +7,21 @@
   <div class="veranstaltung">
     {% include 'Veranstaltungen/titel_veranstaltung.html' %}
   </div>
+  {% ob_livestream_zeigen veranstaltung request.user.my_profile as ob_zeigen %}
+  {% if ob_zeigen %}
+    {% include "Veranstaltungen/livestream.html" %}
+  {% endif %}
   <div class="separator">
     <h2>Inhalt und Informationen</h2>
   </div>
   <div class="salon_content">
     <p>{{ veranstaltung.beschreibung|safe }}</p>
     {{ veranstaltung.art_veranstaltung.beschreibung|safe }}
-    
+
     {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' %}
     <div class="medien_anmeldung" style="margin-top: 5%;">
     <a href="{% url 'Veranstaltungen:liste_alle' %}">zurück zu den Veranstaltungen</a>
     </div>
   </div>
-  
+
 {% endblock content %}

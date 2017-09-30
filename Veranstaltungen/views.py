@@ -126,15 +126,11 @@ def livestream(request):
         messages.warning(request, ('Momentan sind die nächsten Salons noch nicht eingetragen.'))
         return HttpResponseRedirect("/salons/")
     
-    if not (salon.ob_bald(30) and salon.ob_aktiv(art='livestream')):
+    from Produkte.templatetags import produkttags
+    if not produkttags.ob_livestream_zeigen(salon, request.user.my_profile):
         messages.warning(request, ('Zum nächsten Salon gibt es noch keinen Livestream!'))
-        return HttpResponseRedirect("/salon/" + salon.slug)
-
-    for k in request.user.my_profile.kauf_set.all():
-        if k.art_ausgeben()=='livestream' and k.objekt_ausgeben()==salon:
-            return TemplateMitMenue.as_view(
-                template_name='Veranstaltungen/livestream.html')(request)
-
+    
+    return HttpResponseRedirect("/salon/" + salon.slug)
 
 
 from Grundgeruest.daten_einlesen import veranstaltungen_aus_db
