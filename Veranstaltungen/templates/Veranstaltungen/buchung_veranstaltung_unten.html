@@ -2,15 +2,18 @@
 
   <div style="text-align: center;">
     <div class="salon_reservation">
-      {% for veranstaltungsart in veranstaltung.arten_aktiv %}
-      <div class="sinfo">
-          <h2 style="margin: 0 0 10px 0;">
-              {% format_text veranstaltung veranstaltungsart as format_text %}
+      {% for kaufart in veranstaltung.arten_aktiv %}
+        {% ob_kaufbutton_zeigen veranstaltung request.user.my_profile kaufart as obzeigen%}
+        {% if obzeigen %}
+          <div class="sinfo">
+            <h2 style="margin: 0 0 10px 0;">
+              {% format_text veranstaltung kaufart as format_text %}
               {{ format_text }}
-          </h2>
-        {% anzeigemodus veranstaltung veranstaltungsart as modus %}
-        {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=veranstaltung art=veranstaltungsart %}
-    </div>
+            </h2>
+          {% anzeigemodus veranstaltung kaufart as modus %}
+          {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=veranstaltung art=kaufart %}
+          </div>
+        {% endif %}
       {% endfor %}
     </div>
   </div>

@@ -2,20 +2,12 @@ from django.conf.urls import url
 
 from . import views, models
 from Grundgeruest.views import ListeMitMenue, DetailMitMenue, TemplateMitMenue
-from Bibliothek.views import liste_alte_buecher
+from Bibliothek.views import liste_buecher
 
 app_name = 'Bibliothek'
 
 urlpatterns = [
-    url(r'^$', liste_alte_buecher, name='alte_liste_buecher'),
-    url(r'^$', 
-        ListeMitMenue.as_view(
-            template_name='Bibliothek/liste_alle.html',
-            model=models.Buch,
-            paginate_by=300,
-            context_object_name='buecher',
-        ), 
-        name='liste_alle'),
+    url(r'^$', liste_buecher, name='liste_alle'),
     url(r'^(?P<slug>[\w-]+)$', 
         DetailMitMenue.as_view(
             template_name='Bibliothek/detail_buch.html',

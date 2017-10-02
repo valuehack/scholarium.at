@@ -105,6 +105,11 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
                 modus = 'ausgegraut' # ausgebuchte Veranstaltung
             elif art=='teilnahme':
                 modus = 'mit_menge' # Veranstaltung mit select-box
+            # sonst nicht teilnahme, also nur beschränktes Buch (?)
+            #elif self.finde_anzahl(art) == 0: 
+            #    modus = 'verbergen'
+            else: 
+                modus = 'inline'
         else:
             if getattr(self, 'ob_'+art):
                 modus = 'ohne_menge'
@@ -152,6 +157,12 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
                 return range(1, anz)
         else:
             return None
+
+    def ob_gekauft_von(self, kunde, art):
+        for k in kunde.kauf_set.all():
+            if k.art_ausgeben()==art and k.objekt_ausgeben()==self:
+                return True
+        return False
 
     def format_text(self, art=0):
         """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""

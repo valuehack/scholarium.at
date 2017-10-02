@@ -204,7 +204,7 @@ STATICFILES_DIRS = [
 
 
 try:
-    MEDIA_ROOT = 'home/scholarium/scholarium_daten/'
+    MEDIA_ROOT = '/home/scholarium/scholarium_daten/'
 except FileNotFoundError:
     MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 
