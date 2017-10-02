@@ -105,6 +105,13 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
                 modus = 'ausgegraut' # ausgebuchte Veranstaltung
             elif art=='teilnahme':
                 modus = 'mit_menge' # Veranstaltung mit select-box
+            # sonst nicht teilnahme, also nur beschränktes Buch (?)
+            elif self.finde_anzahl(art) == 0: 
+                modus = 'verbergen'
+            elif self.finde_anzahl(art) == 1: 
+                modus = 'inline'
+            else: 
+                modus = 'inline'
         else:
             if getattr(self, 'ob_'+art):
                 modus = 'ohne_menge'

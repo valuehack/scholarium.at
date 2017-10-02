@@ -7,10 +7,10 @@ import sqlite3 as lite
 from seite.settings import BASE_DIR
 from Grundgeruest.views import ListeMitMenue
 
-def liste_alte_buecher(request):
+def liste_buecher(request):
     return ListeMitMenue.as_view(
-        template_name='Bibliothek/alte_buecher.html',
-        model=models.Altes_Buch,
+        template_name='Bibliothek/buecher_alt.html',
+        model=models.Buch,
         context_object_name='buecher',
         paginate_by = 80)(request, page=request.GET.get('seite')) 
 
