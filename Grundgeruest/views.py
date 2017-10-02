@@ -17,11 +17,14 @@ from django.db import transaction
 import sqlite3 as lite
 import os, pdb
 from .models import *
+from Produkte.models import Spendenstufe
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
 from Bibliothek.models import Buch
 from .forms import ZahlungFormular, ProfilEditFormular
 from datetime import date, timedelta
+import paypalrestsdk
+import pprint, string
 
 
 def erstelle_liste_menue(user=None):
@@ -63,7 +66,7 @@ def pruefen_ob_abgelaufen(request):
     """ context-processor """
     #pdb.set_trace()
     if request.user.is_authenticated():
-        ablauf = request.user.my_profile.datum_ablauf 
+        ablauf = request.user.my_profile.datum_ablauf
         if not ablauf or ablauf <= date.today():
             messages.info(request, 'Sie sind abgelaufen!!!')
         elif ablauf + timedelta(days=24) > date.today():
@@ -83,17 +86,17 @@ class MenueMixin():
         context['url_hier'] = self.url_hier
         context.update(self.extra_context)
         return context
-            
+
 
 class TemplateMitMenue(MenueMixin, TemplateView):
-    pass 
-    
+    pass
+
 class ListeMitMenue(MenueMixin, ListView):
     pass
 
 class DetailMitMenue(MenueMixin, DetailView):
     pass
-        
+
 def index(request):
     if request.user.is_authenticated():
         liste_artikel = Artikel.objects.order_by('-datum_publizieren')[:4]
@@ -104,7 +107,7 @@ def index(request):
         return TemplateMitMenue.as_view(
             template_name='startseite.html',
             extra_context={
-                'liste_artikel': liste_artikel, 
+                'liste_artikel': liste_artikel,
                 'medien': medien,
                 'veranstaltungen': veranstaltungen,
                 'buecher': buecher
@@ -113,71 +116,160 @@ def index(request):
         return TemplateMitMenue.as_view(
             template_name='Gast/startseite_gast.html'
             )(request)
-    
+
+
+
+
 def zahlen(request):
-    # falls POST von unangemeldet, keine Fehlermeldungen:
-    #if request.method=='POST' and 'von_spende' in request.POST:
-    #    formular = ZahlungFormular(request.POST)
-    
+
     def formular_init():
         if request.user.is_authenticated():
-            return ZahlungFormular(instance=request.user.my_profile, 
-                    initial = {'vorname': request.user.first_name, 
-                               'nachname': request.user.last_name})
+            return ZahlungFormular(instance=request.user.my_profile,
+                    initial = {'vorname': request.user.first_name,
+                               'nachname': request.user.last_name,
+                               'email': request.user.email})
         else:
             return ZahlungFormular()
-            
+
+
+    def getWebProfile():
+        # Gets Paypal Web Profile
+        wpn = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
+
+        web_profile = paypalrestsdk.WebProfile({
+        "name": wpn,
+        "presentation": {
+        "brand_name": "Scholarium",
+        "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
+        "locale_code": "AT"
+        },
+        "input_fields": {
+        "allow_note": True,
+        "no_shipping": 1,
+        "address_override": 1
+        }})
+
+        if web_profile.create():
+            print("Web Profile[%s] created successfully" % (web_profile.id))
+            return web_profile
+        else:
+            print(web_profile.error)
+            return None
+
+
+    def paypalZahlungErstellen(stufe):
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "experience_profile_id": web_profile.id,
+            "payer": {
+                "payment_method": "paypal"},
+            "redirect_urls": {
+                "return_url": request.build_absolute_uri(reverse('gast_zahlung')), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
+                "cancel_url": request.build_absolute_uri(reverse('gast_spende'))},
+            # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
+            "transactions": [{
+                "payee": {
+                    "email": "info@scholarium.at",
+                    "payee_display_metadata": {
+                        "brand_name": "Scholarium"}},
+                "item_list": {
+                    "items": [{
+                        "name": str(stufe),
+                        "sku": stufe.id,
+                        "price": request.POST['betrag'],
+                        "currency": "EUR",
+                        "quantity": 1}]},
+                "amount": {
+                    "total": request.POST['betrag'],
+                    "currency": "EUR"},
+                "description": stufe.beschreibung}]})
+
+        if payment.create():
+            print("Payment[%s] created successfully" % (payment.id))
+            pprint.pprint(payment)
+            return payment
+        else:
+          print(payment.error)
+          return None
+
+    def nutzerErstellen():
+        # Nutzererstellung
+        nutzer = None
+        if not (Nutzer.objects.filter(email=request.POST['email'])): #or request.user.is_authenticated()):
+            # erstelle neuen Nutzer mit eingegebenen Daten:
+            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+        else:
+            nutzer = Nutzer.objects.get(email=request.POST['email'])
+
+        profil = nutzer.my_profile
+        nutzer.first_name = request.POST['vorname']
+        nutzer.last_name = request.POST['nachname']
+        profil.stufe = int(request.POST['stufe'])+1
+        profil.guthaben_aufladen(request.POST['betrag'])
+        # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
+        for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 'ort', 'land']:
+            setattr(profil, attr, request.POST[attr])
+
+        nutzer.save()
+        profil.save()
+
+
+    formular = formular_init()
+
     # falls POST von hier, werden Daten verarbeitet:
-    if request.method=='POST':
-        # eine form erstellen, insb. um sie im Fehlerfall zu nutzen:
-        formular = ZahlungFormular(request.POST)
-        # und falls alle Eingaben gültig sind, Daten verarbeiten: 
-        if formular.is_valid():
-            nutzer = None
-            if not (Nutzer.objects.filter(email=request.POST['email'])): #or request.user.is_authenticated()):
-                # erstelle neuen Nutzer mit eingegebenen Daten:
-                nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+    if request.method == 'POST':
+        pprint.pprint(request.POST)
 
+        if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
+            pass # TODO: Übertragen, von wo User gekommen sind
+        else:
+            formular = ZahlungFormular(request.POST)
+            # und falls alle Eingaben gültig sind, Daten verarbeiten:
+            if formular.is_valid():
+                stufe = Spendenstufe.objects.get(id=int(request.POST['stufe'])+1)
+
+                # Paypal
+                if request.POST['zahlungsweise'] == 'p':
+
+                    paypalrestsdk.configure({
+                        "mode": settings.PAYPAL_MODE,
+                        "client_id": settings.PAYPAL_CLIENT_ID,
+                        "client_secret": settings.PAYPAL_CLIENT_SECRET })
+
+                    web_profile = getWebProfile()
+                    payment = paypalZahlungErstellen(stufe)
+
+                    # Redirect the user to given approval url
+                    approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
+                    return HttpResponseRedirect(approval_url)
             else:
-                print('{0}gibts schon{0}'.format(10*'\n'))
-                print(request.POST)
-                nutzer = Nutzer.objects.get(email=request.POST['email'])
-                
-            profil = nutzer.my_profile
-            nutzer.first_name = request.POST['vorname']
-            nutzer.last_name = request.POST['nachname']
-            
-            
-            profil.stufe = int(request.POST['stufe'])+1
-            profil.guthaben_aufladen(request.POST['betrag'])
-            # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
-            for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 
-                'ort', 'land']:
-                setattr(profil, attr, request.POST[attr])
+                print('Formular ungültig!')
+                messages.Error(request, 'Formular ungültig.')
 
-            nutzer.save()
-            profil.save()
-            
-            # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
-        
-        if 'von_spende' in request.POST:
-            formular = formular_init()
-                
-    # if a GET (or any other method) we'll create a blank form
     else:
-        formular = formular_init()
+        if request.GET.get('paymentId'):
+            payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
+            pprint.pprint(payment)
+            if payment.state == 'approved':
+                if payment.execute({"payer_id": request.GET['PayerID']}):
+                    print("Payment executed successfully")
+                    nutzerErstellen()
+                    messages.success(request, ('Herzlichen Glückwunsch, Sie sind nun %s' % payment.item))
+                    HttpResponseRedirect(reverse('Grundgeruest:index'))
+                    print(payment.error)
+            else:
+                messages.error(request, 'Transaktion nicht bestätigt.')
 
-    stufe = request.POST.get('stufe', 'Gast')
+    stufe = request.POST.get('stufe', '0')
     betrag = request.POST.get('betrag', '75')
 
     context = {
-        'formular': formular, 
-        'betrag': betrag, 
+        'formular': formular,
+        'betrag': betrag,
         'stufe': stufe
     }
-    
-    return render(request, 'Produkte/zahlung.html', context)    
+
+    return render(request, 'Produkte/zahlung.html', context)
 
 
 # profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
@@ -239,7 +331,7 @@ def profile_edit(request, username, edit_profile_form=ProfilEditFormular,
     profile = get_user_profile(user=user)
 
     user_initial = {'vorname': user.first_name,
-                    'nachname': user.last_name, 
+                    'nachname': user.last_name,
                     'email': user.email,}
 
     form = edit_profile_form(instance=profile, initial=user_initial)
@@ -268,7 +360,7 @@ def profile_edit(request, username, edit_profile_form=ProfilEditFormular,
     extra_context['profile'] = profile
     return ExtraContextTemplateView.as_view(template_name=template_name,
                                             extra_context=extra_context)(request)
-                                            
+
 def profile_detail(request, username,
     template_name=userena_settings.USERENA_PROFILE_DETAIL_TEMPLATE,
     extra_context=None, **kwargs):
@@ -276,14 +368,14 @@ def profile_detail(request, username,
 
 
 def seite_rest(request, slug):
-    punkte = (Hauptpunkt.objects.filter(slug=slug) or 
+    punkte = (Hauptpunkt.objects.filter(slug=slug) or
               Unterpunkt.objects.filter(slug=slug))
-    if not punkte: 
+    if not punkte:
         raise Http404
     liste_menue = erstelle_liste_menue()
     return render(
-        request, 
-        'Grundgeruest/seite_test.html', 
+        request,
+        'Grundgeruest/seite_test.html',
         {'punkt': punkte[0], 'liste_menue': liste_menue})
 
 
@@ -294,7 +386,7 @@ def alles_aus_mysql_einlesen():
      - Veranstaltungen
      - [zu vervollständigen]
     """
-    import os 
+    import os
     from Veranstaltungen.views import aus_alter_db_einlesen as einlesen_v
     from Scholien.views import aus_alter_db_einlesen as einlesen_s
     liste_dateien = os.listdir('.')
@@ -321,19 +413,18 @@ def db_runterladen(request):
     from django.utils.encoding import smart_str
     import os
     from seite.settings import BASE_DIR
-     
+
     with open(os.path.join(BASE_DIR, 'db.sqlite3'), 'rb') as datei:
         datenbank = datei.read()
 
-    response = HttpResponse(datenbank, content_type='application/force-download') 
+    response = HttpResponse(datenbank, content_type='application/force-download')
     response['Content-Disposition'] = 'attachment; filename="db.sqlite3"'
-    
+
     return response
 
 class ListeAktiveMitwirkende(ListeMitMenue):
     template_name='Gast/mitwirkende.html'
     context_object_name='mitwirkende'
-    
+
     def get_queryset(self):
         return Mitwirkende.objects.exclude(end__lt=date.today())
-    
