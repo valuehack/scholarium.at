@@ -1,6 +1,3 @@
-import os
-DATA_DIR = os.path.dirname(os.path.dirname(__file__))
-
 """
 Django settings for seite project.
 
@@ -13,8 +10,22 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
+import os
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+DATA_DIR = os.path.dirname(os.path.dirname(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def get_env_variable(name):
+    '''
+    Gets the environment variable or throws ImproperlyConfigured exception
+    :rtype: object
+    '''
+    try:
+        return os.environ[name]
+    except KeyError:
+        raise ImproperlyConfigured('Environment variable “%s” not found.' % name)
 
 
 # Quick-start development settings - unsuitable for production
@@ -54,7 +65,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'django.contrib.sites',
     'django.contrib.humanize',
-    'easycart', 
+    'easycart',
     'django_countries',
 ]
 
@@ -177,7 +188,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False 
+USE_TZ = False
 
 DATE_FORMAT = 'l, j. M Y'
 DATETIME_FORMAT = DATE_FORMAT + ', H:M'
@@ -208,3 +219,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'iljasseite@gmail.com'
 EMAIL_HOST_PASSWORD = 'iljailja'
+
+# Paypal
+PAYPAL_MODE = 'sandbox'   # sandbox or live
+PAYPAL_CLIENT_ID = get_env_variable('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = get_env_variable('PAYPAL_CLIENT_SECRET')

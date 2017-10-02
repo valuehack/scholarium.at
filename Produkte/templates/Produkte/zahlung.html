@@ -8,7 +8,7 @@
     </header>
     <div class="profil payment_width wrapper">
       <form method="post" action="" name="upgrade_account">
-        
+
         <div class="center">
         {% csrf_token %}
         <p>Bitte geben Sie Ihre Daten ein:</p><br><br>
@@ -60,13 +60,13 @@
         {% endfor %}
       </div>
         <br>
-        <input type="hidden" name="ok" value="1">
+        <!-- <input type="hidden" name="ok" value="1"> -->
         <input type="hidden" name="betrag" value="{{ betrag }}">
         <input type="hidden" name="stufe" value="{{ stufe }}">
         <input type="hidden" name="profile[first_reg]" value="upgrade_buerger">
 
         <input id="weiter_button" type="submit" name="register_from_outside_submit" value="Weiter">
-        
+
         </div>
 	  </form>
     </div>
