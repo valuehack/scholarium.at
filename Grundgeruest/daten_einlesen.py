@@ -1,15 +1,15 @@
-import os, shutil
+import os, shutil, json
 from seite.settings import BASE_DIR, MEDIA_ROOT
 from Grundgeruest.models import Nutzer
 from Scholien.models import Buechlein
-from Bibliothek.models import Altes_Buch
+from Bibliothek.models import Buch
 from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung, Studiumdings
 from Produkte.models import Kauf
 
 from django.db import transaction
 import sqlite3 as lite
 
-import pdb
+import ipdb
 
 try:
     os.chdir('/home/scholarium/godaddy_daten/')
@@ -50,7 +50,7 @@ def veranstaltungen_aus_db():
     from django.db import transaction
     import sqlite3 as lite
     from django.conf import settings
-    import os, pdb
+    import os 
     from django.http import HttpResponseRedirect
     
     # Seminare, Salons, Vorlesungen, Vorträge einlesen
@@ -247,7 +247,9 @@ def eintragen_veranstaltungen(daten):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
     produkte-Tabelle der alten db. Trägt entsprechende Veranstaltungen ein
     und gibt dict produkt_id -> model-Instanz zurück """
-
+    
+    liste_eingetragen = []
+    
     id_art = { # sucht pks der Arten der Veranstaltungen
         a.bezeichnung: a.pk for a in ArtDerVeranstaltung.objects.all()}
     
@@ -283,8 +285,9 @@ def eintragen_veranstaltungen(daten):
                 v.ob_livestream = True
                 v.save()
             id_zu_objekt[zeile['n']] = (v, zeile['type'])
+            liste_eingetragen.append(v)
     
-    return id_zu_objekt
+    return id_zu_objekt, liste_eingetragen
 
 def eintragen_studiendinger(daten):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
@@ -292,6 +295,7 @@ def eintragen_studiendinger(daten):
     und gibt dict produkt_id -> model-Instanz zurück """
 
     id_zu_objekt = {}
+    liste_eingetragen = []
 
     with transaction.atomic():
         for i, zeile in enumerate(daten):
@@ -313,8 +317,9 @@ def eintragen_studiendinger(daten):
                     reihenfolge=0,)
             
             id_zu_objekt[zeile['n']] = (dings, zeile['type'])
+            liste_eingetragen.append(dings)
 
-    return id_zu_objekt
+    return id_zu_objekt, liste_eingetragen
 
 def eintragen_buechlein(daten):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
@@ -322,6 +327,7 @@ def eintragen_buechlein(daten):
     und gibt dict produkt_id -> model-Instanz zurück """
 
     id_zu_objekt = {}
+    liste_eingetragen = []
     
     with transaction.atomic():
         for zeile in daten:
@@ -333,29 +339,68 @@ def eintragen_buechlein(daten):
                 slug=zeile['id'])
             
             id_zu_objekt[zeile['n']] = (buch, zeile['type'])
+            liste_eingetragen.append(buch)
     
-    return id_zu_objekt
+    return id_zu_objekt, liste_eingetragen
 
-def eintragen_antiquariat(daten):
+def eintragen_buecher(daten, analysen):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
     produkte-Tabelle der alten db. Trägt entsprechende Buechlein ein
     und gibt dict produkt_id -> model-Instanz zurück """
 
     id_zu_objekt = {}
+    liste_eingetragen = []
 
     with transaction.atomic():
         for zeile in daten:
-            if zeile['format'] == '0001':
-                buch = Altes_Buch.objects.create(
-                    bezeichnung=zeile['id'],
-                    autor_und_titel=zeile['title'],
+            if zeile['type']=='antiquariat' and zeile['format']=='0001':
+                buch = Buch.objects.create(
+                    bezeichnung=zeile['title'],
                     preis_kaufen=zeile['price_book'],
+                    preis_leihen=zeile['price_book'], #?
                     slug=zeile['id'], 
+                    alte_nr=zeile['n'],
                     anzahl_kaufen=zeile['spots'],)
-            else:
+            elif zeile['type']=='antiquariat':
                 print("da gibt's ein 'antiquariat' mit digitalen Formaten!")
+            elif zeile['type']=='buch' and zeile['format']=='1111':
+                buch = Buch.objects.create(
+                    bezeichnung=zeile['title'][:-6],
+                    preis_druck=zeile['price_book'],
+                    preis_pdf=zeile['price'], 
+                    preis_epub=zeile['price'], 
+                    preis_mobi=zeile['price'], 
+                    slug=zeile['id'], 
+                    alte_nr=zeile['n'],
+                    anzahl_druck=zeile['spots'],
+                    ob_pdf=True, ob_mobi=True, ob_epub=True)
+            elif zeile['type']=='buch' and zeile['format']=='0111': # nur für Alpenphilosophie, fast doppelter code
+                buch = Buch.objects.create(
+                    bezeichnung=zeile['title'][:-6],
+                    preis_druck=zeile['price_book'],
+                    preis_epub=zeile['price'], 
+                    preis_mobi=zeile['price'], 
+                    slug=zeile['id'], 
+                    alte_nr=zeile['n'],
+                    anzahl_druck=zeile['spots'],
+                    ob_mobi=True, ob_epub=True)
+            elif zeile['type']=='buch' and zeile['format']=='0001':
+                buch = Buch.objects.create(
+                    bezeichnung=zeile['title'],
+                    preis_druck=zeile['price_book'],
+                    slug=zeile['id'], 
+                    alte_nr=zeile['n'],
+                    anzahl_druck=zeile['spots'],)
+                
             id_zu_objekt[zeile['n']] = (buch, zeile['type'])
-    return id_zu_objekt
+            liste_eingetragen.append(buch)
+
+    for zeile in analysen: # zu vorhandenen Objekten zuordnen
+        for k, v in id_zu_objekt.copy().items():
+            if zeile['title'] in v[0].bezeichnung:
+                id_zu_objekt[zeile['n']] = v
+            
+    return id_zu_objekt, liste_eingetragen
 
 def eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil):
     """ bekommt eine Liste von dicts mit dem Inhalt von je einer Zeile der
@@ -382,11 +427,17 @@ def eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil):
             art = 'teilnahme'
         elif type_alt == 'antiquariat':
             art = 'kaufen'
-        elif type_alt == 'scholie':
+        elif type_alt in ['scholie', 'buch']:
             art = {'Druck': 'druck', 
-                'PDF': 'pdf', 
+                'PDF': 'pdf',
+                '': 'spam',  
                 'ePub': 'epub', 
                 'Kindle': 'mobi'}[kauf['format']]
+            if art=='spam':
+                if kauf['quantity']==1:
+                    art = 'pdf'
+                else:
+                    art = 'druck'
         elif type_alt[:5] == 'media':
             art = 'aufzeichnung'
         elif type_alt == 'salon':
@@ -412,6 +463,23 @@ def eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil):
             neu.zeit = datum
             neu.save()
             print('Kauf von %s durch %s angelegt' % (objekt, kunde.user))
+
+def izo_load():
+    with open('id_zu_objekt.txt', 'r') as f:
+        datei = json.load(f)
+        id_zu_objekt = {}
+        for k, v in datei.items():
+            #print("versuche %s, %s zu importieren" % (k, v[0]))
+            try:
+                id_zu_objekt[int(k)] = (Kauf.obj_aus_pk(v[0]), v[1])
+            except:
+                print("nicht geklappt bei " + k)
+    return id_zu_objekt
+
+def izo_dump(id_zu_objekt):
+    with open('id_zu_objekt.txt', 'w') as f:
+        datei = {str(k): (Kauf.obj_zu_pk(v[0]), v[1]) for k, v in id_zu_objekt.items()}
+        json.dump(datei, f)
 
 def kaeufe_aus_db():
     """
@@ -446,36 +514,56 @@ def kaeufe_aus_db():
         produkte = [dict(zeile) for zeile in cur.fetchall()]
         cur.execute("SELECT * FROM registration")
         kaeufe = [dict(zeile) for zeile in cur.fetchall()]
+
+    # es wird id_zu_objekt der schon früher eingelesenen objekte importiert
+    try:
+        id_zu_objekt = izo_load()
+    except FileNotFoundError:
+        id_zu_objekt = {}
     
-    id_zu_objekt = {}
+    def loesche_rest(model, liste_aufheben):
+        with transaction.atomic():
+            for instanz in model.objects.all():
+                if instanz not in liste_aufheben:
+                    instanz.delete()
+
+    id_zu_buch, liste_aufheben = eintragen_buecher(
+        [p for p in produkte if p['type'] in ['antiquariat', 'buch']], 
+        [p for p in produkte if p['type'] == 'analyse']) # kriegt 2 Listen
+
+    id_zu_objekt.update(id_zu_buch)
+    loesche_rest(Buch, liste_aufheben)
+    print('Antiquariat und Buecher eingelesen')
     
-    Altes_Buch.objects.all().delete()
-    id_zu_objekt.update(eintragen_antiquariat(
-        [p for p in produkte if p['type']=='antiquariat']))
-    
-    print('Antiquariat eingelesen')
-    
-    Buechlein.objects.all().delete()
-    id_zu_objekt.update(eintragen_buechlein(
-        [p for p in produkte if p['type']=='scholie']))
+    id_zu_buechlein, liste_aufheben = eintragen_buechlein(
+        [p for p in produkte if p['type']=='scholie'])
+
+    id_zu_objekt.update(id_zu_buechlein)
+    loesche_rest(Buechlein, liste_aufheben)
 
     print('Buechlein eingelesen')
-
-    Studiumdings.objects.all().delete()
-    id_zu_objekt.update(eintragen_studiendinger(
+    
+    id_zu_dings, liste_aufheben = eintragen_studiendinger(
         [p for p in produkte if p['type'] in 
-        ['programm', 'vortrag']]))
+        ['programm', 'vortrag']])
+
+    id_zu_objekt.update(id_zu_dings)
+    loesche_rest(Studiumdings, liste_aufheben)
 
     print('Studiumdinger eingelesen')
 
-    Veranstaltung.objects.all().delete()
-    id_zu_objekt.update(eintragen_veranstaltungen(
+    id_zu_veranstaltung, liste_aufheben = eintragen_veranstaltungen(
         [p for p in produkte if p['type'] in 
         ['salon', 'media-salon', 'seminar', 'media-vortrag', 
-        'media-vorlesung']]))
+        'media-vorlesung']])
+
+    id_zu_objekt.update(id_zu_veranstaltung)
+    loesche_rest(Veranstaltung, liste_aufheben)
 
     print('Veranstaltungen eingelesen')
 
+    izo_dump(id_zu_objekt)
+                
     liste_nutzer, id_zu_profil = eintragen_mitglieder(mitglieder)
     
     print('Nutzer eingelesen, lösche überschüssige')
@@ -511,40 +599,52 @@ def kaeufe_aus_db():
     
     Kauf.objects.all().delete()
     eintragen_kaeufe(kliste, id_zu_objekt, id_zu_profil)
-    
-    pdb.set_trace()        
 
-
-    
-    m_nr = {m['user_id']: i for i, m in enumerate(mitglieder)}
-    p_nr = {p['n']: i for i, p in enumerate(produkte)}
-    # produkt: gucke nach type; 
-    # antiquariat: produkt.id = Altes_Buch.bezeichnung
-    # scholie; scholie.titel = Buechlein.bezeichnung; formate: 'Kindle', 'PDF', 'ePub', 'Druck'
-    # buch, video, analyse, programm, privatseminar, projekt; fehlt noch das model, oder?
-    # salon; salon.id = Veranstaltung.slug; {'vorOrt': 'teilnahme', 'Stream': 'livestream'}
-    # seminar; seminar.id = Veranstaltung.slug; {'vorOrt': 'teilnahme', 'Stream': 'livestream'} 
-    # media-salon; media-salon.id = Veranstaltung.slug; art=aufzeichnung
-    # media-vortrag; id=slug; art '' immer aufzeichnung -> (beim Import alle entsprechend aktivieren)
-    # media-vorlesung; genau gleich
-    # vortrag - noch importieren
-    # ist spots - spots_sold verfügbar, oder spots? ersteres ist (selten) negativ
+    # video, analyse, programm, privatseminar, projekt; fehlt noch das model, oder?
 
 def mediendateien_einlesen():
-    von_ordner = 'down_secure/content_secure/'
-    nach_ordner = os.path.join(MEDIA_ROOT, 'veranstaltungen_mp3')
-    if not os.path.exists(nach_ordner):
-        os.makedirs(nach_ordner)
-    for v in Veranstaltung.objects.all():
-        von_name = 'medien-'+v.slug+'.mp3'
-        dateifeld = getattr(v, 'datei')
-        if dateifeld and dateifeld.name.split('/')[-1] in os.listdir(nach_ordner):
-            continue
-        if von_name in os.listdir(von_ordner):
-            von = von_ordner + von_name
-            dateiname = '%s_%s.mp3' % (v.slug, Nutzer.erzeuge_zufall(8, 2))
-            dateifeld.name = 'veranstaltungen_mp3/' + dateiname
-            shutil.copy2(von, os.path.join(MEDIA_ROOT, dateifeld.name))
-            v.ob_aufzeichnung = True  
-            v.save()
+    id_zu_objekt = izo_load()
+    name_zu_objekt = {v[0].slug: v[0] for k, v in id_zu_objekt.items()}
+    objekte_namen = list(name_zu_id.keys())
+    
+    von_ordner = '/home/scholarium/godaddy_daten/down_secure/content_secure/'
+    dateinamen = os.listdir(von_ordner)
+    
+    def datei_zuordnen(objekt, dateiname):
+        endung = dateiname.split('.')[-1]
+        feldname = endung if endung in ['pdf', 'epub', 'mobi'] else 'datei'
+        dateifeld = getattr(objekt, feldname)
+        
+        if isinstance(objekt, Veranstaltung):
+            praefix = 'veranstaltungen/'
+        elif isinstance(objekt, Buch):
+            praefix = 'buecher/'
+        elif isinstance(objekt, Buechlein):
+            praefix = 'scholienbuechlein/'
+        else: 
+            praefix = 'rest/'
+        nach_ordner = os.path.join(MEDIA_ROOT, praefix)
+        
+        ob_feld = 'ob_aufzeichnung' if feldname=='datei' else 'ob_'+feldname
+        def anschalten():
+            feld = getattr(objekt, ob_feld)
+            feld = True
+            objekt.save()
+        
+        if dateifeld and os.path.isfile(os.path.join(MEDIA_ROOT, dateifeld.name)):
+            print("%s hatte schon die Datei %s" % (objekt, dateifeld.name))
+            anschalten()
+            return
 
+        neuname = '%s_%s.%s' % (objekt.slug, Nutzer.erzeuge_zufall(8, 2), endung)
+        shutil.copy2(von_ordner+dateiname, MEDIA_ROOT+praefix+neuname)
+        dateifeld.name = praefix + neuname
+        anschalten()
+                
+        
+    for name in objekte_namen:
+        for dateiname in dateinamen:
+            if name in dateiname:
+                datei_zuordnen(name_zu_objekt[name], dateiname)
+
+        ipdb.set_trace()
