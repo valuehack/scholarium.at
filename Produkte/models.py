@@ -106,10 +106,8 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             elif art=='teilnahme':
                 modus = 'mit_menge' # Veranstaltung mit select-box
             # sonst nicht teilnahme, also nur beschränktes Buch (?)
-            elif self.finde_anzahl(art) == 0: 
-                modus = 'verbergen'
-            elif self.finde_anzahl(art) == 1: 
-                modus = 'inline'
+            #elif self.finde_anzahl(art) == 0: 
+            #    modus = 'verbergen'
             else: 
                 modus = 'inline'
         else:

@@ -40,7 +40,7 @@ def max_anzahl_zu_liste(produkt, art=0):
 @register.simple_tag
 def ob_kaufbutton_zeigen(objekt, kunde, art):
     """ ob überhaupt ein Button zum Kaufen gezeigt wird; ob's ausgegraut 
-    ist, ist einne andere Frage """
+    ist, ist einne andere Frage. Momentan bei Veranstaltung angewendet. """
     if objekt.__class__.__name__ == "Veranstaltung" and objekt.ist_vergangen() and art=='teilnahme':
         return False
     return not objekt.ob_gekauft_von(kunde, art)

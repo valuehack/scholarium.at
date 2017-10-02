@@ -15,7 +15,6 @@ def liste_buecher(request):
         paginate_by = 80)(request, page=request.GET.get('seite')) 
 
 
-
 attributnamen = {
     'author': 'autor',
     'isbn': 'isbn',

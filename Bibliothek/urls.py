@@ -7,7 +7,7 @@ from Bibliothek.views import liste_buecher
 app_name = 'Bibliothek'
 
 urlpatterns = [
-    url(r'^$', liste_buecher, name='liste_buecher'),
+    url(r'^$', liste_buecher, name='liste_alle'),
     url(r'^(?P<slug>[\w-]+)$', 
         DetailMitMenue.as_view(
             template_name='Bibliothek/detail_buch.html',
