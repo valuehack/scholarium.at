@@ -48,6 +48,7 @@ class Veranstaltung(KlasseMitProdukten):
             return bool(self.datei) and bool(self.ob_aufzeichnung)
         else: 
             return ValueError('Art %s habe ich noch nicht beachtet' % art)
+            
         
     def get_url(self):
         if self.art_veranstaltung.bezeichnung == 'Salon':
