@@ -15,8 +15,8 @@ from collections import OrderedDict
 class Anmeldeformular(SignupForm):
     """
     Kopiert aus SigninForm aus userena.forms, angepasst teils nach der Idee
-    wie in SigninFormOnlyEmail gemacht    
-    Habe die Länge und Erzeugungsart des autogenerierten Namens verlängert. 
+    wie in SigninFormOnlyEmail gemacht
+    Habe die Länge und Erzeugungsart des autogenerierten Namens verlängert.
     """
     def __init__(self, *args, **kwargs):
         super(Anmeldeformular, self).__init__(*args, **kwargs)
@@ -28,7 +28,7 @@ class Anmeldeformular(SignupForm):
         # erzeuge zufallsnamen, wie in SignupFormOnlyEmail
         Nutzer = get_user_model()
         new_user = Nutzer.neuen_erstellen(self.cleaned_data['email'])
-        
+
         return new_user
 
 
@@ -39,14 +39,15 @@ class ZahlungFormular(forms.ModelForm):
     zahlungsweise = forms.ChoiceField(
         widget=forms.RadioSelect,
         choices=[
-            ('u', 'Überweisung'), 
-            ('p', 'PayPal'), 
-            ('b', 'Bar')
+            ('u', 'Überweisung'),
+            ('p', 'PayPal'),
+            ('b', 'Bar'),
+            ('g', 'GoCardless')
         ])
-        
+
     class Meta:
         model = ScholariumProfile
-        fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma', 
+        fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma',
             'strasse', 'plz', 'ort', 'zahlungsweise', 'land']
         widgets = {'land': CountrySelectWidget()}
 
@@ -55,10 +56,10 @@ class ProfilEditFormular(forms.ModelForm):
     email = forms.EmailField()
     vorname = forms.CharField(required=False)
     nachname = forms.CharField(required=False)
-        
+
     class Meta:
         model = ScholariumProfile
-        fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma', 
+        fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma',
             'strasse', 'plz', 'ort', 'land']
         widgets = {'land': CountrySelectWidget()}
 

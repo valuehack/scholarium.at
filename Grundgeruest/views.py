@@ -8,10 +8,12 @@ from userena.mail import UserenaConfirmationMail
 from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
 from userena.utils import generate_sha1
+from seite.settings import SITE_ID
 from guardian.models import UserObjectPermission
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
+from django.contrib.sites.models import Site
 
 from django.db import transaction
 import sqlite3 as lite
@@ -164,8 +166,8 @@ def zahlen(request):
             "payer": {
                 "payment_method": "paypal"},
             "redirect_urls": {
-                "return_url": request.build_absolute_uri(reverse('gast_zahlung')), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
-                "cancel_url": request.build_absolute_uri(reverse('gast_spende'))},
+                "return_url": Site.objects.get(pk=SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
+                "cancel_url": Site.objects.get(pk=SITE_ID).domain + reverse('gast_spende')},
             # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
             "transactions": [{
                 "payee": {
@@ -242,6 +244,10 @@ def zahlen(request):
                     # Redirect the user to given approval url
                     approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
                     return HttpResponseRedirect(approval_url)
+
+                #GoCardless
+                if request.POST['zahlungsweise'] == 'g':
+                    pass # TODO: DO stuff.
             else:
                 print('Formular ungültig!')
                 messages.Error(request, 'Formular ungültig.')
