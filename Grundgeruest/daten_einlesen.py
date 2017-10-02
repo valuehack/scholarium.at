@@ -605,7 +605,7 @@ def kaeufe_aus_db():
 def mediendateien_einlesen():
     id_zu_objekt = izo_load()
     name_zu_objekt = {v[0].slug: v[0] for k, v in id_zu_objekt.items()}
-    objekte_namen = list(name_zu_id.keys())
+    objekte_namen = list(name_zu_objekt.keys())
     
     von_ordner = '/home/scholarium/godaddy_daten/down_secure/content_secure/'
     dateinamen = os.listdir(von_ordner)
@@ -630,7 +630,7 @@ def mediendateien_einlesen():
             feld = getattr(objekt, ob_feld)
             feld = True
             objekt.save()
-        
+
         if dateifeld and os.path.isfile(os.path.join(MEDIA_ROOT, dateifeld.name)):
             print("%s hatte schon die Datei %s" % (objekt, dateifeld.name))
             anschalten()
@@ -644,7 +644,7 @@ def mediendateien_einlesen():
         
     for name in objekte_namen:
         for dateiname in dateinamen:
-            if name in dateiname:
+            if name == dateiname.split('.')[0]:
+                print("%s in %s" % (name, dateiname))
                 datei_zuordnen(name_zu_objekt[name], dateiname)
 
-        ipdb.set_trace()
