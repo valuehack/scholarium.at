@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^mitwirkende/',
         ListeAktiveMitwirkende.as_view(),
         name='gast_mitwirkende'),
-    url(r'^studium/$', 
+    url(r'^studium/$',
         ListeMitMenue.as_view(
             model=Studiumdings, # Achtung, es werden nur die studiendinger mit reihenfolge<>0 angezeigt, darüber auskommentieren!
     	    template_name='Veranstaltungen/liste_studien.html',
@@ -43,20 +43,20 @@ urlpatterns = [
 	        context_object_name = 'studien',
         ),
         name='liste_studium'),
-    url(r'^studium/(?P<slug>[-\w]+)/$', 
-        studiumdings_detail, 
+    url(r'^studium/(?P<slug>[-\w]+)/$',
+        studiumdings_detail,
         name='studium_detail'),
-    url(r'^vortrag/', vortrag, name='vortrag'), 
+    url(r'^vortrag/', vortrag, name='vortrag'),
     url(r'^nutzer/', include(userena_urls)),
     url(r'^warenkorb/', include('Produkte.urls')),
     url(r'^veranstaltungen/', include(
-        veranstaltungen_urls, 
+        veranstaltungen_urls,
         namespace='Veranstaltungen')),
     url(r'^salon', include(
         salons_urls,
         namespace='Veranstaltungen')),
     url(r'^seminar', include(
-        seminare_urls, 
+        seminare_urls,
         namespace='Veranstaltungen')),
     url(r'^buecher/', include('Bibliothek.urls')),
     url(r'^scholien', include('Scholien.urls')),

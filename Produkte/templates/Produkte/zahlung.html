@@ -11,7 +11,13 @@
 
         <div class="center">
         {% csrf_token %}
-        <p>Bitte geben Sie Ihre Daten ein:</p><br><br>
+        <p>
+          {% if request.user.is_authenticated %}
+            Bitte überprüfen/vervollständigen Sie Ihre Daten:
+          {% else %}
+            Bitte geben Sie Ihre Daten ein:
+          {% endif %}
+        </p><br><br>
         {{ formular.email.errors }}
         {{ formular.email.label_tag }}
         {{ formular.email }}

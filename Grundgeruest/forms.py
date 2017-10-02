@@ -34,8 +34,8 @@ class Anmeldeformular(SignupForm):
 
 class ZahlungFormular(forms.ModelForm):
     email = forms.EmailField()
-    vorname = forms.CharField()
-    nachname = forms.CharField()
+    vorname = forms.CharField(required=False)
+    nachname = forms.CharField(required=False)
     zahlungsweise = forms.ChoiceField(
         widget=forms.RadioSelect,
         choices=[
@@ -53,8 +53,8 @@ class ZahlungFormular(forms.ModelForm):
 
 class ProfilEditFormular(forms.ModelForm):
     email = forms.EmailField()
-    vorname = forms.CharField()
-    nachname = forms.CharField()
+    vorname = forms.CharField(required=False)
+    nachname = forms.CharField(required=False)
         
     class Meta:
         model = ScholariumProfile

@@ -1,0 +1,12 @@
+<div class="separator">
+  <h2>
+    {% if veranstaltung.ist_vergangen %}
+      Video des Salons
+    {% else %}
+      Salon-Livestream
+    {% endif %}
+  </h2>
+</div>
+<iframe width="640" height="360"
+  src="{{ veranstaltung.embed_link }}" frameborder="2" allowfullscreen>
+</iframe>

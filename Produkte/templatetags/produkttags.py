@@ -38,6 +38,31 @@ def max_anzahl_zu_liste(produkt, art=0):
     return produkt.anzahlen_ausgeben(art)
 
 
+from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung
+@register.simple_tag
+def ob_livestream_zeigen(veranstaltung, kunde):
+    salonart = ArtDerVeranstaltung.objects.get(bezeichnung="Salon")
+    if not veranstaltung.art_veranstaltung == salonart:
+        return False
+        
+    if not veranstaltung.ob_aktiv('livestream'):
+        return False
+    
+    if veranstaltung.ist_zukunft() and not veranstaltung.ist_bald(60):
+        return False    
+
+    for k in kunde.kauf_set.all():
+        if k.art_ausgeben()=='livestream' and k.objekt_ausgeben()==veranstaltung:
+            return True
+    
+    return False
+    
+    """ ob der livestream-Block im Detail-view zu sehen ist """
+    
+    return produkt.anzahlen_ausgeben(art)
+
+
+
 # für pdb tag
 import pdb as pdb_module
 

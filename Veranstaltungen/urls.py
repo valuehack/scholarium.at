@@ -19,9 +19,12 @@ veranstaltungen_urls = ([
     ], 'Veranstaltungen')
 
 salons_urls = ([
-    url(r'^s', 
+    url(r'^s/', 
         views.liste_veranstaltungen, 
         {'art': 'Salon'}, name='liste_salons'),
+    url(r'^/livestream/', 
+        views.livestream, 
+        name='aktueller_livestream'),
     url(r'^/(?P<slug>[-\w]+)/$', 
         views.VeranstaltungDetail.as_view(), 
         {'art': 'Salon'}, name='salon_detail'),
