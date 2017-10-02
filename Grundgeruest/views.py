@@ -8,7 +8,7 @@ from userena.mail import UserenaConfirmationMail
 from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
 from userena.utils import generate_sha1
-from seite.settings import SITE_ID
+from django.conf import settings
 from guardian.models import UserObjectPermission
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -166,8 +166,8 @@ def zahlen(request):
             "payer": {
                 "payment_method": "paypal"},
             "redirect_urls": {
-                "return_url": Site.objects.get(pk=SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
-                "cancel_url": Site.objects.get(pk=SITE_ID).domain + reverse('gast_spende')},
+                "return_url": Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
+                "cancel_url": Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
             # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
             "transactions": [{
                 "payee": {
