@@ -77,6 +77,15 @@ class Buch(KlasseMitProdukten):
             self.bezeichnung = "%s: %s" % (self.autor, self.titel)
         return super().save(*args, **kwargs)
     
+    def anzeigemodus(self, art):
+        from Produkte.models import arten_attribute
+        if arten_attribute[art][0] and self.finde_anzahl(art) > 1:
+            return 'mit_menge'
+        elif arten_attribute[art][0] and self.finde_anzahl(art) == 0:
+            return 'verbergen'
+        else:
+            return 'inline'
+    
     class Meta:
         verbose_name_plural = 'Bücher'
 

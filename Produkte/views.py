@@ -303,7 +303,7 @@ def medien_runterladen(request):
     # sonst setze fort, falls der Nutzer das darf:
     
     obj, art = kauf.objekt_ausgeben(mit_art=True)
-    filefield = getattr(obj, art)
+    filefield = obj.datei if art=='aufzeichnung' else getattr(obj, art)
     with open(filefield.path, 'rb') as datei:
         medium = datei.read()
     

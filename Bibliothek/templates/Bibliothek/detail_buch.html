@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static produkttags %}
 
 {% block content %}
   <div class="veranstaltung">
@@ -16,21 +16,15 @@
       <li> Zusammenfassung: {{ buch.zusammenfassung }} </li>
       <li> ..., sind nur Beispiele </li>
     </ul>
+    {% for kaufart in buch.arten_aktiv %}
     <div style="text-align: center;">
       <div class="salon_reservation">
         <div class="sinfo">
-          <h2 style="margin-top: 0;">Ausleihen</h2>
-          {% include 'Produkte/in_den_warenkorb_ohne_menge.html' with produkt=buch art='leihen' %}
+          {% anzeigemodus buch kaufart as modus %}
+          {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=buch art=kaufart %}
         </div>
       </div>
     </div>
-    <div style="text-align: center;">
-      <div class="salon_reservation">
-        <div class="sinfo">
-          <h2 style="margin-top: 0;">Kaufen</h2>
-          {% include 'Produkte/in_den_warenkorb_ohne_menge.html' with produkt=buch art='kaufen' %}
-        </div>
-      </div>
-    </div>
+    {% endfor %}
   </div>
 {% endblock content %}
