@@ -140,15 +140,21 @@ def zahlen(request):
 
         web_profile = paypalrestsdk.WebProfile({
         "name": wpn,
+        # "temporary": "true",
         "presentation": {
-        "brand_name": "Scholarium",
-        "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
-        "locale_code": "AT"
+            "brand_name": "scholarium",
+            "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
+            "locale_code": "AT"
         },
         "input_fields": {
-        "allow_note": True,
-        "no_shipping": 1,
-        "address_override": 1
+            "allow_note": True,
+            "no_shipping": 1,
+            "address_override": 1
+        },
+        "flow_config": {
+            "landing_page_type": "login",
+            "bank_txn_pending_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+            "user_action": "commit"
         }})
 
         if web_profile.create():
@@ -166,14 +172,14 @@ def zahlen(request):
             "payer": {
                 "payment_method": "paypal"},
             "redirect_urls": {
-                "return_url": Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
-                "cancel_url": Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
+                "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
+                "cancel_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
             # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
             "transactions": [{
                 "payee": {
                     "email": "info@scholarium.at",
                     "payee_display_metadata": {
-                        "brand_name": "Scholarium"}},
+                        "brand_name": "scholarium"}},
                 "item_list": {
                     "items": [{
                         "name": str(stufe),

@@ -39,10 +39,14 @@ def max_anzahl_zu_liste(produkt, art=0):
 
 @register.simple_tag
 def ob_kaufbutton_zeigen(objekt, kunde, art):
-    """ ob überhaupt ein Button zum Kaufen gezeigt wird; ob's ausgegraut 
+    """ ob überhaupt ein Button zum Kaufen gezeigt wird; ob's ausgegraut
     ist, ist einne andere Frage. Momentan bei Veranstaltung angewendet. """
-    if objekt.__class__.__name__ == "Veranstaltung" and objekt.ist_vergangen() and art=='teilnahme':
-        return False
+    from Produkte.models import arten_attribute
+    if objekt.__class__.__name__ == "Veranstaltung" and art=='teilnahme':
+        return not objekt.ist_vergangen()
+    if arten_attribute[art][0]:
+        return True
+        
     return not objekt.ob_gekauft_von(kunde, art)
 
 
@@ -53,12 +57,12 @@ def ob_livestream_zeigen(veranstaltung, kunde):
     salonart = ArtDerVeranstaltung.objects.get(bezeichnung="Salon")
     if not veranstaltung.art_veranstaltung == salonart:
         return False
-        
+
     if not veranstaltung.ob_aktiv('livestream'):
         return False
-    
+
     if veranstaltung.ist_zukunft() and not veranstaltung.ist_bald(60):
-        return False    
+        return False
 
     return veranstaltung.ob_gekauft_von(kunde, 'livestream')
 
