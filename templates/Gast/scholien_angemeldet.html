@@ -9,5 +9,18 @@
       Mit Scholion bezeichnete man ursprünglich eine Randnotiz, die Gelehrte in den Büchern anbrachten, die ihre ständigen Wegbegleiter waren. Heute sind die Scholien die Randnotizen von Rahim Taghizadegan, die Erkenntnisgewinne im Rahmen des <em style="font-style: normal;">scholarium</em> dokumentieren: der tiefgehenden Reflexion und praktischen Überprüfung der Möglichkeiten, unter erschwerten Bedingungen noch Werte zu schaffen, Realität von Illusion zu unterscheiden und Sinn zu finden. Um alle Scholien in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}"> beehren Sie uns bitte als Gast</a>.
     </p>
     <a class="blog_linkbutton" href="{% url 'gast_spende' %}">Unterstützen & Zugang erhalten</a>
-  </article> 
+  </article>
+  <div class="veranstaltungen">
+  {% for artikel in liste_artikel %}
+    <div class="veranstaltung">
+      <h1><a href='{{ artikel.slug }}'>{{ artikel.bezeichnung|safe }}</a></h1>
+      <div>
+        {{ artikel.datum_publizieren | date:"l, d. F Y" }}
+      </div>
+      <p>{{ artikel.inhalt|safe|truncatewords:64 }}<a href='{{ artikel.slug }}'> [Weiterlesen]</a></p>
+      <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+    </div>
+    {% endfor %}
+  </div>
+  {% include "paginationsleiste.html" %}
 {% endblock content %}

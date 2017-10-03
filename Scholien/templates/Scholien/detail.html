@@ -10,9 +10,12 @@
   </div>
   <div class="salon_content">
     {{ scholie.inhalt|safe }}
-    {% if request.user.my_profile.nicht_abgelaufen %}
-    {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
-    {% else %} <a href="{% url 'gast_spende' %}">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, erneuern Sie bitte Ihre Unterstützung</a>
+    {% if request.user.my_profile.get_Status.0 >= 2 %}
+      {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
+    {% elif request.user.my_profile.get_Status.0 >= 1 %}
+      <a href="{% url 'gast_spende' %}">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, erneuern Sie bitte Ihre Unterstützung</a>
+    {% else %}
+      <a href="{% url 'gast_spende' %}">Um den Artikel in voller Länge lesen zu können, werden Sie Unterstützer.</a>
     {% endif %}
     <p style="text-align: right;">
       <a href="{% url 'Scholien:index' %}">zurück zu den Scholienartikeln</a>
