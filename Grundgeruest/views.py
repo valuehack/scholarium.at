@@ -30,7 +30,7 @@ import pprint, string
 
 
 def erstelle_liste_menue(user=None):
-    if user is None or not user.is_authenticated():
+    if user is None or not user.is_authenticated() or user.my_profile.get_Status()[0] == 0:
         menue = GanzesMenue.objects.get(bezeichnung='Gast')
     else: # d.h. wenn nicht AnonymousUser zugreift
         return [
