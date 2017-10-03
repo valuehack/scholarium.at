@@ -166,8 +166,8 @@ def zahlen(request):
             "payer": {
                 "payment_method": "paypal"},
             "redirect_urls": {
-                "return_url": Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
-                "cancel_url": Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
+                "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
+                "cancel_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
             # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
             "transactions": [{
                 "payee": {
