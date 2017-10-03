@@ -8,6 +8,7 @@ from seite.settings import BASE_DIR
 from Grundgeruest.views import ListeMitMenue
 
 def liste_buecher(request):
+    return HttpResponseRedirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-49673810AE064733F')
     return ListeMitMenue.as_view(
         template_name='Bibliothek/buecher_alt.html',
         model=models.Buch,
