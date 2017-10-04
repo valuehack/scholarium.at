@@ -210,7 +210,7 @@ class ScholariumProfile(UserenaBaseProfile):
         if self.datum_ablauf == None:
             return status[0]
         else:
-            verbleibend = (datetime.now().date() - self.datum_ablauf).days
+            verbleibend = (self.datum_ablauf - datetime.now().date()).days
             if self.stufe == 0:
                 return status[0]
             elif verbleibend < 0:
