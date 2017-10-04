@@ -140,19 +140,82 @@ def index(request):
             )(request)
 
 
-
-
 def zahlen(request):
-
     def formular_init():
         if request.user.is_authenticated():
-            return ZahlungFormular(instance=request.user.my_profile,
+            formular = ZahlungFormular(instance=request.user.my_profile,
                     initial = {'vorname': request.user.first_name,
                                'nachname': request.user.last_name,
                                'email': request.user.email})
+            return formular
         else:
             return ZahlungFormular()
+    
+    def nutzerdaten_speichern():
+        """ Speichert Profildaten, alles was nix mit der Zahlung zu tun
+        hat; Zahlung erst bei der nächsten Bestätigung eintragen 
+        Nutzer wird ausgegeben für später; falls der neu erstellte Nutzer 
+        noch nicht eingeloggt ist, muss man ihn """
+        if request.user.is_authenticated():
+            nutzer = request.user
+            #if request.POST['email'] != nutzer.email:
+            #    messages.warning(request, 'Ihre eMailadresse konnte nicht geändert werden. Bitte nutzen Sie das Formular auf der Profilseite unten.')
+        elif not (Nutzer.objects.filter(email=request.POST['email'])):
+            # erstelle neuen Nutzer mit eingegebenen Daten:
+            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+        else:
+            nutzer = Nutzer.objects.get(email=request.POST['email'])
 
+        profil = nutzer.my_profile
+        nutzer.first_name = request.POST['vorname']
+        nutzer.last_name = request.POST['nachname']
+        # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
+        for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 'ort', 'land']:
+            setattr(profil, attr, request.POST[attr])
+
+        nutzer.save()
+        profil.save()
+        return nutzer
+
+    formular = formular_init()
+
+    if request.method == 'POST':
+        pprint.pprint(request.POST)
+
+        if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
+            pass # TODO: Übertragen, von wo User gekommen sind
+        else: # dann POST von hier, also Daten verarbeiten:
+            formular = ZahlungFormular(request.POST)
+            # und falls alle Eingaben gültig sind, Daten verarbeiten:
+            if formular.is_valid():
+                nutzerdaten_speichern()
+                bestaetigungsview = zahlungsabwicklung_p if request.POST['zahlungsweise']=='p' else zahlungsabwicklung_rest
+                return bestaetigungsview(request)
+            else:
+                print('Bitte korrigieren Sie die Fehler im Formular')
+                messages.error(request, 'Formular ungültig.')
+    
+    # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
+    stufe = request.POST.get('stufe', '0')
+    betrag = request.POST.get('betrag', '75')
+
+    context = {
+        'formular': formular,
+        'betrag': betrag,
+        'stufe': stufe
+    }
+
+    return render(request, 'Produkte/zahlung.html', context)
+
+
+def zahlungsabwicklung_paypal(request):
+    pass
+
+def zahlungsabwicklung_rest(request):
+    pass
+
+
+class paypal_von_merlin():
 
     def getWebProfile():
         # Gets Paypal Web Profile
@@ -219,66 +282,21 @@ def zahlen(request):
         else:
           print(payment.error)
           return None
+    
+    def weiterleiten_zu_confirm():
+        paypalrestsdk.configure({
+            "mode": settings.PAYPAL_MODE,
+            "client_id": settings.PAYPAL_CLIENT_ID,
+            "client_secret": settings.PAYPAL_CLIENT_SECRET })
 
-    def nutzerErstellen():
-        # Nutzererstellung
-        nutzer = None
-        if not (Nutzer.objects.filter(email=request.POST['email'])): #or request.user.is_authenticated()):
-            # erstelle neuen Nutzer mit eingegebenen Daten:
-            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
-        else:
-            nutzer = Nutzer.objects.get(email=request.POST['email'])
+        web_profile = getWebProfile()
+        payment = paypalZahlungErstellen(stufe)
 
-        profil = nutzer.my_profile
-        nutzer.first_name = request.POST['vorname']
-        nutzer.last_name = request.POST['nachname']
-        profil.stufe = int(request.POST['stufe'])+1
-        profil.guthaben_aufladen(request.POST['betrag'])
-        # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
-        for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 'ort', 'land']:
-            setattr(profil, attr, request.POST[attr])
+        # Redirect the user to given approval url
+        approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
+        return HttpResponseRedirect(approval_url)
 
-        nutzer.save()
-        profil.save()
-
-
-    formular = formular_init()
-
-    # falls POST von hier, werden Daten verarbeitet:
-    if request.method == 'POST':
-        pprint.pprint(request.POST)
-
-        if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
-            pass # TODO: Übertragen, von wo User gekommen sind
-        else:
-            formular = ZahlungFormular(request.POST)
-            # und falls alle Eingaben gültig sind, Daten verarbeiten:
-            if formular.is_valid():
-                stufe = Spendenstufe.objects.get(id=int(request.POST['stufe'])+1)
-
-                # Paypal
-                if request.POST['zahlungsweise'] == 'p':
-
-                    paypalrestsdk.configure({
-                        "mode": settings.PAYPAL_MODE,
-                        "client_id": settings.PAYPAL_CLIENT_ID,
-                        "client_secret": settings.PAYPAL_CLIENT_SECRET })
-
-                    web_profile = getWebProfile()
-                    payment = paypalZahlungErstellen(stufe)
-
-                    # Redirect the user to given approval url
-                    approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
-                    return HttpResponseRedirect(approval_url)
-
-                #GoCardless
-                if request.POST['zahlungsweise'] == 'g':
-                    pass # TODO: DO stuff.
-            else:
-                print('Formular ungültig!')
-                messages.Error(request, 'Formular ungültig.')
-
-    else:
+    def empfage_user_nach_approval():
         if request.GET.get('paymentId'):
             payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
             pprint.pprint(payment)
@@ -290,18 +308,9 @@ def zahlen(request):
                     HttpResponseRedirect(reverse('Grundgeruest:index'))
                     print(payment.error)
             else:
+                pass
                 messages.error(request, 'Transaktion nicht bestätigt.')
-
-    stufe = request.POST.get('stufe', '0')
-    betrag = request.POST.get('betrag', '75')
-
-    context = {
-        'formular': formular,
-        'betrag': betrag,
-        'stufe': stufe
-    }
-
-    return render(request, 'Produkte/zahlung.html', context)
+    
 
 
 # profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
