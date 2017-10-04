@@ -1,7 +1,16 @@
 from django import template
 from Produkte.models import Kauf
+from Grundgeruest.models import ScholariumProfile
 
 register = template.Library()
+
+@register.simple_tag
+def choice_value(key, field, formular):
+    return dict(formular.fields[field].choices)[key]
+
+@register.simple_tag
+def stufenname(stufe):
+    return dict(ScholariumProfile.stufe_choices)[int(stufe)+1]
 
 @register.simple_tag
 def preis(produkt, art=0):
@@ -46,7 +55,7 @@ def ob_kaufbutton_zeigen(objekt, kunde, art):
         return not objekt.ist_vergangen()
     if arten_attribute[art][0]:
         return True
-        
+
     return not objekt.ob_gekauft_von(kunde, art)
 
 

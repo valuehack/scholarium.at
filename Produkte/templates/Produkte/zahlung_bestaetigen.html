@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static produkttags %}
+
+{% block content %}
+  {% with request.POST.zahlungsweise as zw %}
+  <h1>Unterstützung per {% choice_value zw 'zahlungsweise' formular %}</h1>
+  <form>
+    <input type="hidden" value="{{ request.POST.email }}" name="email"/>
+    <input type="hidden" value="{{ request.POST.stufe }}" name="stufe"/>
+    {% if zw == 'u' %}
+      <div class="payment">
+        <div class="payment_success>" <p=""><b>Daten gespeichert.</b><p></p><p>Für die Aufwertung zur Unterstützungsstufe {% stufenname request.POST.stufe %} bestätigen Sie bitte und überweisen sie {{ request.POST.betrag }}€ auf folgendes Konto:</p></div>
+        <ul>
+          <li>scholarium</li>
+          <li>Erste Bank, Wien/Österreich</li>
+          <li>IBAN: AT27 2011 1827 1589 8503</li>
+          <li>BIC: GIBAATWWXXX</li>
+        </ul>
+        <p><b>Bitte verwenden Sie als Zahlungsreferenz/Betreff die Nummer {{ nutzer.id }} ein</b></p>
+      </div>
+    {% elif zw == 'b' %}
+    <div>
+      Her mit dem Gold!
+    </div>
+    {% endif %}
+    <input type="submit"/>
+  </form>
+  {% endwith %}
+{% endblock content %}

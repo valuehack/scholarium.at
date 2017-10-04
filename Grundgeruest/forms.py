@@ -42,7 +42,7 @@ class ZahlungFormular(forms.ModelForm):
             ('u', 'Überweisung'),
             ('p', 'PayPal'),
             ('b', 'Bar'),
-            ('g', 'GoCardless')
+            # ('g', 'GoCardless')
         ])
 
     class Meta:
