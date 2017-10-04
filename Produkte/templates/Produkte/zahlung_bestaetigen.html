@@ -7,9 +7,13 @@
   <form>
     <input type="hidden" value="{{ request.POST.email }}" name="email"/>
     <input type="hidden" value="{{ request.POST.stufe }}" name="stufe"/>
-    {% if zw == 'u' %}
-      <div class="payment">
-        <div class="payment_success>" <p=""><b>Daten gespeichert.</b><p></p><p>Für die Aufwertung zur Unterstützungsstufe {% stufenname request.POST.stufe %} bestätigen Sie bitte und überweisen sie {{ request.POST.betrag }}€ auf folgendes Konto:</p></div>
+    <div class="payment">
+      <div class="payment_success">
+        <b>Daten gespeichert.</b>
+        <p>Für die Aufwertung zur Unterstützungsstufe {% stufenname request.POST.stufe %} bestätigen Sie bitte hier ihre Zahlung.</p>
+      </div>
+      {% if zw == 'u' %}
+        <p>Bitte überweisen Sie {{ request.POST.betrag }}€ auf folgendes Konto:</p>
         <ul>
           <li>scholarium</li>
           <li>Erste Bank, Wien/Österreich</li>
@@ -17,13 +21,13 @@
           <li>BIC: GIBAATWWXXX</li>
         </ul>
         <p><b>Bitte verwenden Sie als Zahlungsreferenz/Betreff die Nummer {{ nutzer.id }} ein</b></p>
+      {% elif zw == 'b' %}
+        <p>Bitte schicken Sie uns den gewählten Betrag von {{ request.POST.betrag }}€ in Euro-Scheinen oder im ungefähren Edelmetallgegenwert (Gold-/Silbermünzen) an das scholarium, Schlösselgasse 19/2/18, 1080 Wien, Österreich. Alternativ können Sie uns den Betrag auch persönlich (bitte um Voranmeldung) oder bei einer unserer Veranstaltungen überbringen.</p>
+      {% endif %}
+      <div class="profil">
+        <input type="submit" value="Bestätigen"/>
       </div>
-    {% elif zw == 'b' %}
-    <div>
-      Her mit dem Gold!
     </div>
-    {% endif %}
-    <input type="submit"/>
   </form>
   {% endwith %}
 {% endblock content %}

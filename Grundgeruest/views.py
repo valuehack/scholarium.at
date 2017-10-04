@@ -150,11 +150,11 @@ def zahlen(request):
             return formular
         else:
             return ZahlungFormular()
-    
+
     def nutzerdaten_speichern():
         """ Speichert Profildaten, alles was nix mit der Zahlung zu tun
-        hat; Zahlung erst bei der nächsten Bestätigung eintragen 
-        Nutzer wird ausgegeben für später; falls der neu erstellte Nutzer 
+        hat; Zahlung erst bei der nächsten Bestätigung eintragen
+        Nutzer wird ausgegeben für später; falls der neu erstellte Nutzer
         noch nicht eingeloggt ist, muss man ihn """
         if request.user.is_authenticated():
             nutzer = request.user
@@ -189,12 +189,12 @@ def zahlen(request):
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
             if formular.is_valid():
                 nutzerdaten_speichern()
-                bestaetigungsview = zahlungsabwicklung_p if request.POST['zahlungsweise']=='p' else zahlungsabwicklung_rest
-                return bestaetigungsview(request)
+                bestaetigungsview = zahlungsabwicklung_paypal if request.POST['zahlungsweise']=='p' else zahlungsabwicklung_rest
+                return bestaetigungsview(request, formular)
             else:
                 print('Bitte korrigieren Sie die Fehler im Formular')
                 messages.error(request, 'Formular ungültig.')
-    
+
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
     stufe = request.POST.get('stufe', '0')
     betrag = request.POST.get('betrag', '75')
@@ -211,8 +211,12 @@ def zahlen(request):
 def zahlungsabwicklung_paypal(request):
     pass
 
-def zahlungsabwicklung_rest(request):
-    pass
+def zahlungsabwicklung_rest(request, formular):
+    context = {
+        'nutzer': Nutzer.objects.get(email=request.POST['email']),
+        'formular': formular
+    }
+    return render(request, 'Produkte/zahlung_bestaetigen.html', context)
 
 
 class paypal_von_merlin():
@@ -282,7 +286,7 @@ class paypal_von_merlin():
         else:
           print(payment.error)
           return None
-    
+
     def weiterleiten_zu_confirm():
         paypalrestsdk.configure({
             "mode": settings.PAYPAL_MODE,
@@ -310,7 +314,7 @@ class paypal_von_merlin():
             else:
                 pass
                 messages.error(request, 'Transaktion nicht bestätigt.')
-    
+
 
 
 # profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
