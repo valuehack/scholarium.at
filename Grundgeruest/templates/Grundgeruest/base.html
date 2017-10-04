@@ -4,7 +4,7 @@
 {% block kopfleiste %}
   <div class="login">
   {% if request.user.is_authenticated %}
-    {% if request.user.hat_guthaben %}
+    {% if request.user.my_profile.get_Status.0 > 0 %}
       {% include "Grundgeruest/kopfleiste_nutzer.html" %}
     {% else %}
       {% include "Grundgeruest/kopfleiste_interessent.html" %}
