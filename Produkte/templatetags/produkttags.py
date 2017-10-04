@@ -10,7 +10,7 @@ def choice_value(key, field, formular):
 
 @register.simple_tag
 def stufenname(stufe):
-    return dict(ScholariumProfile.stufe_choices)[int(stufe)+1]
+    return dict(ScholariumProfile.stufe_choices)[int(stufe)]
 
 @register.simple_tag
 def preis(produkt, art=0):
