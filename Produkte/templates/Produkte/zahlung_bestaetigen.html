@@ -3,7 +3,7 @@
 
 {% block content %}
   {% with request.POST.zahlungsweise as zw %}
-  <h1>Unterstützung per {% choice_value zw 'zahlungsweise' formular %}</h1>
+  <h1>Unterstützung: {% choice_value zw 'zahlungsweise' formular %}</h1>
   <form method="post">
     {% csrf_token %}
     <input type="hidden" value="{{ request.POST.email }}" name="email"/>

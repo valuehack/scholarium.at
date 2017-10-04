@@ -190,7 +190,7 @@ def zahlen(request):
         today = datetime.now().date()
         nutzer.my_profile.letzte_zahlung = today
         nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
-        nutzer.save()
+        nutzer.my_profile.save()
         messages.success(request, 'Unterstützung erfolgreich!')
         return HttpResponseRedirect(reverse('Grundgeruest:index'))
 
