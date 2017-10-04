@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 import pdb
+from django.contrib import messages
 
 # Create your views here.
 
@@ -280,7 +281,8 @@ def kaufen(request):
     warenkorb = Warenkorb(request)
     nutzer = request.user.my_profile
     if nutzer.guthaben < warenkorb.count_total_price():
-        return HttpResponse('Guthaben reicht nicht aus!') # das schöner machen!
+        messages.error(request, 'Ihr Guthaben reicht leider nicht aus. Laden Sie ihr Guthaben auf, indem Sie ihre Unterstützung erneuern.')
+        return HttpResponseRedirect(reverse('Produkte:warenkorb'))
 
     for pk, ware in list(warenkorb.items.items()):
         Kauf.kauf_ausfuehren(nutzer, pk, ware)

@@ -167,13 +167,13 @@ def zahlen(request):
         noch nicht eingeloggt ist, muss man ihn """
         if request.user.is_authenticated():
             nutzer = request.user
-            #if request.POST['email'] != nutzer.email:
-            #    messages.warning(request, 'Ihre eMailadresse konnte nicht geändert werden. Bitte nutzen Sie das Formular auf der Profilseite unten.')
-        elif not (Nutzer.objects.filter(email=request.POST['email'])):
-            # erstelle neuen Nutzer mit eingegebenen Daten:
-            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+            #if request.post['email'] != nutzer.email:
+            #    messages.warning(request, 'ihre emailadresse konnte nicht geändert werden. bitte nutzen sie das formular auf der profilseite unten.')
+        elif not (nutzer.objects.filter(email=request.post['email'])):
+            # erstelle neuen nutzer mit eingegebenen daten:
+            nutzer = nutzer.neuen_erstellen(request.post['email'])
         else:
-            nutzer = Nutzer.objects.get(email=request.POST['email'])
+            nutzer = nutzer.objects.get(email=request.post['email'])
 
         profil = nutzer.my_profile
         nutzer.first_name = request.POST['vorname']
@@ -186,6 +186,23 @@ def zahlen(request):
         profil.save()
         return nutzer
 
+    def nutzer_upgrade():
+        ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
+        # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
+        if request.user.is_authenticated():
+            nutzer = request.user
+        else:
+            nutzer = nutzer.objects.get(email=request.post['email'])
+        if nutzer.my_profile.stufe < int(request.POST['stufe']):
+            nutzer.my_profile.stufe = int(request.POST['stufe'])
+        nutzer.my_profile.guthaben_aufladen(int(request.POST['betrag']))
+        today = datetime.now().date()
+        nutzer.my_profile.letzte_zahlung = today
+        nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
+        nutzer.my_profile.save()
+        messages.success(request, 'Unterstützung erfolgreich!')
+        return HttpResponseRedirect(reverse('Grundgeruest:index'))
+
     formular = formular_init()
 
     if request.method == 'POST':
@@ -193,6 +210,13 @@ def zahlen(request):
 
         if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
             pass # TODO: Übertragen, von wo User gekommen sind
+        elif 'state' in request.POST:
+            if request.POST['state'] == 'approved':
+                return nutzer_upgrade()
+            else:
+                messages.error(request, 'Transaktion nicht bestätigt.')
+        elif 'bestaetigung' in request.POST:
+            return nutzer_upgrade()
         else: # dann POST von hier, also Daten verarbeiten:
             formular = ZahlungFormular(request.POST)
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
@@ -205,7 +229,7 @@ def zahlen(request):
                 messages.error(request, 'Formular ungültig.')
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
-    stufe = request.POST.get('stufe', '0')
+    stufe = request.POST.get('stufe', '1')
     betrag = request.POST.get('betrag', '75')
 
     context = {

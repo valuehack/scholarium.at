@@ -48,7 +48,7 @@
               <form action="{% url 'gast_zahlung' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="betrag" value="{{ stufe.spendenbeitrag }}">
-                <input type="hidden" name="stufe" value="{{ stufe.id|add:-1 }}">
+                <input type="hidden" name="stufe" value="{{ stufe.id }}">
                 <input type="hidden" name="von_spende" value="irgendwas">
                 <input type="submit" class="pay_option_box_inputbutton" value="Werden Sie jetzt {{ stufe }}">
               </form>
