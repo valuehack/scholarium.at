@@ -280,7 +280,8 @@ def eintragen_veranstaltungen(daten):
                 beschreibung=zeile['text'],
                 art_veranstaltung_id=art_von_type[zeile['type']],
                 datum=datum, 
-                link=zeile['livestream'])
+                link=zeile['livestream'],
+                anzahl_teilnahme=zeile['spots'])
             if zeile['livestream']: 
                 v.ob_livestream = True
                 v.save()
