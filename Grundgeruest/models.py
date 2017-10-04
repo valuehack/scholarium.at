@@ -222,7 +222,8 @@ class ScholariumProfile(UserenaBaseProfile):
 
     def guthaben_aufladen(self, betrag):
         """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """
-        self.guthaben += int(betrag)
+        
+        self.guthaben = int(betrag)
 
     class Meta():
         verbose_name = 'Nutzerprofil'

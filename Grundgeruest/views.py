@@ -60,6 +60,15 @@ def paypal_execute_payment(request):
     return JsonResponse(zahlung)
 
 
+def paypal_bestaetigung(request):
+    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
+    access_token = anfrage_token()
+    zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
+    
+    if zahlung['state'] == 'approved':
+        ipdb.set_trace()
+    return None
+
 
 
 def erstelle_liste_menue(user=None):

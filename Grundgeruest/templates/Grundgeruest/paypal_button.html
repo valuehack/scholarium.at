@@ -1,9 +1,8 @@
 <script src="https://www.paypalobjects.com/api/checkout.js"></script>
-<div id="paypal-button-container" style="position: relative; bottom: 40px; z-index: -1;"></div>
+<div id="paypal-button-container"></div>
 
 <script>
     paypal.Button.render({
-
         env: 'sandbox', // sandbox | production
 
         // PayPal Client IDs - replace with your own
@@ -23,12 +22,12 @@
             return actions.payment.create({
                 payment: {
                     transactions: [{
-                        amount: { total: '1200.00', currency: 'EUR' },
+                        amount: { total: '150.00', currency: 'EUR' },
                         item_list: { items: [{
                             "name": "Unterstützungsstufe",
-                            "description": "Beirat",
+                            "description": "Teilnehmer",
                             "quantity": "1",
-                            "price": "1200",
+                            "price": "150",
                             "currency": "EUR"
                         }]}
                     }],
@@ -45,7 +44,8 @@
 
             // Make a call to the REST api to execute the payment
             return actions.payment.execute().then(function() {
-                window.alert('Payment Complete!');
+                alert(JSON.stringify(data));
+                window.location.replace("/paypal_bestaetigung?paymentID="+data.paymentID);
             });
         }
 
