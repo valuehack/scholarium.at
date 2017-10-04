@@ -60,7 +60,7 @@ class Buch(KlasseMitProdukten):
     mobi = models.FileField(upload_to='buecher', null=True, blank=True)
     bild = models.ImageField(upload_to='buecher', null=True, blank=True)
     alte_nr = models.SmallIntegerField(null=True, editable=False)
-    
+
     def preis_ausgeben(self, art):
         if art=='leihen':
             return self.finde_preis(art) or 13
@@ -68,15 +68,17 @@ class Buch(KlasseMitProdukten):
             return self.finde_preis(art) or 37
         elif art in ['pdf', 'epub', 'mobi']:
             return self.finde_preis(art) or 5
+        elif art=='druck':
+            return self.finde_preis(art) or 20
 
     def button_text(self, art):
         return '%s!' % art.capitalize()
-    
+
     def save(self, *args, **kwargs):
         if not self.bezeichnung:
             self.bezeichnung = "%s: %s" % (self.autor, self.titel)
         return super().save(*args, **kwargs)
-    
+
     def anzeigemodus(self, art):
         from Produkte.models import arten_attribute
         if arten_attribute[art][0] and self.finde_anzahl(art) > 1:
@@ -85,8 +87,6 @@ class Buch(KlasseMitProdukten):
             return 'verbergen'
         else:
             return 'inline'
-    
+
     class Meta:
         verbose_name_plural = 'Bücher'
-
-
