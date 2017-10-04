@@ -2,9 +2,9 @@
 
 {% with buch=obj %}
   <div class="warenkorb_veranstaltung">
-    <span>{{ buch.autor }}</span>
+    <span>{% if buch.autor %}{{ buch.autor }}{% endif %}</span>
     <span>
-      <a href="{% url 'Bibliothek:detail_buch' buch.slug %}">{{ buch.titel }}</a>
+      <a href="{% url 'Bibliothek:detail_buch' buch.slug %}">{% if buch.titel %}{{ buch.titel }}{% else %}{{ buch.bezeichnung }}{% endif %}</a>
     </span>
     <span>{% art_aus_pk pk %}</span>
     <form action="{% url 'Produkte:cart-remove' %}" method="post">
