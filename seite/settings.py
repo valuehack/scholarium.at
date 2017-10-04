@@ -95,7 +95,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'easycart.context_processors.cart',
                 'Grundgeruest.views.liste_menue_zurueckgeben',
-                'Grundgeruest.views.pruefen_ob_abgelaufen',
             ],
         },
     },

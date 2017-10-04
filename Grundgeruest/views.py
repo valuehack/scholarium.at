@@ -32,7 +32,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 
-
 def paypal_zahlung(request):
     return TemplateMitMenue.as_view(
         template_name='Grundgeruest/paypal_test.html',
@@ -52,12 +51,12 @@ def paypal_execute_payment(request):
     access_token = anfrage_token()
     zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
     antwort = fuehre_payment_aus(
-        request.POST.get('paymentID'), 
-        access_token, 
+        request.POST.get('paymentID'),
+        access_token,
         zahlung['transactions'],
         request.POST.get('payerID'))
     zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
-    print('%s%s%s' % (10*'\n', zahlung, 10*'\n')) 
+    print('%s%s%s' % (10*'\n', zahlung, 10*'\n'))
     return JsonResponse(zahlung)
 
 
@@ -97,19 +96,6 @@ def liste_menue_zurueckgeben(request):
     """ context-processor """
     liste_punkte = erstelle_liste_menue(request.user)
     return {'liste_menue': liste_punkte}
-
-def pruefen_ob_abgelaufen(request):
-    """ context-processor """
-    #pdb.set_trace()
-    if request.user.is_authenticated():
-        ablauf = request.user.my_profile.datum_ablauf
-        if not ablauf or ablauf <= date.today():
-            messages.info(request, 'Sie sind abgelaufen!!!')
-        elif ablauf + timedelta(days=24) > date.today():
-            messages.info(request, 'Ihre Unterstützung läuft in wenigen Wochen ab!')
-        else:
-            messages.info(request, 'Ihre Unterstützung läuft noch lange...')
-    return {}
 
 class MenueMixin():
     from functools import partial
@@ -334,6 +320,21 @@ from guardian.decorators import permission_required_or_403
 from userena import settings as userena_settings
 from userena.views import ExtraContextTemplateView
 from django.contrib import messages
+from userena.views import signin
+
+
+def anmelden(request, *args, **kwargs):
+    '''
+    Zeigt nach erfolgreicher Anmeldung definierte Meldungen an.
+    '''
+    s = signin(request, *args, **kwargs)
+    if request.user.is_authenticated():
+        if request.user.my_profile.get_Status()[0] == 1:
+            messages.error(request, 'Ihre Unterstützung ist abgelaufen. Um wieder Zugang zu den Inhalten zu erhalten, erneuern Sie diese bitte.')
+        if request.user.my_profile.get_Status()[0] == 2:
+            messages.error(request, 'Ihre Unterstützung läuft in weniger als 30 Tagen ab.')
+    return s
+
 
 @secure_required
 @permission_required_or_403('change_profile', (get_profile_model(), 'user__username', 'username'))
