@@ -627,8 +627,7 @@ def mediendateien_einlesen():
         
         ob_feld = 'ob_aufzeichnung' if feldname=='datei' else 'ob_'+feldname
         def anschalten():
-            feld = getattr(objekt, ob_feld)
-            feld = True
+            feld = setattr(objekt, ob_feld, True)
             objekt.save()
 
         if dateifeld and os.path.isfile(os.path.join(MEDIA_ROOT, dateifeld.name)):
