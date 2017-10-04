@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404, render, redirect
 
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
 from django.core.urlresolvers import reverse
 from userena.models import UserenaSignup
 from userena.mail import UserenaConfirmationMail
@@ -17,7 +17,7 @@ from django.contrib.sites.models import Site
 
 from django.db import transaction
 import sqlite3 as lite
-import os, pdb
+import os, pdb, ipdb
 from .models import *
 from Produkte.models import Spendenstufe
 from Scholien.models import Artikel
@@ -27,6 +27,40 @@ from .forms import ZahlungFormular, ProfilEditFormular
 from datetime import date, timedelta
 import paypalrestsdk
 import pprint, string
+from django.views.decorators.csrf import csrf_exempt
+
+
+
+
+
+def paypal_zahlung(request):
+    return TemplateMitMenue.as_view(
+        template_name='Grundgeruest/paypal_test.html',
+        )(request)
+
+@csrf_exempt
+def paypal_create_payment(request):
+    from Grundgeruest.paypal import anfrage_token, erstelle_payment
+    access_token = anfrage_token()
+    zahlung = erstelle_payment(access_token)
+    zahlung_id = zahlung['id']
+    return JsonResponse({'paymentID': zahlung_id})
+
+@csrf_exempt
+def paypal_execute_payment(request):
+    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
+    access_token = anfrage_token()
+    zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
+    antwort = fuehre_payment_aus(
+        request.POST.get('paymentID'), 
+        access_token, 
+        zahlung['transactions'],
+        request.POST.get('payerID'))
+    zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
+    print('%s%s%s' % (10*'\n', zahlung, 10*'\n')) 
+    return JsonResponse(zahlung)
+
+
 
 
 def erstelle_liste_menue(user=None):
