@@ -8,6 +8,7 @@ from userena.compat import auth_views_compat_quirks, password_reset_uid_kwarg
 
 from .forms import Anmeldeformular, ZahlungFormular
 from userena.forms import EditProfileForm
+from .views import anmelden
 
 def merged_dict(dict_a, dict_b):
     """Merges two dicts and returns output. It's purpose is to ease use of
@@ -23,8 +24,9 @@ urlpatterns = [
        {'signup_form': Anmeldeformular},
        name='userena_signup'),
     url(r'^anmelden/$',
-       userena_views.signin,
-       name='userena_signin'),
+        anmelden,
+    #    userena_views.signin,
+    name='userena_signin'),
     url(r'^abmelden/$',
        userena_views.signout,
        name='userena_signout'),

@@ -32,7 +32,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 
-
 def paypal_zahlung(request):
     return TemplateMitMenue.as_view(
         template_name='Grundgeruest/paypal_test.html',
@@ -52,14 +51,27 @@ def paypal_execute_payment(request):
     access_token = anfrage_token()
     zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
     antwort = fuehre_payment_aus(
-        request.POST.get('paymentID'), 
-        access_token, 
+        request.POST.get('paymentID'),
+        access_token,
         zahlung['transactions'],
         request.POST.get('payerID'))
     zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
-    print('%s%s%s' % (10*'\n', zahlung, 10*'\n')) 
+    print('%s%s%s' % (10*'\n', zahlung, 10*'\n'))
     return JsonResponse(zahlung)
 
+
+def paypal_bestaetigung(request):
+    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
+    access_token = anfrage_token()
+    zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
+    
+    print(zahlung)
+    
+    if 'completed' in json.dumps(zahlung):
+        HttpResponseRedirect("/spende/zahlung/")
+        
+    messages.error(request, 'Transaktion nicht bestätigt.')
+    return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
 
 
 
@@ -97,19 +109,6 @@ def liste_menue_zurueckgeben(request):
     """ context-processor """
     liste_punkte = erstelle_liste_menue(request.user)
     return {'liste_menue': liste_punkte}
-
-def pruefen_ob_abgelaufen(request):
-    """ context-processor """
-    #pdb.set_trace()
-    if request.user.is_authenticated():
-        ablauf = request.user.my_profile.datum_ablauf
-        if not ablauf or ablauf <= date.today():
-            messages.info(request, 'Sie sind abgelaufen!!!')
-        elif ablauf + timedelta(days=24) > date.today():
-            messages.info(request, 'Ihre Unterstützung läuft in wenigen Wochen ab!')
-        else:
-            messages.info(request, 'Ihre Unterstützung läuft noch lange...')
-    return {}
 
 class MenueMixin():
     from functools import partial
@@ -154,19 +153,110 @@ def index(request):
             )(request)
 
 
-
-
 def zahlen(request):
-
     def formular_init():
         if request.user.is_authenticated():
-            return ZahlungFormular(instance=request.user.my_profile,
+            formular = ZahlungFormular(instance=request.user.my_profile,
                     initial = {'vorname': request.user.first_name,
                                'nachname': request.user.last_name,
                                'email': request.user.email})
+            return formular
         else:
             return ZahlungFormular()
 
+    def nutzerdaten_speichern():
+        """ Speichert Profildaten, alles was nix mit der Zahlung zu tun
+        hat; Zahlung erst bei der nächsten Bestätigung eintragen
+        Nutzer wird ausgegeben für später; falls der neu erstellte Nutzer
+        noch nicht eingeloggt ist, muss man ihn """
+        if request.user.is_authenticated():
+            nutzer = request.user
+            #if request.post['email'] != nutzer.email:
+            #    messages.warning(request, 'ihre emailadresse konnte nicht geändert werden. bitte nutzen sie das formular auf der profilseite unten.')
+        elif not (Nutzer.objects.filter(email=request.POST['email'])):
+            # erstelle neuen nutzer mit eingegebenen daten:
+            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+        else:
+            nutzer = Nutzer.objects.get(email=request.POST['email'])
+
+        profil = nutzer.my_profile
+        nutzer.first_name = request.POST['vorname']
+        nutzer.last_name = request.POST['nachname']
+        # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
+        for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 'ort', 'land']:
+            setattr(profil, attr, request.POST[attr])
+
+        nutzer.save()
+        profil.save()
+        return nutzer
+
+    def nutzer_upgrade():
+        ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
+        # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
+        if request.user.is_authenticated():
+            nutzer = request.user
+        else:
+            nutzer = Nutzer.objects.get(email=request.POST['email'])
+        if nutzer.my_profile.stufe < int(request.POST['stufe']):
+            nutzer.my_profile.stufe = int(request.POST['stufe'])
+        nutzer.my_profile.guthaben_aufladen(int(request.POST['betrag']))
+        today = datetime.now().date()
+        nutzer.my_profile.letzte_zahlung = today
+        nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
+        nutzer.my_profile.save()
+        messages.success(request, 'Unterstützung erfolgreich!')
+        return HttpResponseRedirect(reverse('Grundgeruest:index'))
+
+    formular = formular_init()
+    context = {}
+
+    if request.method == 'POST':
+        pprint.pprint(request.POST)
+
+        if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
+            pass # TODO: Übertragen, von wo User gekommen sind
+        elif 'state' in request.POST:
+            return nutzer_upgrade()
+        elif 'bestaetigung' in request.POST:
+            return nutzer_upgrade()
+        else: # dann POST von hier, also Daten verarbeiten:
+            formular = ZahlungFormular(request.POST)
+            # und falls alle Eingaben gültig sind, Daten verarbeiten:
+            if formular.is_valid():
+                nutzerdaten_speichern()
+                if request.POST['zahlungsweise']=='p':
+                    context.update({'sichtbar': True})
+                else: 
+                    return zahlungsabwicklung_rest(request, formular)
+            else:
+                print('Bitte korrigieren Sie die Fehler im Formular')
+                messages.error(request, 'Formular ungültig.')
+
+    # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
+    stufe = request.POST.get('stufe', '1')
+    betrag = request.POST.get('betrag', '75')
+
+    context.update({
+        'formular': formular,
+        'betrag': betrag,
+        'stufe': stufe
+    })
+
+    return render(request, 'Produkte/zahlung.html', context)
+
+
+def zahlungsabwicklung_paypal(request):
+    pass
+
+def zahlungsabwicklung_rest(request, formular):
+    context = {
+        'nutzer': Nutzer.objects.get(email=request.POST['email']),
+        'formular': formular
+    }
+    return render(request, 'Produkte/zahlung_bestaetigen.html', context)
+
+
+class paypal_von_merlin():
 
     def getWebProfile():
         # Gets Paypal Web Profile
@@ -234,65 +324,20 @@ def zahlen(request):
           print(payment.error)
           return None
 
-    def nutzerErstellen():
-        # Nutzererstellung
-        nutzer = None
-        if not (Nutzer.objects.filter(email=request.POST['email'])): #or request.user.is_authenticated()):
-            # erstelle neuen Nutzer mit eingegebenen Daten:
-            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
-        else:
-            nutzer = Nutzer.objects.get(email=request.POST['email'])
+    def weiterleiten_zu_confirm():
+        paypalrestsdk.configure({
+            "mode": settings.PAYPAL_MODE,
+            "client_id": settings.PAYPAL_CLIENT_ID,
+            "client_secret": settings.PAYPAL_CLIENT_SECRET })
 
-        profil = nutzer.my_profile
-        nutzer.first_name = request.POST['vorname']
-        nutzer.last_name = request.POST['nachname']
-        profil.stufe = int(request.POST['stufe'])+1
-        profil.guthaben_aufladen(request.POST['betrag'])
-        # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
-        for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 'ort', 'land']:
-            setattr(profil, attr, request.POST[attr])
+        web_profile = getWebProfile()
+        payment = paypalZahlungErstellen(stufe)
 
-        nutzer.save()
-        profil.save()
+        # Redirect the user to given approval url
+        approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
+        return HttpResponseRedirect(approval_url)
 
-
-    formular = formular_init()
-
-    # falls POST von hier, werden Daten verarbeitet:
-    if request.method == 'POST':
-        pprint.pprint(request.POST)
-
-        if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
-            pass # TODO: Übertragen, von wo User gekommen sind
-        else:
-            formular = ZahlungFormular(request.POST)
-            # und falls alle Eingaben gültig sind, Daten verarbeiten:
-            if formular.is_valid():
-                stufe = Spendenstufe.objects.get(id=int(request.POST['stufe'])+1)
-
-                # Paypal
-                if request.POST['zahlungsweise'] == 'p':
-
-                    paypalrestsdk.configure({
-                        "mode": settings.PAYPAL_MODE,
-                        "client_id": settings.PAYPAL_CLIENT_ID,
-                        "client_secret": settings.PAYPAL_CLIENT_SECRET })
-
-                    web_profile = getWebProfile()
-                    payment = paypalZahlungErstellen(stufe)
-
-                    # Redirect the user to given approval url
-                    approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
-                    return HttpResponseRedirect(approval_url)
-
-                #GoCardless
-                if request.POST['zahlungsweise'] == 'g':
-                    pass # TODO: DO stuff.
-            else:
-                print('Formular ungültig!')
-                messages.Error(request, 'Formular ungültig.')
-
-    else:
+    def empfage_user_nach_approval():
         if request.GET.get('paymentId'):
             payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
             pprint.pprint(payment)
@@ -304,18 +349,9 @@ def zahlen(request):
                     HttpResponseRedirect(reverse('Grundgeruest:index'))
                     print(payment.error)
             else:
+                pass
                 messages.error(request, 'Transaktion nicht bestätigt.')
 
-    stufe = request.POST.get('stufe', '0')
-    betrag = request.POST.get('betrag', '75')
-
-    context = {
-        'formular': formular,
-        'betrag': betrag,
-        'stufe': stufe
-    }
-
-    return render(request, 'Produkte/zahlung.html', context)
 
 
 # profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
@@ -325,6 +361,21 @@ from guardian.decorators import permission_required_or_403
 from userena import settings as userena_settings
 from userena.views import ExtraContextTemplateView
 from django.contrib import messages
+from userena.views import signin
+
+
+def anmelden(request, *args, **kwargs):
+    '''
+    Zeigt nach erfolgreicher Anmeldung definierte Meldungen an.
+    '''
+    s = signin(request, *args, **kwargs)
+    if request.user.is_authenticated():
+        if request.user.my_profile.get_Status()[0] == 1:
+            messages.error(request, 'Ihre Unterstützung ist abgelaufen. Um wieder Zugang zu den Inhalten zu erhalten, erneuern Sie diese bitte.')
+        if request.user.my_profile.get_Status()[0] == 2:
+            messages.error(request, 'Ihre Unterstützung läuft in weniger als 30 Tagen ab.')
+    return s
+
 
 @secure_required
 @permission_required_or_403('change_profile', (get_profile_model(), 'user__username', 'username'))

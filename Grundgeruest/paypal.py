@@ -2,7 +2,7 @@ import os, ipdb, json
 
 
 def anfrage_token():
-    befehl = """curl -v https://api.sandbox.paypal.com/v1/oauth2/token    -H "Accept: application/json"    -H "Accept-Language: en_US"    -u "AfmyoibNF5Q_5k_wO4jYEAY4Asz00wmybsk3cidPYPp1smwe-JVdDNwR9B_DOrsyoJ8gNYeCKKmXurVQ:EDkk66_ZRFYJl3g5VgXzUUkLoyZrZ3wwLaya3NsIU1rnjBIKZIeBDYNOzbsAUaib2ycVZ2U7GnKbfIdm"    -d "grant_type=client_credentials" """
+    befehl = """curl -v https://api.sandbox.paypal.com/v1/oauth2/token    -H "Accept: application/json"    -H "Accept-Language: en_US"    -u "AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B:EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz"    -d "grant_type=client_credentials" """
     antwort = os.popen(befehl).read()
     return json.loads(antwort)['access_token']
 

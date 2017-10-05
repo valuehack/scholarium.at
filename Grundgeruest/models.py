@@ -210,7 +210,7 @@ class ScholariumProfile(UserenaBaseProfile):
         if self.datum_ablauf == None:
             return status[0]
         else:
-            verbleibend = (datetime.now().date() - self.datum_ablauf).days
+            verbleibend = (self.datum_ablauf - datetime.now().date()).days
             if self.stufe == 0:
                 return status[0]
             elif verbleibend < 0:
@@ -221,8 +221,9 @@ class ScholariumProfile(UserenaBaseProfile):
                 return status[3]
 
     def guthaben_aufladen(self, betrag):
-        """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """
+        """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """        
         self.guthaben += int(betrag)
+        self.save()
 
     class Meta():
         verbose_name = 'Nutzerprofil'
