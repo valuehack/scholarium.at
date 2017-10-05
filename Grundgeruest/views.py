@@ -65,9 +65,13 @@ def paypal_bestaetigung(request):
     access_token = anfrage_token()
     zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
     
-    if zahlung['state'] == 'approved':
-        ipdb.set_trace()
-    return None
+    print(zahlung)
+    
+    if 'completed' in json.dumps(zahlung):
+        HttpResponseRedirect("/spende/zahlung/")
+        
+    messages.error(request, 'Transaktion nicht bestätigt.')
+    return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
 
 
 
@@ -169,11 +173,11 @@ def zahlen(request):
             nutzer = request.user
             #if request.post['email'] != nutzer.email:
             #    messages.warning(request, 'ihre emailadresse konnte nicht geändert werden. bitte nutzen sie das formular auf der profilseite unten.')
-        elif not (nutzer.objects.filter(email=request.post['email'])):
+        elif not (Nutzer.objects.filter(email=request.POST['email'])):
             # erstelle neuen nutzer mit eingegebenen daten:
-            nutzer = nutzer.neuen_erstellen(request.post['email'])
+            nutzer = Nutzer.neuen_erstellen(request.POST['email'])
         else:
-            nutzer = nutzer.objects.get(email=request.post['email'])
+            nutzer = Nutzer.objects.get(email=request.POST['email'])
 
         profil = nutzer.my_profile
         nutzer.first_name = request.POST['vorname']
@@ -192,7 +196,7 @@ def zahlen(request):
         if request.user.is_authenticated():
             nutzer = request.user
         else:
-            nutzer = nutzer.objects.get(email=request.post['email'])
+            nutzer = Nutzer.objects.get(email=request.POST['email'])
         if nutzer.my_profile.stufe < int(request.POST['stufe']):
             nutzer.my_profile.stufe = int(request.POST['stufe'])
         nutzer.my_profile.guthaben_aufladen(int(request.POST['betrag']))
@@ -204,6 +208,7 @@ def zahlen(request):
         return HttpResponseRedirect(reverse('Grundgeruest:index'))
 
     formular = formular_init()
+    context = {}
 
     if request.method == 'POST':
         pprint.pprint(request.POST)
@@ -211,10 +216,7 @@ def zahlen(request):
         if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
             pass # TODO: Übertragen, von wo User gekommen sind
         elif 'state' in request.POST:
-            if request.POST['state'] == 'approved':
-                return nutzer_upgrade()
-            else:
-                messages.error(request, 'Transaktion nicht bestätigt.')
+            return nutzer_upgrade()
         elif 'bestaetigung' in request.POST:
             return nutzer_upgrade()
         else: # dann POST von hier, also Daten verarbeiten:
@@ -222,8 +224,10 @@ def zahlen(request):
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
             if formular.is_valid():
                 nutzerdaten_speichern()
-                bestaetigungsview = zahlungsabwicklung_paypal if request.POST['zahlungsweise']=='p' else zahlungsabwicklung_rest
-                return bestaetigungsview(request, formular)
+                if request.POST['zahlungsweise']=='p':
+                    context.update({'sichtbar': True})
+                else: 
+                    return zahlungsabwicklung_rest(request, formular)
             else:
                 print('Bitte korrigieren Sie die Fehler im Formular')
                 messages.error(request, 'Formular ungültig.')
@@ -232,11 +236,11 @@ def zahlen(request):
     stufe = request.POST.get('stufe', '1')
     betrag = request.POST.get('betrag', '75')
 
-    context = {
+    context.update({
         'formular': formular,
         'betrag': betrag,
         'stufe': stufe
-    }
+    })
 
     return render(request, 'Produkte/zahlung.html', context)
 

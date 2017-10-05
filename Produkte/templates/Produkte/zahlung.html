@@ -75,7 +75,7 @@
 
         </div>
 	  </form>
-    {% include 'Grundgeruest/paypal_button.html' %}
+    {% if sichtbar %}{% include 'Grundgeruest/paypal_button.html' %}{% endif %}
     </div>
   </div>
 {% endblock content %}

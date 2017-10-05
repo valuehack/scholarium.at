@@ -22,12 +22,12 @@
             return actions.payment.create({
                 payment: {
                     transactions: [{
-                        amount: { total: '150.00', currency: 'EUR' },
+                        amount: { total: "{{ betrag }}.00", currency: "EUR" },
                         item_list: { items: [{
                             "name": "Unterstützungsstufe",
-                            "description": "Teilnehmer",
+                            "description": "{{ stufe }}",
                             "quantity": "1",
-                            "price": "150",
+                            "price": "{{ betrag }}",
                             "currency": "EUR"
                         }]}
                     }],
