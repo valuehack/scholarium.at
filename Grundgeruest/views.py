@@ -17,7 +17,7 @@ from django.contrib.sites.models import Site
 
 from django.db import transaction
 import sqlite3 as lite
-import os, pdb, ipdb
+import os, pdb, ipdb, json
 from .models import *
 from Produkte.models import Spendenstufe
 from Scholien.models import Artikel
@@ -67,8 +67,8 @@ def paypal_bestaetigung(request):
     
     print(zahlung)
     
-    if 'completed' in json.dumps(zahlung):
-        HttpResponseRedirect("/spende/zahlung/")
+    if True:
+        return HttpResponseRedirect("/spende/zahlung/")
         
     messages.error(request, 'Transaktion nicht bestätigt.')
     return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
