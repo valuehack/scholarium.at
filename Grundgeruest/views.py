@@ -64,15 +64,19 @@ def paypal_bestaetigung(request):
     from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
     access_token = anfrage_token()
     zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
+    # (das wird nicht genutzt, da wir keine reproduzierbaren Daten in der Antwort gefunden haben)
     
     print(zahlung)
-    
-    if True:
-        return HttpResponseRedirect("/spende/zahlung/")
         
-    messages.error(request, 'Transaktion nicht bestätigt.')
-    return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
-
+    betrag = int(float(zahlung['transactions'][0]['amount']['total']))
+    stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
+    email = Nutzer.objects.get(pk=request.session['neuer_nutzer_pk']).email
+    datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
+    upgrade_nutzer(request, datendict)
+    
+    return HttpResponseRedirect("/spende/zahlung/")
+    #messages.error(request, 'Transaktion nicht bestätigt.')
+    #return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
 
 
 def erstelle_liste_menue(user=None):
@@ -152,6 +156,23 @@ def index(request):
             template_name='Gast/startseite_gast.html'
             )(request)
 
+def upgrade_nutzer(request, datendict):
+    ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
+    # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
+    if request.user.is_authenticated():
+        nutzer = request.user
+    else:
+        nutzer = Nutzer.objects.get(email=datendict['email'])
+    if nutzer.my_profile.stufe < int(datendict['stufe']):
+        nutzer.my_profile.stufe = int(datendict['stufe'])
+    nutzer.my_profile.guthaben_aufladen(int(datendict['betrag']))
+    today = datetime.now().date()
+    nutzer.my_profile.letzte_zahlung = today
+    nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
+    nutzer.my_profile.save()
+    messages.success(request, 'Unterstützung erfolgreich!')
+    return HttpResponseRedirect(reverse('Grundgeruest:index'))
+
 
 def zahlen(request):
     def formular_init():
@@ -176,6 +197,7 @@ def zahlen(request):
         elif not (Nutzer.objects.filter(email=request.POST['email'])):
             # erstelle neuen nutzer mit eingegebenen daten:
             nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+            request.session['neuer_nutzer_pk'] = nutzer.pk
         else:
             nutzer = Nutzer.objects.get(email=request.POST['email'])
 
@@ -191,21 +213,7 @@ def zahlen(request):
         return nutzer
 
     def nutzer_upgrade():
-        ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
-        # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
-        if request.user.is_authenticated():
-            nutzer = request.user
-        else:
-            nutzer = Nutzer.objects.get(email=request.POST['email'])
-        if nutzer.my_profile.stufe < int(request.POST['stufe']):
-            nutzer.my_profile.stufe = int(request.POST['stufe'])
-        nutzer.my_profile.guthaben_aufladen(int(request.POST['betrag']))
-        today = datetime.now().date()
-        nutzer.my_profile.letzte_zahlung = today
-        nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
-        nutzer.my_profile.save()
-        messages.success(request, 'Unterstützung erfolgreich!')
-        return HttpResponseRedirect(reverse('Grundgeruest:index'))
+        return upgrade_nutzer(request, request.POST)
 
     formular = formular_init()
     context = {}

@@ -1,0 +1,25 @@
+{% load static %}
+
+<script src="{% static 'bootstrap.js' %}"></script>
+
+<!-- PayPal Modal; vermutlich ziemlich viel unnötiger spam übernommen, aber es funktioniert erstmal -->
+<div class="modal" id="paypal_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-login">
+  <div class="modal-content-login">
+              <button type="button" class="close" onclick="modal_sichtbar_umschalten('login')" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div class="modal-header">
+
+      <h2 class="modal-title" id="myModalLabel">PayPal-Zahlung</h2>
+      <p class="tologin">Vielen Dank, dass Sie das <em>scholarium</em> <br>unterstützen möchten!</p>
+    </div>
+    <div class="modal-body">
+      {% if not request.user.is_authenticated %}<p>Es wurde ein Nutzeraccount mit den eingegebenen Daten angelegt, und eine eMail zur Aktivierung wurde an Sie versendet.</p>{% endif %}
+      <p>Bitte klicken Sie auf den PayPal-Button, um die Zahlung über PayPal zu bestätigen:<p>
+      <div class="wrapper">{% include 'Grundgeruest/paypal_button.html' %}</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>$('#paypal_modal').modal('show');</script>
+
