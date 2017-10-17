@@ -1,0 +1,6 @@
+{% load humanize %}
+
+<div>
+  <div class="w3-theme">{{ zeile.autor_ausgeben|safe }}, {{ zeile.zeit_erstellt|naturaltime }}</div>
+  <div class="w3-theme-l3">{{ zeile.text }}</div>
+</div>
