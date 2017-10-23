@@ -45,7 +45,7 @@
       </tr>
       {% for kauf in medien %}
       <tr>
-        <td>{% include "Produkte/warenkorb_buechlein.html" with pk=kauf.produkt_pk obj=kauf.objekt_ausgeben %}</td>
+        <td>{% include "Produkte/bestellungen_item.html" with kauf=kauf %}</td>
         <td>{{ kauf.zeit|naturaltime }}</td>
         <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td>
       </tr>
@@ -71,7 +71,7 @@
       </tr>
       {% for kauf in rest %}
       <tr>
-        <td>{% include "Produkte/warenkorb_buechlein.html" with pk=kauf.produkt_pk obj=kauf.objekt_ausgeben %}</td>
+        <td>{% include "Produkte/bestellungen_item.html" with pk=kauf.produkt_pk obj=kauf.objekt_ausgeben %}</td>
         <td>{{ kauf.zeit|naturaltime }}</td>
         <td>{{ kauf.menge }}</td>
       </tr>

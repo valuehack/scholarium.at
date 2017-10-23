@@ -265,8 +265,8 @@ def bestellungen(request):
             continue
 
         if (kauf.model_ausgeben() == 'veranstaltung' and
-            kauf.art_ausgeben() == 'teilnahme' and
-            kauf.tupel_aus_pk(kauf.pk_ausgeben())[1] in v_pks):
+            kauf.art_ausgeben() in ['teilnahme', 'livestream'] and
+            kauf.objekt_ausgeben().ist_zukunft()):
             kaeufe['teilnahmen'].append(kauf)
         elif kauf.art_ausgeben() in ['pdf', 'epub', 'mobi', 'aufzeichnung']:
             kaeufe['digital'].append(kauf)

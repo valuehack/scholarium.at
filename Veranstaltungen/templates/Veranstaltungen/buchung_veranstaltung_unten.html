@@ -1,9 +1,8 @@
 {% load static produkttags %}
-
   <div style="text-align: center;">
     <div class="salon_reservation">
       {% for kaufart in veranstaltung.arten_aktiv %}
-        {% ob_kaufbutton_zeigen veranstaltung request.user.my_profile kaufart as obzeigen%}
+        {% ob_kaufbutton_zeigen veranstaltung request.user.my_profile kaufart as obzeigen %}
         {% if obzeigen %}
           <div class="sinfo">
             <h2 style="margin: 0 0 10px 0;">
