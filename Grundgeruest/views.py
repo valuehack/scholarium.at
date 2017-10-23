@@ -140,8 +140,12 @@ def paypal_bestaetigung(request):
         
     betrag = int(float(zahlung['transactions'][0]['amount']['total']))
     stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
-    pk=request.session['neuer_nutzer_pk']
-    email = Nutzer.objects.get(pk=pk).email
+    if request.user.is_authenticated:
+        pk=request.user.pk
+        email=request.user.email
+    else:
+        pk=request.session['neuer_nutzer_pk']
+        email = Nutzer.objects.get(pk=pk).email
     datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
     upgrade_nutzer(request, datendict)
     Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
@@ -164,7 +168,7 @@ def upgrade_nutzer(request, datendict):
     nutzer.my_profile.letzte_zahlung = today
     nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
     nutzer.my_profile.save()
-    messages.success(request, 'Unterstützung erfolgreich!')
+    messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
     return HttpResponseRedirect(reverse('Grundgeruest:index'))
 
 def zahlen(request):

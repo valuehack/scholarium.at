@@ -11,6 +11,14 @@
   {% if ob_zeigen %}
     {% include "Veranstaltungen/livestream.html" %}
   {% endif %}
+  {% if veranstaltung.ob_chat_anzeigen and ob_zeigen and not veranstaltung.ist_vergangen %}
+    <div class="separator">
+      <h2> Chat zur Diskussion </h2>
+    </div>
+    <div style="display: flex; display: -webkit-flex; margin: 5em 0 5em 0;">
+      <iframe width="640" height="360" style="flex: 400px;" src="https://tlk.io/salon-{{veranstaltung.slug}}"></iframe>
+    </div> 
+  {% else %}
   <div class="separator">
     <h2>Inhalt und Informationen</h2>
   </div>
@@ -23,5 +31,6 @@
     <a href="{% url 'Veranstaltungen:liste_alle' %}">zurück zu den Veranstaltungen</a>
     </div>
   </div>
+  {% endif %}
 
 {% endblock content %}
