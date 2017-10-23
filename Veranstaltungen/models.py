@@ -22,7 +22,7 @@ class Veranstaltung(KlasseMitProdukten):
     art_veranstaltung = models.ForeignKey('ArtDerVeranstaltung')
     datei = models.FileField(null=True, blank=True) # für Aufzeichnung
     link = models.URLField(null=True, blank=True) # youtube-link
-
+    ob_chat_anzeigen = models.BooleanField(default=False)
     arten_liste = ['teilnahme', 'livestream', 'aufzeichnung']
 
     class Meta:
