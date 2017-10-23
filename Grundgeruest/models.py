@@ -224,6 +224,12 @@ class ScholariumProfile(UserenaBaseProfile):
         """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """        
         self.guthaben += int(betrag)
         self.save()
+    
+    def adresse_ausgeben(self):
+        return """%s
+%s
+%s %s
+%s""" % (self.user.get_full_name(), self.strasse, self.plz, self.ort, self.land.name if self.land else '')
 
     class Meta():
         verbose_name = 'Nutzerprofil'

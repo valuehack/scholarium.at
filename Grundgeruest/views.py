@@ -19,7 +19,7 @@ from django.db import transaction
 import sqlite3 as lite
 import os, pdb, ipdb, json
 from .models import *
-from Produkte.models import Spendenstufe
+from Produkte.models import Spendenstufe, Kauf
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
 from Bibliothek.models import Buch
@@ -52,20 +52,46 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             fail_silently = False,
         )
 
-        text = '''Sehr geehrte(r) %s,
+        text = '''Lieber Unterstützer,
 
 Vielen Dank für Ihre Unterstützung über %s am %s!
 
 Ihr ergebenster Rahim
-''' % (nutzer.email, zahlart, str(datetime.now()).split('.')[0])
+''' % (betrag, str(datetime.now()).split('.')[0])
         send_mail(
             subject='Vielen Dank von scholarium.at', 
             message=text,
             from_email='iljasseite@googlemail.com', 
-            recipient_list=[cls.mailadresse, nutzer.email], 
-            bcc=['ilja1988@gmail.com'],
+            recipient_list=['ilja1988@gmail.com', cls.mailadresse, nutzer.email], 
             fail_silently = False,
         )
+
+
+    @classmethod
+    def bestellung_versenden(cls, request):
+        nutzer = request.user
+        from Produkte.views import Warenkorb
+        text_warenkorb = ''
+        for pk, ware in Warenkorb(request).items.items(): 
+            text_warenkorb += "%s x %s\n" % (ware.quantity, Kauf.obj_aus_pk(pk))
+        text = '''Hallo Georg!
+
+Ein Nutzer hat Waren zum Versand bestellt. 
+
+Adresse:
+%s
+
+Waren:
+%s
+''' % (nutzer.my_profile.adresse_ausgeben(), text_warenkorb)
+        send_mail(
+            subject='[website] Bestellung zum Versand eingegangen', 
+            message=text,
+            from_email='iljasseite@googlemail.com', 
+            recipient_list=['ilja1988@googlemail.com', cls.mailadresse], 
+            fail_silently = False,
+        )
+
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated() or user.my_profile.get_Status()[0] == 0:
@@ -127,8 +153,9 @@ class DetailMitMenue(MenueMixin, DetailView):
 def index(request):
     if request.user.is_authenticated():
         liste_artikel = Artikel.objects.order_by('-datum_publizieren')[:4]
-        veranstaltungen = Veranstaltung.objects.order_by('-datum')[:3]
-        medien = []
+        alle_veranstaltungen = Veranstaltung.objects.order_by('datum')
+        veranstaltungen = [v for v in alle_veranstaltungen if v.ist_zukunft()][-3:]
+        medien = [v for v in alle_veranstaltungen if v.ob_aufzeichnung][-3:]
         mehr_buecher = Buch.objects.order_by('-zeit_erstellt')[:50]
         buecher = random.sample(list(mehr_buecher), 3)
         return TemplateMitMenue.as_view(
@@ -238,6 +265,7 @@ def zahlen(request):
         elif 'state' in request.POST:
             return nutzer_upgrade()
         elif 'bestaetigung' in request.POST:
+            Nachricht.nutzer_gezahlt(Nutzer.objects.get(email=request.POST['email']).pk, request.POST['betrag'], {'b': 'Bar', 'u': 'Überweisung'}[request.POST['zahlungsweise']])
             return nutzer_upgrade()
         else: # dann POST von hier, also Daten verarbeiten:
             formular = ZahlungFormular(request.POST)
