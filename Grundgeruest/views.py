@@ -32,7 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 class Nachricht():
-    mailadresse = 'ilja.goethel@web.de'
+    mailadresse = 'mb@scholarium.at' # die von Georg
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
         nutzer = Nutzer.objects.get(pk=nutzer_pk)
@@ -49,6 +49,21 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             message=text,
             from_email='iljasseite@googlemail.com', 
             recipient_list=['ilja1988@googlemail.com', cls.mailadresse], 
+            fail_silently = False,
+        )
+
+        text = '''Sehr geehrte(r) %s,
+
+Vielen Dank für Ihre Unterstützung über %s am %s!
+
+Ihr ergebenster Rahim
+''' % (nutzer.email, zahlart, str(datetime.now()).split('.')[0])
+        send_mail(
+            subject='Vielen Dank von scholarium.at', 
+            message=text,
+            from_email='iljasseite@googlemail.com', 
+            recipient_list=[cls.mailadresse, nutzer.email], 
+            bcc=['ilja1988@gmail.com'],
             fail_silently = False,
         )
 
