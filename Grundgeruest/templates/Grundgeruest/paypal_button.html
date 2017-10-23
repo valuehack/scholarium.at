@@ -44,7 +44,6 @@
 
             // Make a call to the REST api to execute the payment
             return actions.payment.execute().then(function() {
-                alert(JSON.stringify(data));
                 window.location.replace("/paypal_bestaetigung?paymentID="+data.paymentID);
             });
         }

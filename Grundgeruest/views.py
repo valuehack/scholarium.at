@@ -17,63 +17,40 @@ from django.contrib.sites.models import Site
 
 from django.db import transaction
 import sqlite3 as lite
-import os, pdb, ipdb
+import os, pdb, ipdb, json
 from .models import *
 from Produkte.models import Spendenstufe
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
 from Bibliothek.models import Buch
 from .forms import ZahlungFormular, ProfilEditFormular
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+from django.core.mail import send_mail
 import paypalrestsdk
 import pprint, string
 from django.views.decorators.csrf import csrf_exempt
 
 
+class Nachricht():
+    mailadresse = 'ilja.goethel@web.de'
+    @classmethod
+    def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
+        nutzer = Nutzer.objects.get(pk=nutzer_pk)
+        text = '''Hallo Georg!
 
-
-def paypal_zahlung(request):
-    return TemplateMitMenue.as_view(
-        template_name='Grundgeruest/paypal_test.html',
-        )(request)
-
-@csrf_exempt
-def paypal_create_payment(request):
-    from Grundgeruest.paypal import anfrage_token, erstelle_payment
-    access_token = anfrage_token()
-    zahlung = erstelle_payment(access_token)
-    zahlung_id = zahlung['id']
-    return JsonResponse({'paymentID': zahlung_id})
-
-@csrf_exempt
-def paypal_execute_payment(request):
-    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
-    access_token = anfrage_token()
-    zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
-    antwort = fuehre_payment_aus(
-        request.POST.get('paymentID'),
-        access_token,
-        zahlung['transactions'],
-        request.POST.get('payerID'))
-    zahlung = pruefe_payment(request.POST.get('paymentID'), access_token)
-    print('%s%s%s' % (10*'\n', zahlung, 10*'\n'))
-    return JsonResponse(zahlung)
-
-
-def paypal_bestaetigung(request):
-    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
-    access_token = anfrage_token()
-    zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
-    
-    print(zahlung)
-    
-    if 'completed' in json.dumps(zahlung):
-        HttpResponseRedirect("/spende/zahlung/")
-        
-    messages.error(request, 'Transaktion nicht bestätigt.')
-    return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
-
-
+Ein Nutzer hat eine Unterstützung gezeichnet! Prüf' doch mal bei Gelegenheit, ob das Geld eingegangen ist.
+ * Nutzer: 
+email: %s, id: %s, username: %s 
+ * Zahlung:
+Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
+''' % (nutzer.email, nutzer_pk, nutzer.username, betrag, zahlart, str(datetime.now()).split('.')[0])
+        send_mail(
+            subject='[website] Nutzer hat gezahlt', 
+            message=text,
+            from_email='iljasseite@googlemail.com', 
+            recipient_list=['ilja1988@googlemail.com', cls.mailadresse], 
+            fail_silently = False,
+        )
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated() or user.my_profile.get_Status()[0] == 0:
@@ -153,6 +130,43 @@ def index(request):
             )(request)
 
 
+def paypal_bestaetigung(request):
+    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
+    access_token = anfrage_token()
+    zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
+    # (der 'state' der Antwort wird nicht genutzt, da wir kein reproduzierbares Muster gefunden haben)
+    
+    print(zahlung)
+        
+    betrag = int(float(zahlung['transactions'][0]['amount']['total']))
+    stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
+    pk=request.session['neuer_nutzer_pk']
+    email = Nutzer.objects.get(pk=pk).email
+    datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
+    upgrade_nutzer(request, datendict)
+    Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
+    
+    return HttpResponseRedirect("/spende/zahlung/")
+    #messages.error(request, 'Transaktion nicht bestätigt.')
+    #return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
+
+def upgrade_nutzer(request, datendict):
+    ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
+    # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
+    if request.user.is_authenticated():
+        nutzer = request.user
+    else:
+        nutzer = Nutzer.objects.get(email=datendict['email'])
+    if nutzer.my_profile.stufe < int(datendict['stufe']):
+        nutzer.my_profile.stufe = int(datendict['stufe'])
+    nutzer.my_profile.guthaben_aufladen(int(datendict['betrag']))
+    today = datetime.now().date()
+    nutzer.my_profile.letzte_zahlung = today
+    nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
+    nutzer.my_profile.save()
+    messages.success(request, 'Unterstützung erfolgreich!')
+    return HttpResponseRedirect(reverse('Grundgeruest:index'))
+
 def zahlen(request):
     def formular_init():
         if request.user.is_authenticated():
@@ -176,6 +190,7 @@ def zahlen(request):
         elif not (Nutzer.objects.filter(email=request.POST['email'])):
             # erstelle neuen nutzer mit eingegebenen daten:
             nutzer = Nutzer.neuen_erstellen(request.POST['email'])
+            request.session['neuer_nutzer_pk'] = nutzer.pk
         else:
             nutzer = Nutzer.objects.get(email=request.POST['email'])
 
@@ -191,21 +206,7 @@ def zahlen(request):
         return nutzer
 
     def nutzer_upgrade():
-        ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
-        # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
-        if request.user.is_authenticated():
-            nutzer = request.user
-        else:
-            nutzer = Nutzer.objects.get(email=request.POST['email'])
-        if nutzer.my_profile.stufe < int(request.POST['stufe']):
-            nutzer.my_profile.stufe = int(request.POST['stufe'])
-        nutzer.my_profile.guthaben_aufladen(int(request.POST['betrag']))
-        today = datetime.now().date()
-        nutzer.my_profile.letzte_zahlung = today
-        nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
-        nutzer.my_profile.save()
-        messages.success(request, 'Unterstützung erfolgreich!')
-        return HttpResponseRedirect(reverse('Grundgeruest:index'))
+        return upgrade_nutzer(request, request.POST)
 
     formular = formular_init()
     context = {}
