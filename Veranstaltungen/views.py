@@ -120,7 +120,7 @@ class ListeVortrag(ListeMitMenue):
             return []
 
 def vortrag(request):
-    return ListeVortrag.as_view(request, page=request.GET.get('seite'))
+    return ListeVortrag.as_view()(request, page=request.GET.get('seite'))
     
 
 def livestream(request):
