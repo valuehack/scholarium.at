@@ -1,5 +1,5 @@
 <form action="{% url 'Produkte:runterladen' %}" method="post">
   {% csrf_token %}
   <input type="hidden" name="kauf_id" value="{{ kauf.id }}">
-  <input class="inputbutton" type="submit" value="Herunterladen!"><br>
+  <input class="media_button" type="submit" value="Herunterladen"><br>
 </form>

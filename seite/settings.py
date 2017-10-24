@@ -37,7 +37,7 @@ SECRET_KEY = '_h!7u1tm_6)ncy=8mv24yocp_@b^)l!l_yvo=9*v=afg_l9vr#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'Bibliothek',
     'Scholien',
     'Workflow',
-    'Notizen', 
+    'Notizen',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -204,6 +204,7 @@ STATICFILES_DIRS = [
 
 try:
     MEDIA_ROOT = '/home/scholarium/scholarium_daten/'
+    os.chdir(MEDIA_ROOT)
 except FileNotFoundError:
     MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 
