@@ -4,6 +4,7 @@
 
 from django.db import models
 from Produkte.models import KlasseMitProdukten
+from django.urls import reverse
 
 class Altes_Buch(KlasseMitProdukten):
     arten_liste = ['kaufen']
@@ -61,6 +62,9 @@ class Buch(KlasseMitProdukten):
     bild = models.ImageField(upload_to='buecher', null=True, blank=True)
     alte_nr = models.SmallIntegerField(null=True, editable=False)
 
+    def get_absolute_url(self):
+        return reverse('Bibliothek:detail_buch', kwargs={'slug': self.slug})
+
     def preis_ausgeben(self, art):
         if art=='leihen':
             return self.finde_preis(art) or 13
@@ -90,3 +94,4 @@ class Buch(KlasseMitProdukten):
 
     class Meta:
         verbose_name_plural = 'Bücher'
+        verbose_name = 'Buch'
