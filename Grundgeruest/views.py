@@ -80,10 +80,12 @@ Ein Nutzer hat Waren zum Versand bestellt.
 
 Adresse:
 %s
+eMail für Rückfragen:
+%s
 
 Waren:
 %s
-''' % (nutzer.my_profile.adresse_ausgeben(), text_warenkorb)
+''' % (nutzer.my_profile.adresse_ausgeben(), request.user.email, text_warenkorb)
         send_mail(
             subject='[website] Bestellung zum Versand eingegangen', 
             message=text,
@@ -106,9 +108,10 @@ Ein Nutzer hat Studiendinger gebucht.
 Waren:
 %s
 
-Vermutlich muss er eine händische Mail zur weiteren Vorgehensweise bekommen.
+Vermutlich muss er eine händische Mail zur weiteren Vorgehensweise bekommen:
+%s
 
-''' % (text_warenkorb, )
+''' % (text_warenkorb, request.user.email)
         send_mail(
             subject='[website] Bestellung Studiendinger eingegangen', 
             message=text,
