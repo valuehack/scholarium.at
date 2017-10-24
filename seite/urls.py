@@ -22,7 +22,7 @@ from Grundgeruest.models import Mitwirkende
 import Grundgeruest.userena_urls as userena_urls
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
-from Veranstaltungen.views import studiumdings_detail, ListeVortrag
+from Veranstaltungen.views import studiumdings_detail, vortrag
 from Notizen.views import ZeigenUndEintragen
 from Produkte.models import Spendenstufe
 
@@ -47,7 +47,7 @@ urlpatterns = [
     url(r'^studium/(?P<slug>[-\w]+)/$',
         studiumdings_detail,
         name='studium_detail'),
-    url(r'^vortrag/', ListeVortrag.as_view(), name='vortrag'),
+    url(r'^vortrag/', vortrag, name='vortrag'),
     url(r'^nutzer/', include(userena_urls)),
     url(r'^warenkorb/', include('Produkte.urls')),
     url(r'^veranstaltungen/', include(
