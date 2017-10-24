@@ -119,6 +119,10 @@ class ListeVortrag(ListeMitMenue):
         else:
             return []
 
+def vortrag(request):
+    return ListeVortrag.as_view(request, page=request.GET.get('seite'))
+    
+
 def livestream(request):
     """ soll das nächste salon-Objekt ans livestream-Template geben, falls 
     Termin nah genug und link aktiviert. Sonst später Extraseite, erstmal 
