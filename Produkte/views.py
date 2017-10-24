@@ -12,7 +12,7 @@ from django.contrib import messages
 from easycart import BaseCart, BaseItem
 from Grundgeruest.views import erstelle_liste_menue, Nachricht
 from .models import Kauf, arten_attribute
-from Veranstaltungen.models import Veranstaltung
+from Veranstaltungen.models import Veranstaltung, Studiumdings
 
 """
 Integration des Pakets easycart - keine Modelle, über session Variablen
@@ -292,8 +292,14 @@ def kaufen(request):
     if warenkorb.ob_versand:
         request.user.my_profile.guthaben += -5
         Nachricht.bestellung_versenden(request)
+    ob_studien = False
     for pk, ware in list(warenkorb.items.items()):
         Kauf.kauf_ausfuehren(nutzer, pk, ware)
+        if isinstance(Kauf.obj_aus_pk(pk), Studiumdings):
+            ob_studien = True
+    
+    if ob_studien:
+        Nachricht.studiumdings_gebucht(request)
 
     warenkorb.empty()
 
