@@ -93,23 +93,31 @@ def studiumdings_detail(request, slug):
             url_hier='/studium/%s/' % slug,
             context_object_name = 'studiumdings')(request, slug=slug)
 
-def vortrag(request):
-    vortrag = get_object_or_404(Studiumdings, bezeichnung='Vortrag')
-    if request.user.is_authenticated():
-        arten_wahl = [
-            get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vortrag'),
-            get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vorlesung')
-        ]
-        medien = [v for v in Veranstaltung.objects.all() if
-            v.art_veranstaltung in arten_wahl
-            and v.hat_medien()]
-        extra_context = {'vortrag': vortrag, 'medien': medien}
-    else:
-        extra_context = { 'vortrag': vortrag, 'url_hier': '/vortrag/'}
-    return TemplateMitMenue.as_view(
-        template_name='Veranstaltungen/vortrag.html', 
-        extra_context=extra_context)(request)
 
+class ListeVortrag(ListeMitMenue):
+    """ Klasse zur Darstellung des Vortrag-Objektes und der Liste der 
+    Aufzeichnungen von Vorträgen und Vorlesungen. """
+    def __init__(self, *args, **kwargs):
+        vortrag = get_object_or_404(Studiumdings, bezeichnung='Vortrag')
+        self.extra_context = {'vortrag': vortrag, 'url_hier': '/vortrag/'}
+    
+    context_object_name = 'medien'
+    paginate_by = 5
+    template_name = 'Veranstaltungen/vortrag.html' 
+    def get_queryset(self, **kwargs):
+        if self.request.user.is_authenticated():
+            arten_wahl = [
+                get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vortrag'),
+                get_object_or_404(ArtDerVeranstaltung, bezeichnung='Vorlesung')
+            ]
+            mit_medien = [v for v in Veranstaltung.objects.all()
+                if v.art_veranstaltung in arten_wahl
+                and v.ist_vergangen()
+                and v.hat_medien()]
+            mit_medien.sort(key = lambda m: m.datum, reverse=True)
+            return mit_medien
+        else:
+            return []
 
 def livestream(request):
     """ soll das nächste salon-Objekt ans livestream-Template geben, falls 
