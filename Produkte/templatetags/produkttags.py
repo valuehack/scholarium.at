@@ -5,6 +5,10 @@ from Grundgeruest.models import ScholariumProfile
 register = template.Library()
 
 @register.simple_tag
+def verbose(obj):
+    return obj.__class__._meta.verbose_name
+
+@register.simple_tag
 def choice_value(key, field, formular):
     return dict(formular.fields[field].choices)[key]
 
@@ -51,6 +55,8 @@ def ob_kaufbutton_zeigen(objekt, kunde, art):
     """ ob überhaupt ein Button zum Kaufen gezeigt wird; ob's ausgegraut
     ist, ist einne andere Frage. Momentan bei Veranstaltung angewendet. """
     from Produkte.models import arten_attribute
+    if not kunde:
+        return False
     if objekt.__class__.__name__ == "Veranstaltung" and art=='teilnahme':
         return not objekt.ist_vergangen()
     if arten_attribute[art][0]:
@@ -64,6 +70,8 @@ from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung
 def ob_livestream_zeigen(veranstaltung, kunde):
     """ ob der livestream-Block im Detail-view zu sehen ist """
     salonart = ArtDerVeranstaltung.objects.get(bezeichnung="Salon")
+    if not kunde:
+        return False
     if not veranstaltung.art_veranstaltung == salonart:
         return False
 

@@ -1,0 +1,18 @@
+{% load static produkttags %}
+
+{% with obj=kauf.objekt_ausgeben pk=kauf.pk_ausgeben %}
+
+  <div class="warenkorb_veranstaltung" style="display: inline;">
+    {% if obj.bild %}
+    <div class="buecher_img">
+      <img style="height: 200px;" src="{{ obj.bild.url }}" alt="{{ obj.bezeichnung|safe }}">
+    </div>
+    {% endif %}
+    <div>
+      <span>{% verbose obj %}</span>
+      <span>
+        <a href="{{ obj.get_absolute_url }}">{{ obj.bezeichnung|safe }}</a>
+      </span>
+      <span>Format: {% art_aus_pk pk|title %}</span>
+  </div>
+{% endwith %}

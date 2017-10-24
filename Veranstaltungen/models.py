@@ -27,6 +27,10 @@ class Veranstaltung(KlasseMitProdukten):
 
     class Meta:
         verbose_name_plural = "Veranstaltungen"
+        verbose_name = "Veranstaltung"
+
+    def get_absolute_url(self):
+        return reverse('Veranstaltungen:veranstaltung_detail', kwargs={'slug': self.slug})
 
     def preis_ausgeben(self, art='teilnahme'):
         """ Preis ausgeben, es gibt nur eine art für Präsenz? oder Medium-model hier einfügen, dann mehr? """
@@ -88,6 +92,8 @@ class Studiumdings(KlasseMitProdukten):
         verbose_name_plural = "Studiendinger"
         ordering = ['reihenfolge']
 
+    def get_absolute_url(self):
+        return reverse('studium_detail', kwargs={'slug': self.slug})
 
 class ArtDerVeranstaltung(Grundklasse):
     beschreibung = models.TextField(
