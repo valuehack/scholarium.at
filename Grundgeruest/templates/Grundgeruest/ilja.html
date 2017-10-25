@@ -29,7 +29,7 @@
       {% if messages %}
         <div class="basket_message">
         {% for message in messages %}
-          <i>{{ message }}</i><br>
+          <i>{% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}</i><br>
         {% endfor %}
         </div>
       {% endif %}

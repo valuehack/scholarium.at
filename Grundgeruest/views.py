@@ -15,6 +15,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.contrib.sites.models import Site
 
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from userena.mail import send_mail as sendmail_von_userena
+
 from django.db import transaction
 import sqlite3 as lite
 import os, pdb, ipdb, json
@@ -51,33 +55,23 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
             fail_silently = False,
         )
-        ueberweisungstext = '''
-Bitte überweisen Sie %s Euro an folgendes Konto:
 
-    scholarium
-    Erste Bank, Wien/Österreich
-    IBAN: AT27 2011 1827 1589 8503
-    BIC: GIBAATWWXXX
-
-Bitte verwenden Sie als Zahlungsreferenz/Betreff die Nummer %s ein.
-''' % (betrag, nutzer_pk)
-        dank = '''Lieber Unterstützer,
-
-Vielen Dank für Ihre Unterstützung über %s Euro am %s!
-''' % (betrag, str(datetime.now()).split('.')[0])
-        gruesse = '''
-Mit freundlichen Grüßen,
-
-Rahim Taghizadegan
-'''
-        text = ''.join([dank, ueberweisungstext, gruesse]) if zahlart == 'Überweisung' else ''.join([dank, gruesse])
-        send_mail(
-            subject='Vielen Dank von scholarium.at',
-            message=text,
-            from_email='iljasseite@googlemail.com',
-            recipient_list=['ilja1988@gmail.com', cls.mailadresse, nutzer.email],
-            fail_silently = False,
-        )
+        rHerr = 'r Herr' if nutzer.my_profile.anrede=='Herr' else ' Frau'
+        subject = 'Herzlich willkommen'
+        message_plain = None
+        message_html = render_to_string(
+            'Grundgeruest/email/dank_unterstuetzung.html', {
+            'betrag': betrag, 
+            'datum': str(datetime.now()).split('.')[0],
+            'nachname': nutzer.last_name,
+            'rHerr': rHerr,
+            'pk': nutzer.pk, 
+            
+        })
+        email_from = settings.DEFAULT_FROM_EMAIL
+        email_to = ['ilja1988@gmail.com', cls.mailadresse, nutzer.email]
+        sendmail_von_userena(subject, message_plain, message_html, email_from, email_to,
+              custom_headers={}, attachments=())
 
 
     @classmethod
@@ -474,9 +468,9 @@ def anmelden(request, *args, **kwargs):
     s = signin(request, *args, **kwargs)
     if request.user.is_authenticated():
         if request.user.my_profile.get_Status()[0] == 1:
-            messages.error(request, 'Ihre Unterstützung ist abgelaufen. Um wieder Zugang zu den Inhalten zu erhalten, erneuern Sie diese bitte.')
+            messages.error(request, 'Ihre Unterstützung ist abgelaufen. Um wieder Zugang zu den Inhalten zu erhalten, erneuern Sie diese bitte - <a href="/spende/zahlung">Unterstützung erneuern!</a>', extra_tags="safe")
         if request.user.my_profile.get_Status()[0] == 2:
-            messages.error(request, 'Ihre Unterstützung läuft in weniger als 30 Tagen ab.')
+            messages.error(request, 'Ihre Unterstützung läuft in weniger als 30 Tagen ab - <a href="/spende/zahlung">Unterstützung erneuern!</a>', extra_tags="safe")
     return s
 
 

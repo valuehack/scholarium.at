@@ -8,6 +8,7 @@ from userena import settings as userena_settings
 from django.contrib.auth.models import Group
 
 from .models import *
+from Produkte.models import Kauf
 
 # Register your models here.
 
@@ -44,3 +45,16 @@ class UserenaAdmin(UserAdmin, GuardedModelAdmin):
 #admin.site.unregister(get_user_model())
 #admin.site.unregister(Group)
 admin.site.register(get_user_model(), UserenaAdmin)
+
+
+# geht nicht:
+#class KaufInline(admin.TabularInline):
+#    model = Kauf
+#    fields = ('datum', 'produkt_pk')
+#    extra = 1
+#
+#class ProfileAdmin(admin.ModelAdmin):
+#    inlines = [KaufInline]
+#
+#admin.site.unregister(ScholariumProfile)
+#admin.site.register(ScholariumProfile, ProfileAdmin)
