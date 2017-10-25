@@ -32,37 +32,50 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 class Nachricht():
-    mailadresse = 'mb@scholarium.at' # die von Georg
+    mailadresse = 'rt@scholarium.at' # die von Georg
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
         nutzer = Nutzer.objects.get(pk=nutzer_pk)
         text = '''Hallo Georg!
 
 Ein Nutzer hat eine Unterstützung gezeichnet! Prüf' doch mal bei Gelegenheit, ob das Geld eingegangen ist.
- * Nutzer: 
-email: %s, id: %s, username: %s 
+ * Nutzer:
+email: %s, id: %s, username: %s
  * Zahlung:
 Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
 ''' % (nutzer.email, nutzer_pk, nutzer.username, betrag, zahlart, str(datetime.now()).split('.')[0])
         send_mail(
-            subject='[website] Nutzer hat gezahlt', 
+            subject='[website] Nutzer hat gezahlt',
             message=text,
-            from_email='iljasseite@googlemail.com', 
-            recipient_list=['ilja1988@googlemail.com', cls.mailadresse], 
+            from_email='iljasseite@googlemail.com',
+            recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
             fail_silently = False,
         )
+        ueberweisungstext = '''
+Bitte überweisen Sie %s Euro an folgendes Konto:
 
-        text = '''Lieber Unterstützer,
+    scholarium
+    Erste Bank, Wien/Österreich
+    IBAN: AT27 2011 1827 1589 8503
+    BIC: GIBAATWWXXX
+
+Bitte verwenden Sie als Zahlungsreferenz/Betreff die Nummer %s ein.
+''' % (betrag, nutzer_pk)
+        dank = '''Lieber Unterstützer,
 
 Vielen Dank für Ihre Unterstützung über %s Euro am %s!
-
-Ihr ergebenster Rahim
 ''' % (betrag, str(datetime.now()).split('.')[0])
+        gruesse = '''
+Mit freundlichen Grüßen,
+
+Rahim Taghizadegan
+'''
+        text = ''.join([dank, ueberweisungstext, gruesse]) if zahlart == 'Überweisung' else ''.join([dank, gruesse])
         send_mail(
-            subject='Vielen Dank von scholarium.at', 
+            subject='Vielen Dank von scholarium.at',
             message=text,
-            from_email='iljasseite@googlemail.com', 
-            recipient_list=['ilja1988@gmail.com', cls.mailadresse, nutzer.email], 
+            from_email='iljasseite@googlemail.com',
+            recipient_list=['ilja1988@gmail.com', cls.mailadresse, nutzer.email],
             fail_silently = False,
         )
 
@@ -72,11 +85,11 @@ Ihr ergebenster Rahim
         nutzer = request.user
         from Produkte.views import Warenkorb
         text_warenkorb = ''
-        for pk, ware in Warenkorb(request).items.items(): 
+        for pk, ware in Warenkorb(request).items.items():
             text_warenkorb += "%s x %s\n" % (ware.quantity, Kauf.obj_aus_pk(pk))
         text = '''Hallo Georg!
 
-Ein Nutzer hat Waren zum Versand bestellt. 
+Ein Nutzer hat Waren zum Versand bestellt.
 
 Adresse:
 %s
@@ -87,10 +100,10 @@ Waren:
 %s
 ''' % (nutzer.my_profile.adresse_ausgeben(), request.user.email, text_warenkorb)
         send_mail(
-            subject='[website] Bestellung zum Versand eingegangen', 
+            subject='[website] Bestellung zum Versand eingegangen',
             message=text,
-            from_email='iljasseite@googlemail.com', 
-            recipient_list=['ilja1988@googlemail.com', cls.mailadresse], 
+            from_email='iljasseite@googlemail.com',
+            recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
             fail_silently = False,
         )
 
@@ -99,11 +112,11 @@ Waren:
         nutzer = request.user
         from Produkte.views import Warenkorb
         text_warenkorb = ''
-        for pk, ware in Warenkorb(request).items.items(): 
+        for pk, ware in Warenkorb(request).items.items():
             text_warenkorb += "%s x %s\n" % (ware.quantity, Kauf.obj_aus_pk(pk))
         text = '''Hallo Georg!
 
-Ein Nutzer hat Studiendinger gebucht. 
+Ein Nutzer hat Studiendinger gebucht.
 
 Waren:
 %s
@@ -113,10 +126,10 @@ Vermutlich muss er eine händische Mail zur weiteren Vorgehensweise bekommen:
 
 ''' % (text_warenkorb, request.user.email)
         send_mail(
-            subject='[website] Bestellung Studiendinger eingegangen', 
+            subject='[website] Bestellung Studiendinger eingegangen',
             message=text,
-            from_email='iljasseite@googlemail.com', 
-            recipient_list=['ilja1988@googlemail.com', cls.mailadresse], 
+            from_email='iljasseite@googlemail.com',
+            recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
             fail_silently = False,
         )
 
@@ -227,7 +240,7 @@ def paypal_bestaetigung(request):
             datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
             upgrade_nutzer(request, datendict)
             Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
-            
+
             return HttpResponseRedirect("/spende/zahlung/")
             #messages.error(request, 'Transaktion nicht bestätigt.')
             #return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
@@ -311,7 +324,7 @@ def zahlen(request):
                     return HttpResponseRedirect('/nutzer/anmelden/?next=/spende/zahlung/')
                 if request.POST['zahlungsweise']=='p':
                     context.update({'sichtbar': True})
-                else: 
+                else:
                     return zahlungsabwicklung_rest(request, formular)
             else:
                 print('Bitte korrigieren Sie die Fehler im Formular')
