@@ -32,7 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 class Nachricht():
-    mailadresse = 'rt@scholarium.at' # die von Georg
+    mailadresse = 'mb@scholarium.at' # die von Georg
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
         nutzer = Nutzer.objects.get(pk=nutzer_pk)

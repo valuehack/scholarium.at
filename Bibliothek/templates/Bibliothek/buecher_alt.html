@@ -5,21 +5,20 @@
 
 {% block head %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static 'style_buecher_alt.css' %}">
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'style_buecher_alt.css' %}"> -->
 {% endblock head %}
 
 {% block content %}
-<div class="buecher_content">
 <h1>Bücher</h1>
-<table class='buecher_table'>
+<div class="container_breit">
+<table class='buecher_tabelle'>
 
 {% for buch in buecher %}
 <tr>
-  <td class="buecher_table_b" style="width: 60%">
-    <a href={{ buch.slug }}>{{ buch.bezeichnung }}</a>			</td>
-  <td class="buecher_table_d">
-    {% if buch.arten_aktiv %}{% include "Produkte/in_den_warenkorb_inline.html" with produkt=buch art=buch.arten_aktiv.0 %}{% endif %}
+  <td class="bestellung_titel">
+    <a href={{ buch.slug }}>{{ buch.bezeichnung }}</a>			
   </td>
+  {% if buch.arten_aktiv %}{% include "Produkte/in_den_warenkorb_inline.html" with produkt=buch art=buch.arten_aktiv.0 %}{% else %}<td class="buecher_table_d"/>{% endif %}
 </tr>
 {% endfor %}
 </table>

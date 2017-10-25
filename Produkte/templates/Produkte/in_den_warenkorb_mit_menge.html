@@ -19,5 +19,7 @@
     </select>
     <input class="inputbutton" type="submit" value="{{ button_text }}">
         <br />
-        <span id="gesamtpreis_{{ art }}" class="coin-span"><script>preis_berechnen_{{ art }}()</script></span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
+        <div  style="padding: 1em;">
+          <span id="gesamtpreis_{{ art }}" class="coin-span"><script>preis_berechnen_{{ art }}()</script></span><img class="coin-span__img" style="padding-left: 0.5em; padding-bottom: 0.5em;" src="{% static 'img/coin.png' %}">
+        </div>
 </form>

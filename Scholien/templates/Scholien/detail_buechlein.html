@@ -18,7 +18,9 @@
         {% for buechleinformat in scholienbuechlein.arten_aktiv %}
         
         {% anzeigemodus scholienbuechlein buechleinformat as modus %}
-        {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=scholienbuechlein art=buechleinformat %}
+        <table class="buecher_tabelle buecher_korb" style="width: 30%; margin-left: auto; border: 0;">
+          {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=scholienbuechlein art=buechleinformat %}
+        </table>
 
         {% endfor %}
     </div>

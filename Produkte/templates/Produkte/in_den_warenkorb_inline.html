@@ -13,19 +13,29 @@
       p.innerHTML = m.value*{{ preis }}
     }
     </script>
+  <td>
     <select class="input-select" name="quantity" id="menge_{{ art }}" onchange="preis_berechnen_{{ art }}()">
       {% for i in anzahlen %}
         <option value="{{ i }}" {% if forloop.first %}selected{% endif %}>{{ i }}</option>
       {% endfor %}
     </select>
+  </td>
+  <td>
     <input class="inputbutton" type="submit" value="{{ button_text }}">
-    <div class="buecher-coin">
-        <span id="gesamtpreis_{{ art }}" class="buecher-coin-span"><script>preis_berechnen_{{ art }}()</script></span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
-    </div>
+  </td>
+  <td>
+    <div id="gesamtpreis_{{ art }}" class="buecher-coin-span"><script>preis_berechnen_{{ art }}()</script></div>
+  </td>
   {% else %}
-  <input class="inputbutton" type="submit" value="{{ button_text }}">
-  <div class="buecher-coin">
-    <span id="gesamtpreis_{{ art }}" class="buecher-coin-span1">{{ preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
-  </div>
+  <td/>
+  <td>
+    <input class="inputbutton" type="submit" value="{{ button_text }}">
+  </td>
+  <td>
+    <div id="gesamtpreis_{{ art }}" class="buecher-coin-span1">{{ preis }}</div>
+  </td>
   {% endif %}
+  <td>
+    <img class="coin-span__img" src="{% static 'img/coin.png' %}">
+  </td>
 </form>

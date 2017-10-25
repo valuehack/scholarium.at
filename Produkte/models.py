@@ -109,6 +109,8 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             # sonst nicht teilnahme, also nur beschränktes Buch (?)
             #elif self.finde_anzahl(art) == 0:
             #    modus = 'verbergen'
+            elif art=='buchung':
+                modus = 'ohne_menge'
             else:
                 modus = 'inline'
         else:

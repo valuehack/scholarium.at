@@ -16,15 +16,13 @@
       {% if buch.sprache %}<li> Sprache: {{ buch.sprache }} </li>{% endif %}
       {% if buch.zusammenfassung %}<li> Zusammenfassung: {{ buch.zusammenfassung }} </li>{% endif %}
     </ul>
+    <table class="buecher_tabelle buecher_korb sinfo" style="width: 30%; margin: auto; border: 0;">
     {% for kaufart in buch.arten_aktiv %}
-    <div style="text-align: center;">
-      <div class="salon_reservation">
-        <div class="sinfo">
-          {% anzeigemodus buch kaufart as modus %}
-          {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=buch art=kaufart %}
-        </div>
-      </div>
-    </div>
+      <tr>
+        {% anzeigemodus buch kaufart as modus %}
+        {% include "Produkte/in_den_warenkorb_"|add:modus|add:".html" with produkt=buch art=kaufart %}
+      </tr>
     {% endfor %}
+  </table>
   </div>
 {% endblock content %}

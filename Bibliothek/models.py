@@ -12,7 +12,7 @@ class Altes_Buch(KlasseMitProdukten):
         max_length=255,
         null=True, blank=True)
     def button_text(self, _):
-        return 'Auswählen!'
+        return 'Auswählen'
 
 
 class Buch(KlasseMitProdukten):
@@ -76,7 +76,7 @@ class Buch(KlasseMitProdukten):
             return self.finde_preis(art) or 20
 
     def button_text(self, art):
-        return '%s!' % art.capitalize()
+        return art.capitalize()
 
     def save(self, *args, **kwargs):
         if not self.bezeichnung:

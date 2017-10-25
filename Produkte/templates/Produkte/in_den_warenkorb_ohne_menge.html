@@ -6,5 +6,7 @@
   <input type="hidden" name="pk" value="{% produkt_pk produkt art %}">
   <input class="inputbutton" type="submit" value="{{ button_text }}">
     <br />
-    <span id="gesamtpreis_{{ art }}" class="coin-span">{{ preis }}</span><img class="coin-span__img" src="{% static 'img/coin.png' %}">
+    <div style="padding: 1em;">
+      <span id="gesamtpreis_{{ art }}" class="coin-span">{{ preis }}</span><img class="coin-span__img" style="padding-left: 0.5em; padding-bottom: 0.5em;" src="{% static 'img/coin.png' %}">
+  </div>
 </form>
