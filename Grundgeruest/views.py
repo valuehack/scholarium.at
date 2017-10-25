@@ -274,12 +274,12 @@ def zahlen(request):
             nutzer = Nutzer.neuen_erstellen(request.POST['email'])
             request.session['neuer_nutzer_pk'] = nutzer.pk
         else:
-            nutzer = Nutzer.objects.get(email=request.POST['email'])
+            messages.warning(request, 'Wir kennen Sie schon. Bitte loggen Sie sich zur Sicherheit ein, um Ihre Daten bearbeiten und Unerstützungen eintragen.')
+            return 'zu_login'
 
         profil = nutzer.my_profile
         nutzer.first_name = request.POST['vorname']
         nutzer.last_name = request.POST['nachname']
-        # ? hier noch Zahlungsdatum eintragen, oden bei Eingang ?
         for attr in ['anrede', 'tel', 'firma', 'strasse', 'plz', 'ort', 'land']:
             setattr(profil, attr, request.POST[attr])
 
@@ -307,7 +307,8 @@ def zahlen(request):
             formular = ZahlungFormular(request.POST)
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
             if formular.is_valid():
-                nutzerdaten_speichern()
+                if nutzerdaten_speichern() == 'zu_login': # dann gibt's redirect, sonst wird schlicht gespeichert
+                    return HttpResponseRedirect('/nutzer/anmelden/?next=/spende/zahlung/')
                 if request.POST['zahlungsweise']=='p':
                     context.update({'sichtbar': True})
                 else: 
@@ -317,8 +318,13 @@ def zahlen(request):
                 messages.error(request, 'Formular ungültig.')
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
-    stufe = request.POST.get('stufe', '1')
-    betrag = request.POST.get('betrag', '75')
+    if request.user.is_authenticated:
+        default_stufe = request.user.my_profile.stufe or 1 # also 1 falls sie 0 war
+    else:
+        default_stufe = 1
+    default_betrag = Spendenstufe.objects.get(pk=default_stufe).spendenbeitrag
+    stufe = request.POST.get('stufe', default_stufe)
+    betrag = request.POST.get('betrag', default_betrag)
 
     context.update({
         'formular': formular,
