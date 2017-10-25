@@ -4,7 +4,6 @@
       {% for kaufart in veranstaltung.arten_aktiv %}
         {% ob_kaufbutton_zeigen veranstaltung request.user.my_profile kaufart as obzeigen %}
         {% if obzeigen %}
-        <h1>{{ kaufart }}</h1>
           <div class="sinfo">
             <h2 style="margin: 0 0 10px 0;">
               {% format_text veranstaltung kaufart as format_text %}

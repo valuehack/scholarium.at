@@ -78,7 +78,7 @@ arten_attribute = {
     'druck': (10, 'Druck'),
     'kaufen': (1, 'Zum Kauf auswählen'),
     'leihen': (1, 'Zum Verleih auswählen'),
-    'buchung': (1, 'Buchen', 'IrgendnenSpam'),
+    'buchung': (1, 'Buchen', ''),
 }
 
 class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):

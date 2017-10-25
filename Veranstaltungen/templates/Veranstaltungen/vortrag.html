@@ -9,7 +9,7 @@
 	  <div class="blog_text_fragen">
       {{ vortrag.beschreibung1|safe }}
       {% if request.user.is_authenticated %}
-      {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' with veranstaltung=studiumdings %}
+      {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' with veranstaltung=vortrag %}
       {% else %}
         <div style="text-align: center;">
           <a class="blog_linkbutton" href="mailto:&#105;&#110;&#102;&#111;&#064;&#115;&#099;&#104;&#111;&#108;&#097;&#114;&#105;&#117;&#109;&#046;&#097;&#116;">Anfrage schicken
