@@ -14,5 +14,8 @@
           </div>
         {% endif %}
       {% endfor %}
+      {% if not request.user.is_authenticated %}
+        <a class="blog_linkbutton" style="padding: 2ex 2ex 0 2ex" href="/nutzer/anmelden/?next={{ veranstaltung.get_absolute_url }}">  Zur Buchung bitte hier anmelden  </a>
+      {% endif %}
     </div>
   </div>
