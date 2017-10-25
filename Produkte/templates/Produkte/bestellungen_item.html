@@ -1,26 +1,26 @@
 {% load static produkttags %}
 {% load humanize %}
 
-<div class="container">
+<div class="container" style="width: 70%; padding: 50px 15%;">
   <table class="bestellung_item">
     <tr>
-      {% if bild %}<th/>{% endif %}
-      <th/>
+      {% if bild %}<th class="noborder"/>{% endif %}
+      <th style="text-align: left;">Beschreibung</th>
       <th>Format</th>
+      {% if datum %}
+      <th>Datum</th>
+      {% endif %}
       <th>Gebucht</th>
       {% if menge %}
         <th>Anzahl</th>
       {% endif %}
-      {% if datum %}
-        <th>Datum</th>
-      {% endif %}
-      {% if dl %}<th/>{% endif %}
+      {% if dl or stream %}<th class="noborder"/>{% endif %}
     </tr>
     {% for kauf in items %}
     {% with obj=kauf.objekt_ausgeben pk=kauf.pk_ausgeben %}
       <tr>
         {% if bild %}
-          <td>
+          <td class="noborder">
           {% if obj.bild %}
           <div class="buecher_img">
             <img src="{{ obj.bild.url }}" alt="{{ obj.bezeichnung|safe }}">
@@ -35,17 +35,21 @@
           <span>{% verbose obj %}</span>
           <span>{% art_aus_pk pk|title %}</span>
         </td>
-        <td>{{ kauf.zeit|naturaltime }}</td>
+        {% if datum %}
+        <!-- <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td> -->
+        <td>{{ obj.datum|naturalday|capfirst }}</td>
+        {% endif %}
+        <td>{{ kauf.zeit|naturalday }}</td>
         {% if menge %}
           <td>{{ kauf.menge }}</td>
         {% endif %}
-        {% if datum %}
-          <!-- <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td> -->
-          <td>{{ obj.datum }}</td>
-        {% endif %}
         {% if dl %}
-          <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td>
+          <td class="noborder">{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td>
         {% endif %}
+        {% if kauf.art_ausgeben == 'livestream' %}
+        <td class="noborder"><a class="media_button" href="{{ obj.get_absolute_url }}">Zum Stream</a></td>
+        {% endif %}
+
       </tr>
     {% endwith %}
     {% endfor %}
