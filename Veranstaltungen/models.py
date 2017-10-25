@@ -25,6 +25,13 @@ class Veranstaltung(KlasseMitProdukten):
     ob_chat_anzeigen = models.BooleanField(default=False)
     arten_liste = ['teilnahme', 'livestream', 'aufzeichnung']
 
+    @property
+    def livestream(self):
+        return self.link
+    @property
+    def aufzeichnung(self):
+        return self.datei
+
     class Meta:
         verbose_name_plural = "Veranstaltungen"
         verbose_name = "Veranstaltung"

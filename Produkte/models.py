@@ -111,7 +111,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             else:
                 modus = 'inline'
         else:
-            if getattr(self, 'ob_'+art):
+            if getattr(self, 'ob_'+art) and bool(getattr(self, art)):
                 modus = 'ohne_menge'
             else:
                 modus = 'verbergen'
