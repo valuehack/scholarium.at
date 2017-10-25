@@ -16,9 +16,11 @@
 {% for buch in buecher %}
 <tr>
   <td class="bestellung_titel">
-    <a href={{ buch.slug }}>{{ buch.bezeichnung }}</a>			
+    <a href={{ buch.slug }}>{{ buch.bezeichnung }}</a>
   </td>
-  {% if buch.arten_aktiv %}{% include "Produkte/in_den_warenkorb_inline.html" with produkt=buch art=buch.arten_aktiv.0 %}{% else %}<td class="buecher_table_d"/>{% endif %}
+  {% if "kaufen" in buch.arten_aktiv %}{% include "Produkte/in_den_warenkorb_inline.html" with produkt=buch art="kaufen" %}
+  {% elif "druck" in buch.arten_aktiv %}{% include "Produkte/in_den_warenkorb_inline.html" with produkt=buch art="druck" %}
+  {% else %}<td class="buecher_table_d"/>{% endif %}
 </tr>
 {% endfor %}
 </table>

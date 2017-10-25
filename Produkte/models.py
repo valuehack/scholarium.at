@@ -71,7 +71,7 @@ class PreiseMetaklasse(ModelBase):
 arten_attribute = {
     'teilnahme': (5, 'Auswählen', 'Vor Ort'),
     'livestream': (False, 'Livestream buchen', 'Livestream'),
-    'aufzeichnung': (False, 'Aufzeichnung ansehen und/oder mp3 herunterladen', 'MP3'),
+    'aufzeichnung': (False, 'Aufzeichnung herunterladen', 'MP3'),
     'pdf': (False, 'PDF'),
     'epub': (False, 'EPUB'),
     'mobi': (False, 'Kindle'),

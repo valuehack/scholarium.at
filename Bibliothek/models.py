@@ -89,8 +89,12 @@ class Buch(KlasseMitProdukten):
             return 'mit_menge'
         elif arten_attribute[art][0] and self.finde_anzahl(art) == 0:
             return 'verbergen'
-        else:
+        elif arten_attribute[art][0]: # beschränkt, genau eins
+            return 'ohne_menge'
+        elif getattr(self, 'ob_'+art) and bool(getattr(self, art)): # wenn unbeschränkt, gucke nach Datei und ob aktiviert
             return 'inline'
+        else:
+            return 'verbergen'
 
     class Meta:
         verbose_name_plural = 'Bücher'
