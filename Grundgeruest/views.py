@@ -54,7 +54,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
 
         text = '''Lieber Unterstützer,
 
-Vielen Dank für Ihre Unterstützung über %s am %s!
+Vielen Dank für Ihre Unterstützung über %s Euro am %s!
 
 Ihr ergebenster Rahim
 ''' % (betrag, str(datetime.now()).split('.')[0])
@@ -201,28 +201,36 @@ def index(request):
 
 
 def paypal_bestaetigung(request):
-    from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
-    access_token = anfrage_token()
-    zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
+    #from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
+    #access_token = anfrage_token()
+    #zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
     # (der 'state' der Antwort wird nicht genutzt, da wir kein reproduzierbares Muster gefunden haben)
-    
-    print(zahlung)
-        
-    betrag = int(float(zahlung['transactions'][0]['amount']['total']))
-    stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
-    if request.user.is_authenticated:
-        pk=request.user.pk
-        email=request.user.email
-    else:
-        pk=request.session['neuer_nutzer_pk']
-        email = Nutzer.objects.get(pk=pk).email
-    datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
-    upgrade_nutzer(request, datendict)
-    Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
-    
-    return HttpResponseRedirect("/spende/zahlung/")
-    #messages.error(request, 'Transaktion nicht bestätigt.')
-    #return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
+
+    paypalrestsdk.configure({
+        "mode": settings.PAYPAL_MODE,
+        "client_id": settings.PAYPAL_CLIENT_ID,
+        "client_secret": settings.PAYPAL_CLIENT_SECRET })
+
+    if 'paymentID' in request.GET:
+        payment = paypalrestsdk.Payment.find(request.GET['paymentID'])
+        pprint.pprint(payment)
+        if payment.state == 'approved':
+            ipdb.set_trace()
+            betrag = int(float(payment.to_dict()['transactions'][0]['amount']['total']))
+            stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
+            if request.user.is_authenticated:
+                pk=request.user.pk
+                email=request.user.email
+            else:
+                pk=request.session['neuer_nutzer_pk']
+                email = Nutzer.objects.get(pk=pk).email
+            datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
+            upgrade_nutzer(request, datendict)
+            Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
+            
+            return HttpResponseRedirect("/spende/zahlung/")
+            #messages.error(request, 'Transaktion nicht bestätigt.')
+            #return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
 
 def upgrade_nutzer(request, datendict):
     ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''

@@ -221,5 +221,5 @@ EMAIL_HOST_PASSWORD = 'iljailja'
 
 # Paypal
 PAYPAL_MODE = 'sandbox'   # sandbox or live
-PAYPAL_CLIENT_ID = 'AVoRdNuyWNkIdTV7QnEVrrljx-S7ATX9Ny6W6wIGi8MScRPaqeTxX3Ubark1OkgepNVXJ77ifEv1ZQ5a' #get_env_variable('PAYPAL_CLIENT_ID')
-PAYPAL_CLIENT_SECRET = 'EE4pF1UU-v6pUDjR5W06B68mz7uH4qXHxyqrZ0XYyCu7miVKauxytlTGRt83pdytjLT-zvSywojaskiS' #get_env_variable('PAYPAL_CLIENT_SECRET')
+PAYPAL_CLIENT_ID = 'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B' #get_env_variable('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = 'EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz' #get_env_variable('PAYPAL_CLIENT_SECRET')
