@@ -220,7 +220,7 @@ class Warenkorb(BaseCart):
     def was_zu_versand(self):
         self.liste_zu_versand = []
         for item in self.items.values():
-            if arten_attribute[item.art][0] and item.art != 'teilnahme': # wenn max. Anzahl angegeben
+            if arten_attribute[item.art][0] and item.art not in ['teilnahme', 'buchung']: # wenn max. Anzahl angegeben
                 self.liste_zu_versand.append(item)
         return self.liste_zu_versand
         
