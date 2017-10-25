@@ -1,18 +1,53 @@
 {% load static produkttags %}
+{% load humanize %}
 
-{% with obj=kauf.objekt_ausgeben pk=kauf.pk_ausgeben %}
-
-  <div class="warenkorb_veranstaltung" style="display: inline;">
-    {% if obj.bild %}
-    <div class="buecher_img">
-      <img style="height: 200px;" src="{{ obj.bild.url }}" alt="{{ obj.bezeichnung|safe }}">
-    </div>
-    {% endif %}
-    <div>
-      <span>{% verbose obj %}</span>
-      <span>
-        <a href="{{ obj.get_absolute_url }}">{{ obj.bezeichnung|safe }}</a>
-      </span>
-      <span>Format: {% art_aus_pk pk|title %}</span>
-  </div>
-{% endwith %}
+<div class="container">
+  <table class="bestellung_item">
+    <tr>
+      {% if bild %}<th/>{% endif %}
+      <th/>
+      <th>Format</th>
+      <th>Gebucht</th>
+      {% if menge %}
+        <th>Anzahl</th>
+      {% endif %}
+      {% if datum %}
+        <th>Datum</th>
+      {% endif %}
+      {% if dl %}<th/>{% endif %}
+    </tr>
+    {% for kauf in items %}
+    {% with obj=kauf.objekt_ausgeben pk=kauf.pk_ausgeben %}
+      <tr>
+        {% if bild %}
+          <td>
+          {% if obj.bild %}
+          <div class="buecher_img">
+            <img src="{{ obj.bild.url }}" alt="{{ obj.bezeichnung|safe }}">
+          </div>
+          {% endif %}
+          </td>
+        {% endif %}
+        <td class="bestellung_titel">
+          <a href="{{ obj.get_absolute_url }}">{{ obj|safe }}</a>
+        </td>
+        <td>
+          <span>{% verbose obj %}</span>
+          <span>{% art_aus_pk pk|title %}</span>
+        </td>
+        <td>{{ kauf.zeit|naturaltime }}</td>
+        {% if menge %}
+          <td>{{ kauf.menge }}</td>
+        {% endif %}
+        {% if datum %}
+          <!-- <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td> -->
+          <td>{{ obj.datum }}</td>
+        {% endif %}
+        {% if dl %}
+          <td>{% include "Produkte/medium_runterladen.html" with kauf=kauf %}</td>
+        {% endif %}
+      </tr>
+    {% endwith %}
+    {% endfor %}
+  </table>
+</div>

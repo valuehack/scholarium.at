@@ -11,17 +11,9 @@
   <div class="salon_content">
     {{ studiumdings.beschreibung1|safe }}
     {{ studiumdings.beschreibung2|safe }}
-    {% if studiumdings.bezeichnung != "Roland Baader-Stipendium" %}
-    <div style="text-align: center;">
-      <div class="salon_reservation">
-        <div class="sinfo">
-            {% include "Produkte/in_den_warenkorb_ohne_menge.html" with produkt=studiumdings art='teilnahme' %}
-        </div>
-      </div>
-    </div>
-    {% endif %}
+    {% include 'Veranstaltungen/buchung_veranstaltung_unten.html' with veranstaltung=studiumdings %}
     <div class="medien_anmeldung" style="margin-top: 5%;">
       <a href="{% url 'liste_studium' %}">zurück zu den Studienangeboten</a>
     </div>
-    
+
 {% endblock content %}
