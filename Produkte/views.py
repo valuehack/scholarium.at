@@ -173,7 +173,7 @@ class Warenkorb(BaseCart):
         }
         if formatter:
             cart_repr = formatter(cart_repr)
-            
+
         return JsonResponse(cart_repr)
 
     def create_items(self, session_items):
@@ -216,14 +216,14 @@ class Warenkorb(BaseCart):
         if len(items) < len(session_items):
             self._stale_pks = set(session_items).difference(items)
         return items
-    
+
     def was_zu_versand(self):
         self.liste_zu_versand = []
         for item in self.items.values():
             if arten_attribute[item.art][0] and item.art not in ['teilnahme', 'buchung']: # wenn max. Anzahl angegeben
                 self.liste_zu_versand.append(item)
         return self.liste_zu_versand
-        
+
     @property
     def ob_versand(self):
         liste_versand = self.was_zu_versand()
@@ -277,7 +277,6 @@ def bestellungen(request):
             kaeufe['digital'].append(kauf)
         else:
             kaeufe['rest'].append(kauf)
-
     return render(request,
         'Produkte/bestellungen.html',
         {'kaeufe': kaeufe, 'liste_menue': liste_menue})
@@ -288,7 +287,7 @@ def kaufen(request):
     if nutzer.guthaben < warenkorb.count_total_price():
         messages.error(request, 'Ihr Guthaben reicht leider nicht aus. Laden Sie ihr Guthaben auf, indem Sie ihre Unterstützung erneuern.')
         return HttpResponseRedirect(reverse('Produkte:warenkorb'))
-    
+
     if warenkorb.ob_versand:
         request.user.my_profile.guthaben += -5
         Nachricht.bestellung_versenden(request)
@@ -297,7 +296,7 @@ def kaufen(request):
         Kauf.kauf_ausfuehren(nutzer, pk, ware)
         if isinstance(Kauf.obj_aus_pk(pk), Studiumdings):
             ob_studien = True
-    
+
     if ob_studien:
         Nachricht.studiumdings_gebucht(request)
 
