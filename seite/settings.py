@@ -37,7 +37,7 @@ SECRET_KEY = '_h!7u1tm_6)ncy=8mv24yocp_@b^)l!l_yvo=9*v=afg_l9vr#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'Bibliothek',
     'Scholien',
     'Workflow',
-    'Notizen', 
+    'Notizen',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -204,6 +204,7 @@ STATICFILES_DIRS = [
 
 try:
     MEDIA_ROOT = '/home/scholarium/scholarium_daten/'
+    os.chdir(MEDIA_ROOT)
 except FileNotFoundError:
     MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 
@@ -221,5 +222,5 @@ EMAIL_HOST_PASSWORD = 'iljailja'
 
 # Paypal
 PAYPAL_MODE = 'sandbox'   # sandbox or live
-PAYPAL_CLIENT_ID = 'AVoRdNuyWNkIdTV7QnEVrrljx-S7ATX9Ny6W6wIGi8MScRPaqeTxX3Ubark1OkgepNVXJ77ifEv1ZQ5a' #get_env_variable('PAYPAL_CLIENT_ID')
-PAYPAL_CLIENT_SECRET = 'EE4pF1UU-v6pUDjR5W06B68mz7uH4qXHxyqrZ0XYyCu7miVKauxytlTGRt83pdytjLT-zvSywojaskiS' #get_env_variable('PAYPAL_CLIENT_SECRET')
+PAYPAL_CLIENT_ID = 'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B' #get_env_variable('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = 'EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz' #get_env_variable('PAYPAL_CLIENT_SECRET')

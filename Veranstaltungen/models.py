@@ -25,6 +25,13 @@ class Veranstaltung(KlasseMitProdukten):
     ob_chat_anzeigen = models.BooleanField(default=False)
     arten_liste = ['teilnahme', 'livestream', 'aufzeichnung']
 
+    @property
+    def livestream(self):
+        return self.link
+    @property
+    def aufzeichnung(self):
+        return self.datei
+
     class Meta:
         verbose_name_plural = "Veranstaltungen"
         verbose_name = "Veranstaltung"
@@ -87,9 +94,10 @@ class Studiumdings(KlasseMitProdukten):
     beschreibung1 = models.TextField()
     beschreibung2 = models.TextField()
     reihenfolge = models.SmallIntegerField(null=True)
-    arten_liste = ['teilnahme']
+    arten_liste = ['buchung']
     class Meta:
-        verbose_name_plural = "Studiendinger"
+        verbose_name_plural = "Studienprogramme"
+        verbose_name = "Studienprogramm"
         ordering = ['reihenfolge']
 
     def get_absolute_url(self):

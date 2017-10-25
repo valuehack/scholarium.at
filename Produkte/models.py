@@ -78,6 +78,7 @@ arten_attribute = {
     'druck': (10, 'Druck'),
     'kaufen': (1, 'Zum Kauf auswählen'),
     'leihen': (1, 'Zum Verleih auswählen'),
+    'buchung': (1, 'Buchen', 'IrgendnenSpam'),
 }
 
 class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
@@ -111,7 +112,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             else:
                 modus = 'inline'
         else:
-            if getattr(self, 'ob_'+art):
+            if getattr(self, 'ob_'+art) and bool(getattr(self, art)):
                 modus = 'ohne_menge'
             else:
                 modus = 'verbergen'

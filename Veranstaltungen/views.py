@@ -82,7 +82,7 @@ def eine_veranstaltung(request, slug):
 
 
 def studiumdings_detail(request, slug):
-    if request.user.is_authenticated() and request.user.hat_guthaben():
+    if request.user.is_authenticated() and request.user.my_profile.get_Status() > 1:
         template_name='Veranstaltungen/detail_studiendings.html'
     else:
         template_name='Veranstaltungen/detail_studiendings_gast.html'

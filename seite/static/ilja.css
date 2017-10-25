@@ -243,7 +243,7 @@ div.basket_message {
 	background-color: #DFF0D8;
 	font-size: 16pt;
 	text-align: center;
-	font-family: "Garamond", Georgia, Times, serif;	
+	font-family: "Garamond", Georgia, Times, serif;
 }
 
 div.basket_message a {
@@ -1787,6 +1787,75 @@ div.warenkorb_veranstaltung form input {
     border-bottom: 1px dotted rgb(46,74,98);
 }
 
+/*==================================================*/
+/*                   Bestellübersicht                    		*/
+/*==================================================*/
+
+.bestellung_item {
+	width: 100%;
+	font-size: 14pt;
+	color: rgb(180,180,180);
+}
+
+.bestellung_item td,th {
+	padding: 10px;
+}
+.bestellung_item td {
+	vertical-align: middle;
+}
+
+/*.bestellung_item img {
+	height: 100%;
+	width: auto;
+}*/
+
+.bestellung_item span:first-child {
+    font-size: 14pt;
+		/*color: black;*/
+		/*font-weight: bold;*/
+    display: block;
+		padding-bottom: 20px;
+}
+
+.bestellung_item span:nth-child(2) {
+	font-size: 14pt;
+	font-style: italic;
+	display: block;
+}
+
+td.bestellung_titel {
+    font-size: 18pt;
+    text-align: left;
+		padding: 15px;
+}
+
+.bestellung_titel a {
+    color: rgb(46,74,98);
+    text-decoration: none;
+}
+
+.media_button {
+	text-decoration: none;
+	background: rgb(46,74,98);
+	color: #fff;
+	border: 0;
+	border-radius: 2px;
+	min-width: 8em;
+	height: 1.75em;
+	font-size: 14pt;
+	font-family: "Futura Book", Helvetica, Arial, serif;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.24);
+  cursor: pointer;
+}
+
+.media_button:hover {
+	background: rgb(30,48,64);
+}
+
+.media_button:disabled {
+	background: rgb(200,200,200);
+    cursor: default;
+}
 
 /*==================================================*/
 /*                   Footer                    		*/
