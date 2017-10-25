@@ -57,7 +57,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
         )
 
         rHerr = 'r Herr' if nutzer.my_profile.anrede=='Herr' else ' Frau'
-        subject = 'Herzlich willkommen'
+        subject = 'Herzlich willkommen!!!!'
         message_plain = None
         message_html = render_to_string(
             'Grundgeruest/email/dank_unterstuetzung.html', {
@@ -66,6 +66,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             'nachname': nutzer.last_name,
             'rHerr': rHerr,
             'pk': nutzer.pk, 
+            'zahlart': zahlart,
             
         })
         email_from = settings.DEFAULT_FROM_EMAIL
