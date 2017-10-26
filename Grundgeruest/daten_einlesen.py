@@ -81,10 +81,7 @@ def veranstaltungen_aus_db():
             if zeile['type'] in ['seminar', 'salon']:
                 datum = zeile['start'] or '1111-01-01 00-00'
             else:
-                if zeile['last_donation'] in ['0000-00-00 00:00:00', None]:
-                    datum = '1111-01-01 00-00'
-                else:
-                    datum = zeile['last_donation']
+                datum = '1111-01-01 00-00'
                     
             datum = datum.split(' ')[0]
             v = Veranstaltung.objects.create(
