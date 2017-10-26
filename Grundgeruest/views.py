@@ -150,6 +150,7 @@ def erstelle_liste_menue(user=None):
             {'bezeichnung': 'Studium Generale', 'slug': 'studium/studium'},
             {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
             {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
+            {'bezeichnung': 'Orientierungscoaching', 'slug': 'studium/orientierungscoaching'},
             ]),
         ]
     liste_punkte = []
