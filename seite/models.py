@@ -10,7 +10,8 @@ class Grundklasse(models.Model):
     slug = models.SlugField(
         max_length=30,
         null=False,
-        blank=True)
+        blank=True,
+        unique=True)
     zeit_erstellt = models.DateTimeField(
         auto_now_add=True,
         editable=False)

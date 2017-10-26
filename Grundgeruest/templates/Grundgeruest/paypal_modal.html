@@ -13,6 +13,7 @@
       <p class="tologin">Vielen Dank, dass Sie das <em>scholarium</em> <br>unterstützen möchten!</p>
     </div>
     <div class="modal-body">
+      {{paypal_id}}
       {% if not request.user.is_authenticated %}<p>Es wurde ein Nutzeraccount mit den eingegebenen Daten angelegt, und eine eMail zur Aktivierung wurde an Sie versendet.</p>{% endif %}
       <p>Bitte klicken Sie auf den PayPal-Button, um die Zahlung über PayPal zu bestätigen:<p>
       <div class="wrapper">{% include 'Grundgeruest/paypal_button.html' %}</div>
@@ -22,4 +23,3 @@
 </div>
 
 <script>$('#paypal_modal').modal('show');</script>
-

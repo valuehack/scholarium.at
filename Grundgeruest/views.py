@@ -57,7 +57,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
         )
 
         rHerr = 'r Herr' if nutzer.my_profile.anrede=='Herr' else ' Frau'
-        subject = 'Herzlich willkommen!!!!'
+        subject = 'Herzlich willkommen'
         message_plain = None
         message_html = render_to_string(
             'Grundgeruest/email/dank_unterstuetzung.html', {
@@ -337,7 +337,9 @@ def zahlen(request):
     context.update({
         'formular': formular,
         'betrag': betrag,
-        'stufe': stufe
+        'stufe': stufe,
+        'paypal_mode': settings.PAYPAL_MODE,
+        'paypal_id': settings.PAYPAL_CLIENT_ID,
     })
 
     return render(request, 'Produkte/zahlung.html', context)
