@@ -3,13 +3,13 @@
 
 <script>
     paypal.Button.render({
-        env: {{ paypal_mode }}, // sandbox | production
+        env: '{{ paypal_mode }}', // sandbox | production
 
         // PayPal Client IDs - replace with your own
         // Create a PayPal app: https://developer.paypal.com/developer/applications/create
         client: {
             sandbox:    'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B',
-            production: {{ paypal_id }},
+            production: '{{ paypal_id }}'
         },
 
         // Show the buyer a 'Pay Now' button in the checkout flow
