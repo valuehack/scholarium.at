@@ -275,6 +275,9 @@ def bestellungen(request):
             kaeufe['teilnahmen'].append(kauf)
         elif kauf.art_ausgeben() in ['pdf', 'epub', 'mobi', 'aufzeichnung']:
             kaeufe['digital'].append(kauf)
+# wär nett das reinzunehmen, aber dafür download-button flexibler anzeigen:
+#        elif kauf.art_ausgeben() == 'livestream': # bleibt nur vergangen
+#            kaeufe['digital'].append(kauf)            
         else:
             kaeufe['rest'].append(kauf)
     return render(request,

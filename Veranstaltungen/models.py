@@ -37,7 +37,9 @@ class Veranstaltung(KlasseMitProdukten):
         verbose_name = "Veranstaltung"
 
     def get_absolute_url(self):
-        return reverse('Veranstaltungen:veranstaltung_detail', kwargs={'slug': self.slug})
+        art = self.art_veranstaltung.bezeichnung.lower()
+        prefix = 'vortrag' if art=='vorlesung' else art
+        return "/%s/%s/" % (prefix, self.slug)
 
     def preis_ausgeben(self, art='teilnahme'):
         """ Preis ausgeben, es gibt nur eine art für Präsenz? oder Medium-model hier einfügen, dann mehr? """
