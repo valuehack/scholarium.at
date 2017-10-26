@@ -23,7 +23,6 @@ import Grundgeruest.userena_urls as userena_urls
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings
 from Veranstaltungen.views import studiumdings_detail, vortrag
-from Notizen.views import ZeigenUndEintragen
 from Produkte.models import Spendenstufe
 
 urlpatterns = [
@@ -83,7 +82,6 @@ urlpatterns = [
     url(r'^geheim_db$',
         db_runterladen,
         name='bitte_bald_loeschen'),
-    url(r'^livestream/', ZeigenUndEintragen.as_view(), name='aktueller_livestream'),
     url(r'^', include('Grundgeruest.urls')),
     url(r'^nimda/', include('Workflow.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

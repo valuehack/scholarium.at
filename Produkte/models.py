@@ -72,12 +72,12 @@ arten_attribute = {
     'teilnahme': (5, 'Auswählen', 'Vor Ort'),
     'livestream': (False, 'Livestream buchen', 'Livestream'),
     'aufzeichnung': (False, 'Aufzeichnung herunterladen', 'MP3'),
-    'pdf': (False, 'PDF'),
-    'epub': (False, 'EPUB'),
-    'mobi': (False, 'Kindle'),
-    'druck': (10, 'Druck'),
-    'kaufen': (1, 'Zum Kauf auswählen'),
-    'leihen': (1, 'Zum Verleih auswählen'),
+    'pdf': (False, 'PDF', ''),
+    'epub': (False, 'EPUB', ''),
+    'mobi': (False, 'Kindle', ''),
+    'druck': (10, 'Druck', ''),
+    'kaufen': (1, 'Zum Kauf auswählen', ''),
+    'leihen': (1, 'Zum Verleih auswählen', ''),
     'buchung': (1, 'Buchen', ''),
 }
 
