@@ -104,6 +104,8 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         if arten_attribute[art][0]: # falls beschränkt
             if self.finde_anzahl(art) == 0 and art=='teilnahme':
                 modus = 'ausgegraut' # ausgebuchte Veranstaltung
+            elif self.finde_anzahl(art) == 0:
+                modus = 'verbergen'
             elif art=='teilnahme':
                 modus = 'mit_menge' # Veranstaltung mit select-box
             # sonst nicht teilnahme, also nur beschränktes Buch (?)
