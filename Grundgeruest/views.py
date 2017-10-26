@@ -148,7 +148,6 @@ def erstelle_liste_menue(user=None):
             ]),
             ({'bezeichnung': 'Studium', 'slug': 'studium'}, [
             {'bezeichnung': 'Studium Generale', 'slug': 'studium/studium'},
-            {'bezeichnung': 'craftprobe', 'slug': 'studium/craftprobe'},
             {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
             {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
             ]),
