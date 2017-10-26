@@ -223,7 +223,6 @@ def paypal_bestaetigung(request):
         payment = paypalrestsdk.Payment.find(request.GET['paymentID'])
         pprint.pprint(payment)
         if payment.state == 'approved':
-            ipdb.set_trace()
             betrag = int(float(payment.to_dict()['transactions'][0]['amount']['total']))
             stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
             if request.user.is_authenticated:
@@ -338,7 +337,7 @@ def zahlen(request):
         'formular': formular,
         'betrag': betrag,
         'stufe': stufe,
-        'paypal_mode': settings.PAYPAL_MODE,
+        'paypal_mode': "production",
         'paypal_id': settings.PAYPAL_CLIENT_ID,
     })
 
