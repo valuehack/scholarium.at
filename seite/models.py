@@ -8,7 +8,7 @@ from django.template.defaultfilters import slugify
 class Grundklasse(models.Model):
     bezeichnung = models.CharField(max_length=200)
     slug = models.SlugField(
-        max_length=30,
+        max_length=100,
         null=False,
         blank=True,
         unique=True)
