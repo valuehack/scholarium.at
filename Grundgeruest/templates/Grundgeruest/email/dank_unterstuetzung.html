@@ -1,3 +1,4 @@
+{% load static %}
 {% autoescape off %}
 
 <head>
@@ -36,7 +37,7 @@
   </style>
 </head>
 <div class="box">
-  <img src="http://www.scholarium.at/style/gfx/email_header_new.jpg"/>
+  <img src="{{ host }}{% static 'img/email_header_new.jpg' %}"/>
     <h1>Sehr geehrte{{ rHerr }} {{ nachname }},<br>
     vielen Dank für Ihr Interesse!</h1>
 

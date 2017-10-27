@@ -67,7 +67,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             'rHerr': rHerr,
             'pk': nutzer.pk, 
             'zahlart': zahlart,
-            
+            'host': settings.HOSTNAME,
         })
         email_from = settings.DEFAULT_FROM_EMAIL
         email_to = settings.DEFAULT_TO_EMAILS + [nutzer.email]

@@ -224,3 +224,5 @@ DEFAULT_TO_EMAILS = ['mb@scholarium.at', 'ilja1988@gmail.com']
 PAYPAL_MODE = 'sandbox'   # sandbox or live
 PAYPAL_CLIENT_ID = 'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B' #get_env_variable('PAYPAL_CLIENT_ID')
 PAYPAL_CLIENT_SECRET = 'EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz' #get_env_variable('PAYPAL_CLIENT_SECRET')
+
+HOSTNAME = 'https://scholarium.at'
