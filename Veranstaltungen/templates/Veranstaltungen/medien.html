@@ -7,7 +7,7 @@
   {% for medium in medien %}
   <tr>
     <td>
-      <a href="{{ medium.get_url }}">
+      <a href="{{ medium.get_absolute_url }}">
         {{ medium|safe }}
       </a>
     </td>

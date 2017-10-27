@@ -62,13 +62,6 @@ class Veranstaltung(KlasseMitProdukten):
         else:
             return ValueError('Art %s habe ich noch nicht beachtet' % art)
 
-
-    def get_url(self):
-        if self.art_veranstaltung.bezeichnung == 'Salon':
-            return '/salon/%s' % self.slug
-        elif self.art_veranstaltung.bezeichnung == 'Seminar':
-            return '/seminar/%s' % self.slug
-
     def __str__(self):
         return self.art_veranstaltung.bezeichnung+': '+self.bezeichnung
 
