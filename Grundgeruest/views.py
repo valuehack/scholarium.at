@@ -36,7 +36,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 class Nachricht():
-    mailadresse = 'mb@scholarium.at' # die von Georg
+    mailadresse = settings.DEFAULT_TO_EMAILS[0] # die von Georg
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
         nutzer = Nutzer.objects.get(pk=nutzer_pk)
@@ -70,7 +70,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             
         })
         email_from = settings.DEFAULT_FROM_EMAIL
-        email_to = ['ilja1988@gmail.com', cls.mailadresse, nutzer.email]
+        email_to = settings.DEFAULT_TO_EMAILS + [nutzer.email]
         sendmail_von_userena(subject, message_plain, message_html, email_from, email_to,
               custom_headers={}, attachments=())
 
