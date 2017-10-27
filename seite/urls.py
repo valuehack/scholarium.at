@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^studium/(?P<slug>[-\w]+)/$',
         studiumdings_detail,
         name='studium_detail'),
+    url(r'^vortrag/(?P<slug>[-\w]+)/', vortrag, name='vortrag_detail'),
     url(r'^vortrag/', vortrag, name='vortrag'),
     url(r'^nutzer/', include(userena_urls)),
     url(r'^warenkorb/', include('Produkte.urls')),

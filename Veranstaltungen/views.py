@@ -119,9 +119,13 @@ class ListeVortrag(ListeMitMenue):
         else:
             return []
 
-def vortrag(request):
-    return ListeVortrag.as_view()(request, page=request.GET.get('seite'))
-    
+def vortrag(request, slug=None):
+    if not slug:
+        return ListeVortrag.as_view()(request, page=request.GET.get('seite'))
+    else:
+        obj = get_object_or_404(Veranstaltung, slug=slug)
+        art = obj.art_veranstaltung.bezeichnung
+        return VeranstaltungDetail.as_view()(request, art=art, slug=slug)
 
 def livestream(request):
     """ soll das nächste salon-Objekt ans livestream-Template geben, falls 
