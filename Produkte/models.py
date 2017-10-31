@@ -118,6 +118,8 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         else:
             if getattr(self, 'ob_'+art) and bool(getattr(self, art)):
                 modus = 'ohne_menge'
+            elif art=='livestream' and self.ob_livestream:
+                modus = 'ohne_menge'
             else:
                 modus = 'verbergen'
 

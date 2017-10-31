@@ -1,7 +1,7 @@
 {% load humanize %}
   {% with art=veranstaltung.art_veranstaltung %}
   <div>{{ art.bezeichnung }}</div>
-  <h1><a href='{{ veranstaltung.get_url }}'>{{ veranstaltung.bezeichnung|safe }}</a></h1>
+  <h1><a href='{{ veranstaltung.get_absolute_url }}'>{{ veranstaltung.bezeichnung|safe }}</a></h1>
   <div>
     {{ veranstaltung.datum | naturalday }} {{ art.zeit_beginn | time:"H:i" }} bis {{ art.zeit_ende|time:"H:i" }} Uhr
   </div>
