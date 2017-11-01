@@ -1,7 +1,15 @@
 {% load produkttags %}
 
+{% if "seite" in request.GET %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    window.location = '#medien'
+});
+</script>
+{% endif %}
+
 <div class="separator">
-  <h2>Verfügbare Aufzeichnungen</h2>
+  <h2 id="medien">Verfügbare Aufzeichnungen</h2>
 </div>
 <table class="veranstaltungen">
   {% for medium in medien %}

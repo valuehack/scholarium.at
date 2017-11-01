@@ -13,7 +13,7 @@ class ListeAlle(ListeMitMenue):
     """
     template_name = 'Veranstaltungen/liste_veranstaltungen.html'
     context_object_name = 'veranstaltungen'
-    paginate_by = 3
+    paginate_by = 5
     model = Veranstaltung
 
 def liste_veranstaltungen(request, art):
@@ -22,10 +22,15 @@ def liste_veranstaltungen(request, art):
     else:
         template_name = 'Veranstaltungen/liste_veranstaltungen_gast.html'
     
-    return ListeArt.as_view(
-        template_name=template_name,
-        art=art)(request, page=request.GET.get('seite'))
-    
+    if "seite" in request.GET:
+        return ListeArt.as_view(
+            template_name=template_name,
+            art=art)(request, page=request.GET.get('seite'))
+    else:
+        return ListeArt.as_view(
+            template_name=template_name,
+            art=art)(request)
+ 
 class ListeArt(ListeAlle):
     """ Klasse zur Darstellung der Seminare oder Salons
     Bekommt als kwargs art übergeben und ob user.is_authenticated()
@@ -45,7 +50,7 @@ class ListeArt(ListeAlle):
     
     art = 'Salon'
     context_object_name = 'medien'
-    paginate_by = 3
+    paginate_by = 5
     def get_queryset(self, **kwargs):
         mit_medien = [v for v in Veranstaltung.objects.all()
             if v.art_veranstaltung==self.art_model
