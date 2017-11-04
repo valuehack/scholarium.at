@@ -87,6 +87,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
 
     """ Liste aller möglichen Formate der Produktklasse """
     arten_liste = ['spam'] # Liste von <art> str
+    admin_kaeufe = models.TextField(default='', blank=True)
 
     def anzeigemodus(self, art=0):
         """ gibt einen Code für den Anzeigemodus in Templates aus; also ob
@@ -176,7 +177,19 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     def format_text(self, art=0):
         """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""
         return arten_attribute[art][2]
-
+    
+    def kaeufe_finden(self):
+        pk_lang = Kauf.obj_zu_pk(self, art=0)
+        pk_start = pk_lang[:-2]
+        kaeufe = [k for k in Kauf.objects.filter(produkt_pk__startswith=pk_start)]
+        return kaeufe
+    
+    def save(self, *args, **kwargs):
+        # bei jeden save Käufe eintragen:
+        kaeufe = self.kaeufe_finden()
+        self.admin_kaeufe = '\n'.join([str(k) for k in kaeufe])   
+        return super().save(*args, **kwargs)
+        
     class Meta:
         abstract = True
 
@@ -276,11 +289,31 @@ class Kauf(models.Model):
         wird für den Preis.
         *** offen: Sollte der Ware Anzahl abziehen, falls beschränkt! """
         guthaben = nutzer.guthaben
-        kauf = Kauf.objects.create(
-            nutzer=nutzer,
-            produkt_pk=pk,
-            menge=ware.quantity,
-            guthaben_davor=guthaben)
+        art = Kauf.tupel_aus_pk(pk)[2] 
+        if arten_attribute[art][0]: # also falls beschränkt
+            objekt = Kauf.obj_aus_pk(pk)
+            menge = int(getattr(objekt, 'anzahl_'+art))
+            if menge < ware.quantity:
+                return None # Kaufvorgang abbrechen wenn Menge nicht reicht 
+            else:
+                menge += - ware.quantity
+                setattr(objekt, 'anzahl_'+art, menge)
+                objekt.save()
+                
+        kauf = None
+        if art == 'teilnahme': # zusammenfassen, wenn schon vorhanden; bei anderen erstmal nicht, da vll. wichtig, dass Bücher getrennt versendet wurden, oder so
+            kaeufe = Kauf.objects.filter(nutzer=nutzer, produkt_pk=pk)
+            if len(kaeufe) == 1:
+                kauf = kaeufe[0]
+                kauf.menge += ware.quantity
+                kauf.save()
+        if kauf is None:
+            kauf = Kauf.objects.create(
+                nutzer=nutzer,
+                produkt_pk=pk,
+                menge=ware.quantity,
+                guthaben_davor=guthaben)
+
         nutzer.guthaben = guthaben - ware.total
         nutzer.save()
         return kauf
@@ -301,9 +334,10 @@ class Kauf(models.Model):
 
     def __str__(self):
         objekt, art = self.objekt_ausgeben(mit_art=True)
-        text = '{} hat am {} gekauft: {}'.format(
+        text = '{} hat am {} gekauft: {}x {}'.format(
             self.nutzer.user.__str__(),
             self.zeit.strftime('%x, %H:%M'),
+            self.menge,
             objekt.__str__())
         if art != 0:
             text += ' im Format {}'.format(art)

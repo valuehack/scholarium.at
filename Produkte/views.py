@@ -296,13 +296,20 @@ def kaufen(request):
         Nachricht.bestellung_versenden(request)
     ob_studien = False
     for pk, ware in list(warenkorb.items.items()):
-        Kauf.kauf_ausfuehren(nutzer, pk, ware)
-        if isinstance(Kauf.obj_aus_pk(pk), Studiumdings):
+        kauf = Kauf.kauf_ausfuehren(nutzer, pk, ware)
+        if kauf is None: # Rückgabewert wenn Menge nicht gereicht hat
+            messages.error(request, 'Entschuldigung, die Menge des Produktes reicht für den Kauf nicht aus.')
+            return HttpResponseRedirect(reverse('Produkte:warenkorb'))
+        objekt = kauf.objekt_ausgeben()
+        if isinstance(objekt, Studiumdings):
             ob_studien = True
+        if isinstance(objekt, Veranstaltung) and kauf.art_ausgeben()=='teilnahme':
+            ob_teilnahmen = True
 
     if ob_studien:
         Nachricht.studiumdings_gebucht(request)
-
+    if ob_teilnahmen:
+        Nachricht.teilnahme_gebucht(request)        
     warenkorb.empty()
 
     return HttpResponseRedirect(reverse('Produkte:bestellungen'))

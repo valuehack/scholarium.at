@@ -128,6 +128,32 @@ Vermutlich muss er eine händische Mail zur weiteren Vorgehensweise bekommen:
             fail_silently = False,
         )
 
+    @classmethod
+    def teilnahme_gebucht(cls, request):
+        nutzer = request.user
+        from Produkte.views import Warenkorb
+        text_warenkorb = ''
+        for pk, ware in Warenkorb(request).items.items():
+            text_warenkorb += "%s x %s\n" % (ware.quantity, Kauf.obj_aus_pk(pk))
+        text = '''Hallo Georg!
+
+Ein Nutzer hat Teilnahmen an kommenden Veranstaltungen gebucht.
+
+Waren:
+%s
+
+Mailadresse für eventuelle Rückfragen:
+%s
+
+''' % (text_warenkorb, request.user.email)
+        send_mail(
+            subject='[website] Bestellung Teilnahmen eingegangen',
+            message=text,
+            from_email='iljasseite@googlemail.com',
+            recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
+            fail_silently = False,
+        )
+
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated() or user.my_profile.get_Status()[0] == 0:
