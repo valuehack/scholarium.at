@@ -81,7 +81,7 @@ def ob_livestream_zeigen(veranstaltung, kunde):
     if veranstaltung.ist_zukunft() and not veranstaltung.ist_bald(60):
         return False
 
-    return veranstaltung.ob_gekauft_von(kunde, 'livestream')
+    return veranstaltung.ob_gekauft_von(kunde, 'livestream') or veranstaltung.ob_gekauft_von(kunde, 'aufzeichnung')
 
 
 

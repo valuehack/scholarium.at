@@ -69,7 +69,7 @@ class Veranstaltung(KlasseMitProdukten):
         """ gibt Liste der art-Namen, die aktiv sind, zurück; also insb.
         leere Liste die in if-Abfrage False gibt """
         medien = [art for art in ['livestream', 'aufzeichnung']
-            if self.ob_aktiv(art)]
+            if self.anzeigemodus(art) != 'verbergen']
         return medien
 
     def embed_link(self):

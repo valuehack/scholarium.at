@@ -71,7 +71,7 @@ class PreiseMetaklasse(ModelBase):
 arten_attribute = {
     'teilnahme': (5, 'Auswählen', 'Vor Ort'),
     'livestream': (False, 'Livestream buchen', 'Livestream'),
-    'aufzeichnung': (False, 'Aufzeichnung herunterladen', 'MP3'),
+    'aufzeichnung': (False, 'Aufzeichnung', 'MP3'),
     'pdf': (False, 'PDF', ''),
     'epub': (False, 'EPUB', ''),
     'mobi': (False, 'Kindle', ''),
@@ -116,9 +116,11 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             else:
                 modus = 'inline'
         else:
-            if getattr(self, 'ob_'+art) and bool(getattr(self, art)):
+            if art=='livestream' and self.ist_vergangen():
+                modus = 'verbergen'
+            elif getattr(self, 'ob_'+art) and bool(getattr(self, art)):
                 modus = 'ohne_menge'
-            elif art=='livestream' and self.ob_livestream:
+            elif art=='livestream' and self.ob_livestream: # auch vor dem Eintragen vom Link anzeigen
                 modus = 'ohne_menge'
             else:
                 modus = 'verbergen'
