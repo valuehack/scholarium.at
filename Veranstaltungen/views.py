@@ -88,8 +88,6 @@ class VeranstaltungDetail(DetailMitMenue):
             return HttpResponseForbidden()
 def eine_veranstaltung(request, slug):
     # gedoppelter code, aber die url /veranstaltungen/... wird eh bald obsolet?
-    if request.method == 'POST':
-        print(request.post)
     if request.user.is_authenticated():
         return DetailMitMenue.as_view(
             template_name='Veranstaltungen/detail_veranstaltung.html',
