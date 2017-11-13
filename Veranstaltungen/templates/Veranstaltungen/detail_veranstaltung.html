@@ -7,6 +7,13 @@
   <div class="veranstaltung">
     {% include 'Veranstaltungen/titel_veranstaltung.html' %}
   </div>
+  {% if request.user.is_staff %}
+    <form style="text-align: center; padding: 1em;" method="POST">
+      {% csrf_token %}
+      <input type="hidden" value="{{ veranstaltung.pk }}" name="pk"/>
+      <input class="inputbutton" type="submit" value="Teilnehmerliste drucken"/>
+    </form>
+  {% endif %}
   {% ob_livestream_zeigen veranstaltung request.user.my_profile as ob_zeigen %}
   {% if ob_zeigen %}
     {% include "Veranstaltungen/livestream.html" %}

@@ -22,3 +22,6 @@ Deutschland''', widget=forms.Textarea)
     BIC = forms.CharField(max_length=100, label='BIC', initial='GIBAATWWXXX')
     
     #closingnote = forms.CharField(initial = 'Mit freundlichen Grüßen,')
+    
+class TrelloToSQLForm():
+    pass

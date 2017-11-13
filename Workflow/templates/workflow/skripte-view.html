@@ -1,14 +1,13 @@
-<!doctype html5>
-<html lang="de">
-  <head>
-    <meta charset="utf-8">
-    <title>Skripte</title>
-  </head>
-  <body>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Submit</button>
-    </form>
-  </body>
-</html>
+{% extends 'workflow/control-frame.html' %}
+{% block title %}Skripte{% endblock %}
+{% block body %}
+{% for key, function in methods.items %}
+  <h2>{{ key }}</h2>
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="function" value="{{ function.name }}">
+    <input type="submit" value="Ausführen">
+  </form>
+  <p>{% if function.doc %}{{ function.doc|linebreaks }}{% endif %}</p>
+{% endfor %}
+{% endblock %}

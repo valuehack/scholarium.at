@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.contrib import messages
 
 from .models import *
@@ -74,9 +74,22 @@ class VeranstaltungDetail(DetailMitMenue):
         return Veranstaltung.objects.filter(
             art_veranstaltung=art).get(slug=slug)
         
-        
+    def post(self, request, *args, **kwargs):
+        if request.user.is_staff: 
+            v = Veranstaltung.objects.get(pk = request.POST.get('pk'))
+            kaeufe = list(Kauf.objects.filter(produkt_pk='%s+%s+%s' % ('veranstaltung', request.POST.get('pk'), 'teilnahme')))
+            content = '<h1>Teilnehmer für %s</h1><ul>' % v
+            for k in kaeufe:
+                teilnehme = '<li>%s %s - Menge: %d</li>' % (k.nutzer.user.first_name, k.nutzer.user.last_name, k.menge)
+                content += teilnehme
+            content += '</ul>'
+            return HttpResponse(content)#, content_type='text/plain')
+        else:
+            return HttpResponseForbidden()
 def eine_veranstaltung(request, slug):
     # gedoppelter code, aber die url /veranstaltungen/... wird eh bald obsolet?
+    if request.method == 'POST':
+        print(request.post)
     if request.user.is_authenticated():
         return DetailMitMenue.as_view(
             template_name='Veranstaltungen/detail_veranstaltung.html',
@@ -160,5 +173,3 @@ def daten_einlesen(request):
     aus_alter_db_einlesen()
     return HttpResponseRedirect('/veranstaltungen')
     
-
-
