@@ -12,7 +12,7 @@ import datetime
 from Scholien.models import Artikel
 from django.conf import settings
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.join(settings.MEDIA_ROOT, 'Schriften')
 bib = os.path.join(base_dir,"scholarium.bib")
 md_path = os.path.join(base_dir,"Markdown")
 html_path = os.path.join(base_dir,"HTML")
@@ -86,20 +86,19 @@ def trelloToSQL():
                 # lstrip entfernt mögliche Absätze am Anfang.
                 private=split[1].lstrip() if len(split) > 1 else ""
                 if not private:
-                    print('Keinen privaten Teil gefunden.')
+                    print('Keinen privaten Teil gefunden für',title)
                     # print(html)
                     
-                art_neu = Artikel.objects.create(slug=id, bezeichnung=title, inhalt=public, inhalt_nur_fuer_angemeldet=private)#, prioritaet=priority)
-                
-                # #Old Database
-                # c = Connector()
-                # query = 'INSERT INTO blog (id, title, public_text, private_text, priority, edited) VALUES (%s,%s,%s,%s,%s,1)'
-                # c.commit(query,(id,title,public,privat,priority))
-                
+                try:
+                    art_neu = Artikel.objects.create(slug=id, bezeichnung=title, inhalt=public, inhalt_nur_fuer_angemeldet=private, prioritaet=priority)
+                except Exception as e:
+                    print(title, 'failed:', e)
+                    break
+                    
+                card.change_board(played_board.id, target_list.id)
+                card.set_pos('top')
                 print('%s erfolgreich in DB übertragen.' % title)
                 
-                # card.change_board(played_board.id, target_list.id)
-                # card.set_pos('top')
                 
                 
 def druck(text = 'default'):

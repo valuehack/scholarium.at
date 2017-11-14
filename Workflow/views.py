@@ -50,10 +50,14 @@ def control_view(request):
 def rechnung_view(request):
     if request.method == 'POST':
         pass #TODO: import Rechnung2Pdf
-    
+    menu = {
+        'Skripte': reverse('Workflow:skripte'),
+        'Rechnungen': reverse('Workflow:rechnungen')
+    }
     # form = Rechnung2PdfForm
 
     context = {
         # 'form': form
+        'menu': menu
     }
     return render(request, 'workflow/rechnung-view.html', context)

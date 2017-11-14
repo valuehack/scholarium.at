@@ -1,0 +1,23 @@
+<!doctype html5>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Control{% endblock %}</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        {% for key, tab in menu.items %}
+        <td>
+          <form action='{{tab}}'>
+            <button type='submit'>{{ key }}</button>
+          </form>
+        </td>
+        {% endfor %}
+      </tr>
+    </table>
+
+    {% block body %}
+    {% endblock %}
+  </body>
+</html>

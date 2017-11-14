@@ -16,6 +16,7 @@ class Artikel(Grundklasse):
     inhalt = models.TextField()
     inhalt_nur_fuer_angemeldet = models.TextField(null=True, blank=True)
     datum_publizieren = models.DateField(null=True, blank=True)
+    prioritaet = models.PositiveSmallIntegerField(default=0)
     class Meta:
         verbose_name_plural = "Artikel"
         verbose_name = "Artikel"
