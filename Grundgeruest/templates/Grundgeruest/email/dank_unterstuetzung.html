@@ -50,14 +50,19 @@
       BIC: GIBAATWWXXX</div>
 
     <i>Bitte geben Sie als Zahlungsreferenz/Betreff die Nummer <b>{{ pk }}</b> ein.</i>
+    {% elif zahlart == 'Bar' %}
+    Bitte schicken Sie uns den gewählten Betrag von {{ betrag }}€ in Euro-Scheinen oder im ungefähren Edelmetallgegenwert (Gold-/Silbermünzen) an das scholarium, Schlösselgasse 19/2/18, 1080 Wien, Österreich. 
+    Alternativ können Sie uns den Betrag auch persönlich (bitte um Voranmeldung) oder bei einer unserer Veranstaltungen überbringen.
+    {% elif zahlart == 'PayPal' %}
+    Vielen Dank, Ihre Zahlung per PayPal ist eingegangen.
     {% endif %}
     Herzliche Grüße aus Wien!
     <div class="sig">scholarium
-    Schlösselgasse 19/2/18
-    1080 Wien
-    Österreich
-    info@scholarium.at</div>
-    </pre>
+Schlösselgasse 19/2/18
+1080 Wien
+Österreich
+info@scholarium.at</div>
+</pre>
     
 </div>
 
