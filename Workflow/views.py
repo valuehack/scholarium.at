@@ -28,7 +28,7 @@ def control_view(request):
         'Rechnungen': reverse('Workflow:rechnungen')
     }
     methods = {
-        'Trello to PDF': {
+        'Trello zu PDF': {
             'name': utils.trelloToSQL.__name__,
             'sig': inspect.signature(utils.trelloToSQL), # Not used
             'doc': inspect.getdoc(utils.trelloToSQL),
@@ -38,6 +38,10 @@ def control_view(request):
             'doc': inspect.getdoc(utils.druck),
 
         },
+        'Veröffentlichen': {
+            'name': utils.publish.__name__,
+            'doc': inspect.getdoc(utils.publish)
+        }
     }
     context = {
         'menu': menu,

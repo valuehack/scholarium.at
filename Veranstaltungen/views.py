@@ -79,10 +79,12 @@ class VeranstaltungDetail(DetailMitMenue):
             v = Veranstaltung.objects.get(pk = request.POST.get('pk'))
             kaeufe = list(Kauf.objects.filter(produkt_pk='%s+%s+%s' % ('veranstaltung', request.POST.get('pk'), 'teilnahme')))
             content = '<h1>Teilnehmer für %s</h1><ul>' % v
+            n = 0
             for k in kaeufe:
-                teilnehme = '<li>%s %s - Menge: %d</li>' % (k.nutzer.user.first_name, k.nutzer.user.last_name, k.menge)
+                teilnehme = '<li>%s %s - (%d)</li>' % (k.nutzer.user.first_name, k.nutzer.user.last_name, k.menge)
                 content += teilnehme
-            content += '</ul>'
+                n += k.menge
+            content += '</ul><p>%d Teilnehmer</p>' % n
             return HttpResponse(content)#, content_type='text/plain')
         else:
             return HttpResponseForbidden()

@@ -8,9 +8,11 @@ from trello import TrelloClient
 from slugify import slugify
 import datetime
 # from db_connector import Connector
+from datetime import timedelta, date
 
 from Scholien.models import Artikel
 from django.conf import settings
+from django.db import IntegrityError
 
 base_dir = os.path.join(settings.MEDIA_ROOT, 'Schriften')
 bib = os.path.join(base_dir,"scholarium.bib")
@@ -26,16 +28,6 @@ def trelloToSQL():
     Das Ergebnis wird dann in die Datenbank geschrieben.
     Die Trello-Karten werden hinterher verschoben.
     '''
-
-    #Trello Connection
-    # with open(os.path.join(base_dir, 'trello.key'), 'r') as f:
-    #     lines = f.readlines()
-    #     client = TrelloClient(
-    #         api_key=lines[0].strip(),
-    #         # api_secret=lines[1].strip(),
-    #         token=lines[1].strip(),
-    #         # token_secret=lines[3].strip()
-    #     )
 
     client = TrelloClient(api_key=settings.TRELLO_API_KEY, token=settings.TRELLO_TOKEN)
     play_board=client.get_board('55d5dfee98d40fcb68fc0e0b')
@@ -91,15 +83,46 @@ def trelloToSQL():
                     
                 try:
                     art_neu = Artikel.objects.create(slug=id, bezeichnung=title, inhalt=public, inhalt_nur_fuer_angemeldet=private, prioritaet=priority)
+                    print('%s erfolgreich in DB übertragen.' % title)
+                except IntegrityError as e:
+                    print('Artikel schon vorhanden')
                 except Exception as e:
                     print(title, 'failed:', e)
-                    break
-                    
+                    continue
+                
                 card.change_board(played_board.id, target_list.id)
                 card.set_pos('top')
-                print('%s erfolgreich in DB übertragen.' % title)
                 
                 
+def publish():
+    '''
+    Neuer Post alle 6 Tage. Nach Priorität sortieren.
+    '''
+    # Check, ob Beitrag in letzten Tagen
+    # last = c.query('SELECT * FROM blog WHERE publ_date <= CURDATE() AND DATEDIFF(CURDATE(),publ_date) < 6')
+    artikel = Artikel.objects.all()
+    for a in artikel:
+        # if a.datum_publizieren 
+        if a.datum_publizieren:
+            print(a.datum_publizieren > date.today())# - date.today())
+    # if not last:
+    #     # Suche nach neuem Beitrag mit Priorität.
+    #     post = c.query('SELECT * FROM blog WHERE publ_date IS NULL AND priority = 1 ORDER BY n asc LIMIT 1')
+            # new = Artikel.objects.filter(datum_publizieren=None)
+    #     if not post:
+    #         # Suche nach neuem Beistrag ohne Datum.
+    #         post = c.query('SELECT * FROM blog WHERE publ_date IS NULL ORDER BY n asc LIMIT 1')
+    # 
+    #     if post:
+    #         # Setze aktuelles Datum als Veröffentlichung.
+    #         c.commit('UPDATE blog SET publ_date = CURDATE() WHERE n = %d' % post[0]['n']) #No Injection danger, post is save. Passing post as argument does not work.
+    #         print('%s veröffentlicht.' % post[0]['title'])
+    #     else:
+    #         print('Kein neuer Beitrag vorhanden.')
+    # else:
+    #     print('Letzter Beitrag vor am %s.' % last[0]['publ_date'])
+
+    
                 
 def druck(text = 'default'):
     print(text)
