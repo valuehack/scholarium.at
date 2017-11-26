@@ -294,7 +294,7 @@ def kaufen(request):
     if warenkorb.ob_versand:
         request.user.my_profile.guthaben += -5
         Nachricht.bestellung_versenden(request)
-    ob_studien = False
+    ob_studien = ob_teilnahmen = False
     for pk, ware in list(warenkorb.items.items()):
         kauf = Kauf.kauf_ausfuehren(nutzer, pk, ware)
         if kauf is None: # Rückgabewert wenn Menge nicht gereicht hat

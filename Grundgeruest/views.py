@@ -70,7 +70,7 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             'host': settings.HOSTNAME,
         })
         email_from = settings.DEFAULT_FROM_EMAIL
-        email_to = settings.DEFAULT_TO_EMAILS + [nutzer.email]
+        email_to = [nutzer.email]
         sendmail_von_userena(subject, message_plain, message_html, email_from, email_to,
               custom_headers={}, attachments=())
 
