@@ -332,6 +332,14 @@ class Kauf(models.Model):
             kommentar=kommentar)
         return kauf
 
+    def rueckabwickeln(self):
+        """ Löscht den Kauf, erstattet Guthaben
+        sollte erst eine Mail an den Nutzer senden, ist aber Quatsch """
+        preis1 = self.objekt_ausgeben().preis_ausgeben(self.art_ausgeben())
+        preis = self.menge * preis1
+        self.nutzer.guthaben += preis
+        self.delete()        
+        
     def __str__(self):
         objekt, art = self.objekt_ausgeben(mit_art=True)
         text = '{} hat am {} gekauft: {}x {}'.format(
