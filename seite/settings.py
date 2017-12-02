@@ -217,7 +217,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'iljasseite@gmail.com'
-EMAIL_HOST_PASSWORD = 'iljailja'
+EMAIL_HOST_PASSWORD = 'ad8F9hnv2Jjsk4Rg5ns'
 DEFAULT_TO_EMAILS = ['mb@scholarium.at', 'ilja1988@gmail.com']
 
 # Paypal
