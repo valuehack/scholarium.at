@@ -68,7 +68,7 @@
         {% for buch in buecher %}
         <p>
           <a href="{% url 'Bibliothek:detail_buch' buch.slug %}">{{ buch.bezeichnung|safe }}</a>
-          <br>{{ buch.jahr }}
+          <!-- <br>{{ buch.jahr }} -->
         </p>
         {% endfor %}
       </div>
