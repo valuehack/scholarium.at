@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'easycart',
     'django_countries',
+    'django_cron',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -78,6 +79,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'seite.urls'
 
@@ -226,3 +228,12 @@ PAYPAL_CLIENT_ID = 'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-P
 PAYPAL_CLIENT_SECRET = 'EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz' #get_env_variable('PAYPAL_CLIENT_SECRET')
 
 HOSTNAME = 'https://scholarium.at'
+
+## Cron
+CRON_CLASSES = [
+    'seite.cron.cron_t2sql',
+    'seite.cron.cron_publish',
+]
+
+# Release period in days
+RELEASE_PERIOD = 6

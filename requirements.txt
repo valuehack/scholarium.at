@@ -8,7 +8,9 @@ chargebee==2.3.7
 cryptography==2.0.3
 decorator==4.1.2
 Django==1.11.6
+django-common-helpers==0.9.1
 django-countries==4.5
+django-cron==0.5.0
 django-easycart==0.4.0
 django-extensions==1.7.5
 django-guardian==1.4.9
