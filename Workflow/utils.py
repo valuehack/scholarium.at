@@ -1,13 +1,10 @@
-# import mysql.connector
 import codecs
 import re
 import pypandoc
 import os
-# import subprocess
 from trello import TrelloClient
 from slugify import slugify
 import datetime
-# from db_connector import Connector
 from datetime import timedelta, date
 
 from Scholien.models import Artikel
@@ -98,31 +95,26 @@ def publish():
     '''
     Neuer Post alle 6 Tage. Nach Priorität sortieren.
     '''
+    artikel_pub = Artikel.objects.all().order_by('-datum_publizieren')
+    last = (datetime.date.today() - artikel_pub[0].datum_publizieren).days
+            
     # Check, ob Beitrag in letzten Tagen
-    # last = c.query('SELECT * FROM blog WHERE publ_date <= CURDATE() AND DATEDIFF(CURDATE(),publ_date) < 6')
-    artikel = Artikel.objects.all()
-    for a in artikel:
-        # if a.datum_publizieren 
-        if a.datum_publizieren:
-            print(a.datum_publizieren > date.today())# - date.today())
-    # if not last:
-    #     # Suche nach neuem Beitrag mit Priorität.
-    #     post = c.query('SELECT * FROM blog WHERE publ_date IS NULL AND priority = 1 ORDER BY n asc LIMIT 1')
-            # new = Artikel.objects.filter(datum_publizieren=None)
-    #     if not post:
-    #         # Suche nach neuem Beistrag ohne Datum.
-    #         post = c.query('SELECT * FROM blog WHERE publ_date IS NULL ORDER BY n asc LIMIT 1')
-    # 
-    #     if post:
-    #         # Setze aktuelles Datum als Veröffentlichung.
-    #         c.commit('UPDATE blog SET publ_date = CURDATE() WHERE n = %d' % post[0]['n']) #No Injection danger, post is save. Passing post as argument does not work.
-    #         print('%s veröffentlicht.' % post[0]['title'])
-    #     else:
-    #         print('Kein neuer Beitrag vorhanden.')
-    # else:
-    #     print('Letzter Beitrag vor am %s.' % last[0]['publ_date'])
-
-    
-                
-def druck(text = 'default'):
-    print(text)
+    if last >= settings.RELEASE_PERIOD:    
+        artikel_p = Artikel.objects.filter(datum_publizieren=None, prioritaet=True)
+        artikel_np = Artikel.objects.filter(datum_publizieren=None)
+        
+        # Check, ob Artikel mit Priorität vorhanden ist.
+        if artikel_p:
+            neu = artikel_p[0]
+        elif artikel_np:
+            print('Kein Artikel mit Priorität gefunden.')
+            neu = artikel_np[0]
+        else:
+            print('Kein neuen Artikel gefunden.')
+        
+        if neu:
+            neu.datum_publizieren = datetime.date.today()
+            neu.save()
+            print('%s publiziert.' % neu)
+    else:
+        print('Letzter Artikel bereits vor %d Tagen veröffentlicht.' % last)
