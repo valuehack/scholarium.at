@@ -14,8 +14,10 @@ class ListeAlle(ListeMitMenue):
     template_name = 'Veranstaltungen/liste_veranstaltungen.html'
     context_object_name = 'veranstaltungen'
     paginate_by = 5
-    model = Veranstaltung
-
+    
+    def get_queryset(self, **kwargs):
+        return Veranstaltung.objects.filter(datum__gte=date.today())
+    
 def liste_veranstaltungen(request, art):
     if request.user.is_authenticated():
         template_name = 'Veranstaltungen/liste_veranstaltungen.html'
