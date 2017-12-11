@@ -178,11 +178,18 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""
         return arten_attribute[art][2]
     
-    def kaeufe_finden(self):
-        pk_lang = Kauf.obj_zu_pk(self, art=0)
-        pk_start = pk_lang[:-2]
-        kaeufe = [k for k in Kauf.objects.filter(produkt_pk__startswith=pk_start)]
-        return kaeufe
+    def kaeufe_finden(self, qs=False, art=0):
+        pk_lang = Kauf.obj_zu_pk(self, art=art)
+        if not art:
+            pk_start = pk_lang[:-2]
+            queryset = Kauf.objects.filter(produkt_pk__startswith=pk_start)
+        else:
+            queryset = Kauf.objects.filter(produkt_pk=pk_lang)
+            
+        if qs:
+            return queryset
+        else:
+            return [k for k in queryset]
     
     def save(self, *args, **kwargs):
         # bei jeden save Käufe eintragen:
