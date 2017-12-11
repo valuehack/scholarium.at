@@ -79,14 +79,15 @@ class VeranstaltungDetail(DetailMitMenue):
     def post(self, request, *args, **kwargs):
         if request.user.is_staff: 
             v = Veranstaltung.objects.get(pk = request.POST.get('pk'))
-            kaeufe = list(Kauf.objects.filter(produkt_pk='%s+%s+%s' % ('veranstaltung', request.POST.get('pk'), 'teilnahme')))
-            content = '<h1>Teilnehmer für %s</h1><ul>' % v
+            kaeufe = Kauf.objects.filter(produkt_pk='%s+%s+%s' % ('veranstaltung', request.POST.get('pk'), 'teilnahme'))
+            content = '<h1>Teilnehmer für %s</h1><table style="text-align: left;"><tr><th>Nachname</th><th>Vorname</th><th>Anzahl</th><th>Email</th></tr>' % v
             n = 0
+            kaeufe = kaeufe.order_by('nutzer__user__last_name')
             for k in kaeufe:
-                teilnehme = '<li>%s %s - (%d)</li>' % (k.nutzer.user.first_name, k.nutzer.user.last_name, k.menge)
-                content += teilnehme
+                teilnahme = '<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>' % (k.nutzer.user.last_name, k.nutzer.user.first_name, k.menge, k.nutzer.user.email)
+                content += teilnahme
                 n += k.menge
-            content += '</ul><p>%d Teilnehmer</p>' % n
+            content += '</table><p>%d Teilnehmer</p>' % n
             return HttpResponse(content)#, content_type='text/plain')
         else:
             return HttpResponseForbidden()
