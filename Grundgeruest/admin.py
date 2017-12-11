@@ -12,6 +12,15 @@ from Produkte.models import Kauf
 
 # Register your models here.
 
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_filter = ('stufe', 'land')
+    search_fields = ['user__email']
+
+#admin.site.unregister(ScholariumProfile)
+admin.site.register(ScholariumProfile, ProfileAdmin)
+
+
 class UnterpunktInline(admin.TabularInline):
     model = Unterpunkt
     fields = ('bezeichnung', 'slug')
@@ -53,8 +62,3 @@ admin.site.register(get_user_model(), UserenaAdmin)
 #    fields = ('datum', 'produkt_pk')
 #    extra = 1
 #
-#class ProfileAdmin(admin.ModelAdmin):
-#    inlines = [KaufInline]
-#
-#admin.site.unregister(ScholariumProfile)
-#admin.site.register(ScholariumProfile, ProfileAdmin)

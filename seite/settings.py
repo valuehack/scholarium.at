@@ -120,6 +120,7 @@ ANONYMOUS_USER_ID = -1
 
 USERENA_WITHOUT_USERNAMES = True
 USERENA_SIGNIN_REDIRECT_URL = '/nutzer/%(username)s/'
+USERENA_REGISTER_PROFILE = False 
 LOGIN_URL = '/nutzer/anmelden/'
 LOGOUT_URL = '/nutzer/abmelden/'
 

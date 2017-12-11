@@ -231,6 +231,9 @@ class ScholariumProfile(UserenaBaseProfile):
 %s %s
 %s""" % (self.user.get_full_name(), self.strasse, self.plz, self.ort, self.land.name if self.land else '')
 
+    def __str__(self):
+        return 'Profil von %s (%s)' % (self.user.email, self.user.get_full_name())
+
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
