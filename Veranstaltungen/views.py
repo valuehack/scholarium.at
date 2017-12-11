@@ -79,7 +79,7 @@ class VeranstaltungDetail(DetailMitMenue):
     def post(self, request, *args, **kwargs):
         if request.user.is_staff: 
             v = Veranstaltung.objects.get(pk = request.POST.get('pk'))
-            kaeufe = Kauf.objects.filter(produkt_pk='%s+%s+%s' % ('veranstaltung', request.POST.get('pk'), 'teilnahme'))
+            kaeufe = v.kaeufe_finden(qs=True, art='teilnahme')
             content = '<h1>Teilnehmer für %s</h1><table style="text-align: left;"><tr><th>Nachname</th><th>Vorname</th><th>Anzahl</th><th>Email</th></tr>' % v
             n = 0
             kaeufe = kaeufe.order_by('nutzer__user__last_name')
