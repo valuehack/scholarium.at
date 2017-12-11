@@ -7,7 +7,6 @@ from slugify import slugify
 import datetime
 from datetime import timedelta, date
 
-from Scholien.models import Artikel
 from django.conf import settings
 from django.db import IntegrityError
 
@@ -16,7 +15,46 @@ bib = os.path.join(base_dir,"scholarium.bib")
 md_path = os.path.join(base_dir,"Markdown")
 html_path = os.path.join(base_dir,"HTML")
 
+def markdown_to_html(markdown):
+    # codecs.decode(markdown)
+    
+    #ids
+    p = re.compile(r"§§.*")
+    id = p.findall(markdown)
+    id = id[0][2:] if id else title
+    priority = 1 if id[0] == '!' else 0
+    id = slugify(id)
+    text = p.sub("",text, count=1)
 
+    text = "---\nbibliography: {}\n---\n\n{}\n\n## Literatur".format(bib, text)
+
+    #to html
+    md=text.read()
+    extra_args=[]
+    filters=['pandoc-citeproc']
+    html=pypandoc.convert(md, 'html', format='md',  extra_args=extra_args, filters=filters)
+
+    #blockquotes mit class versehen
+    p=re.compile("<blockquote>")
+    html=p.sub("<blockquote class=\"blockquote\">",html)
+
+    #Gedankenstriche ("--" nach "–")
+    p=re.compile("--")
+    html=p.sub("&ndash;",html)
+
+    #Trennungszeichen
+    p=re.compile(r"<p>&lt;&lt;&lt;</p>")
+    split=re.split(p,html)
+    public=split[0]
+    # lstrip entfernt mögliche Absätze am Anfang.
+    private=split[1].lstrip() if len(split) > 1 else ""
+    if not private:
+        print('Keinen privaten Teil gefunden für',title)
+        # print(html)
+    return public, private
+
+
+# TODO: Beide Funktionen zusammenfassen.
 def trelloToSQL():
     '''
     Liest Trello-Karten aus Liste "Texte lektoriert" des "Play-Boards" aus
@@ -25,6 +63,7 @@ def trelloToSQL():
     Das Ergebnis wird dann in die Datenbank geschrieben.
     Die Trello-Karten werden hinterher verschoben.
     '''
+    from Scholien.models import Artikel
 
     client = TrelloClient(api_key=settings.TRELLO_API_KEY, token=settings.TRELLO_TOKEN)
     play_board=client.get_board('55d5dfee98d40fcb68fc0e0b')

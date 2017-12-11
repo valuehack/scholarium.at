@@ -6,4 +6,4 @@ from .models import *
 
 admin.site.register(Buechlein)
 admin.site.register(Artikel)
-
+admin.site.register(MarkdownArtikel)

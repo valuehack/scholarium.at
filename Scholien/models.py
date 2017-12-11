@@ -10,6 +10,7 @@ from django.urls import reverse
 
 from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
+from Workflow.utils import markdown_to_html
 
 
 class Artikel(Grundklasse):
@@ -21,6 +22,30 @@ class Artikel(Grundklasse):
         verbose_name_plural = "Artikel"
         verbose_name = "Artikel"
         ordering = ['-datum_publizieren']
+
+class MarkdownArtikel(Grundklasse):
+    text = models.TextField()
+    prioritaet = models.PositiveSmallIntegerField(default=0)
+    class Meta:
+        verbose_name_plural = "Markdown Artikel"
+        verbose_name = "Markdown Artikel"
+        ordering = ['-zeit_erstellt']
+    
+    def artikel_erstellen(self):
+        inhalt, inhalt_angemeldet = markdown_to_html(self.text)
+        try:
+            art_neu = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt, inhalt_nur_fuer_angemeldet=inhalt_angemeldet, prioritaet=self.prioritaet)
+            art_neu.save()
+            print('%s erfolgreich in DB übertragen.' % self.bezeichnung)
+        except IntegrityError as e:
+            print('Artikel schon vorhanden')
+        except Exception as e:
+            print(self.bezeichnung, 'failed:', e)
+
+    def save(self, *args, **kwargs):
+        self.artikel_erstellen()
+        super().save(*args, **kwargs)
+        
 
 class Buechlein(KlasseMitProdukten):
     pdf = models.FileField(upload_to='scholienbuechlein', null=True, blank=True)
