@@ -99,3 +99,4 @@ class Buch(KlasseMitProdukten):
     class Meta:
         verbose_name_plural = 'Bücher'
         verbose_name = 'Buch'
+        ordering = ['-zeit_erstellt']
