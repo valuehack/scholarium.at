@@ -194,7 +194,7 @@ class ScholariumProfile(UserenaBaseProfile):
     alt_mahnstufe = models.SmallIntegerField(
         default=0, null=True, editable=False)
     alt_auslaufend = models.SmallIntegerField(
-        default=0, null=True, editable=False)
+        default=0, null=True, editable=True, verbose_name='auslaufend')
     alt_gave_credits = models.SmallIntegerField(
         default=0, null=True, editable=False)
     alt_registration_ip = models.GenericIPAddressField(
