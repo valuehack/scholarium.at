@@ -17,19 +17,10 @@ html_path = os.path.join(base_dir,"HTML")
 
 def markdown_to_html(markdown):
     # codecs.decode(markdown)
-    
-    #ids
-    p = re.compile(r"§§.*")
-    id = p.findall(markdown)
-    id = id[0][2:] if id else title
-    priority = 1 if id[0] == '!' else 0
-    id = slugify(id)
-    text = p.sub("",text, count=1)
-
-    text = "---\nbibliography: {}\n---\n\n{}\n\n## Literatur".format(bib, text)
+    text = "---\nbibliography: {}\n---\n\n{}\n\n## Literatur".format(bib, markdown)
 
     #to html
-    md=text.read()
+    md=text
     extra_args=[]
     filters=['pandoc-citeproc']
     html=pypandoc.convert(md, 'html', format='md',  extra_args=extra_args, filters=filters)
@@ -46,11 +37,11 @@ def markdown_to_html(markdown):
     p=re.compile(r"<p>&lt;&lt;&lt;</p>")
     split=re.split(p,html)
     public=split[0]
+    
     # lstrip entfernt mögliche Absätze am Anfang.
     private=split[1].lstrip() if len(split) > 1 else ""
     if not private:
-        print('Keinen privaten Teil gefunden für',title)
-        # print(html)
+        print('Keinen privaten Teil gefunden.')
     return public, private
 
 

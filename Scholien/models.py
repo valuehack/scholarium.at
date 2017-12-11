@@ -7,6 +7,7 @@ from django.core.files import File
 from urllib.request import urlopen
 import os, io
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 
 from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
@@ -26,6 +27,8 @@ class Artikel(Grundklasse):
 class MarkdownArtikel(Grundklasse):
     text = models.TextField()
     prioritaet = models.PositiveSmallIntegerField(default=0)
+    artikel = models.OneToOneField(Artikel, on_delete=models.SET_NULL, null=True, blank=True)
+    
     class Meta:
         verbose_name_plural = "Markdown Artikel"
         verbose_name = "Markdown Artikel"
@@ -33,14 +36,21 @@ class MarkdownArtikel(Grundklasse):
     
     def artikel_erstellen(self):
         inhalt, inhalt_angemeldet = markdown_to_html(self.text)
-        try:
-            art_neu = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt, inhalt_nur_fuer_angemeldet=inhalt_angemeldet, prioritaet=self.prioritaet)
-            art_neu.save()
-            print('%s erfolgreich in DB übertragen.' % self.bezeichnung)
-        except IntegrityError as e:
-            print('Artikel schon vorhanden')
-        except Exception as e:
-            print(self.bezeichnung, 'failed:', e)
+        if self.artikel: 
+            art = self.artikel
+            art.slug = self.slug
+            art.bezeichnung = self.bezeichnung    
+            art.inhalt = inhalt
+            art.inhalt_nur_fuer_angemeldet = inhalt_angemeldet
+            art.prioritaet = self.prioritaet
+        elif Artikel.objects.filter(slug=self.slug).exists():
+            raise ValidationError('Artikel-slug existiert bereits.')
+        else:
+            art = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt, inhalt_nur_fuer_angemeldet=inhalt_angemeldet, prioritaet=self.prioritaet)
+            self.artikel = art
+        art.save()
+        print('%s erfolgreich gespeichert.' % self.bezeichnung)
+            
 
     def save(self, *args, **kwargs):
         self.artikel_erstellen()
