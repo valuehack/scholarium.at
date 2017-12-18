@@ -1,7 +1,6 @@
 from django.shortcuts import render, reverse
 from django.contrib.admin.views.decorators import staff_member_required
 # from .forms import Rechnung2PdfForm
-from django.conf import settings
 from . import utils
 import inspect
 
