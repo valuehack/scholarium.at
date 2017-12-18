@@ -9,7 +9,6 @@ skripte_dir = "/home/scholarium/Skripte/"
 python_bin = skripte_dir+"venv/bin/python3.6"
 
 
-
 @staff_member_required
 def control_view(request):
     if request.method == 'POST':
@@ -19,7 +18,7 @@ def control_view(request):
             method(*args)
         else:
             method()
-        
+
     # form = Rechnung2PdfForm
     # for f in inspect.getmembers(utils, inspect.isfunction):
     #     print(f)
@@ -30,7 +29,7 @@ def control_view(request):
     methods = {
         'Trello zu PDF': {
             'name': utils.trelloToSQL.__name__,
-            'sig': inspect.signature(utils.trelloToSQL), # Not used
+            'sig': inspect.signature(utils.trelloToSQL),  # Not used
             'doc': inspect.getdoc(utils.trelloToSQL),
         },
         'String drucken': {
@@ -51,9 +50,10 @@ def control_view(request):
     return render(request, 'workflow/skripte-view.html', context)
 
 
+@staff_member_required
 def rechnung_view(request):
     if request.method == 'POST':
-        pass #TODO: import Rechnung2Pdf
+        pass  # TODO: import Rechnung2Pdf
     menu = {
         'Skripte': reverse('Workflow:skripte'),
         'Rechnungen': reverse('Workflow:rechnungen')
