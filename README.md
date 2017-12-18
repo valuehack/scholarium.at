@@ -5,15 +5,15 @@
 virtualenv -p python3 venv
 source venv/bin/activate
 ```
-###Dependencies
+### Dependencies
 ```
 pip install -r requirements.txt
 ```
-###Server mit localen Settings 
+### Server mit localen Settings 
 ```
 python manage.py runserver settings='seite.local_settings'
 ```
-###Datenbank besorgen
+### Datenbank besorgen
 ```
 scp scholarium.at:/home/scholarium/scholarium_production/db.sqlite3 .
 ```
