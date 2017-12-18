@@ -232,7 +232,7 @@ HOSTNAME = 'https://scholarium.at'
 
 ## Cron
 CRON_CLASSES = [
-    'seite.cron.cron_t2sql',
+    # 'seite.cron.cron_t2sql',
     'seite.cron.cron_publish',
 ]
 
