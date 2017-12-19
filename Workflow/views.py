@@ -1,8 +1,14 @@
+import inspect
+import csv
+from datetime import datetime
+
 from django.shortcuts import render, reverse
 from django.contrib.admin.views.decorators import staff_member_required
+from django.http import HttpResponse
+
 # from .forms import Rechnung2PdfForm
+from Grundgeruest.models import ScholariumProfile
 from . import utils
-import inspect
 
 skripte_dir = "/home/scholarium/Skripte/"
 python_bin = skripte_dir+"venv/bin/python3.6"
