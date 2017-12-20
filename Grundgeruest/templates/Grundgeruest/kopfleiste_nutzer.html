@@ -51,3 +51,11 @@
     >Warenkorb <span class="badge">{{ cart.item_count }}</span>
   </a>
 </div>
+{% if request.user.is_staff %}
+  <div class="login_button">
+    <a href="{% url 'admin:index' %}">Datenbank (Admin)</a>
+  </div>
+  <div class="login_button">
+    <a href="{% url 'Workflow:index' %}">Control-Panel</a>
+  </div>
+{% endif %}
