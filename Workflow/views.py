@@ -82,7 +82,6 @@ def rechnung_view(request):
     menu = {
         'Skripte': reverse('Workflow:skripte'),
         'Rechnungen': reverse('Workflow:rechnungen'),
-        'CSV erstellen': reverse('Workflow:csv')
     }
     # form = Rechnung2PdfForm
 
