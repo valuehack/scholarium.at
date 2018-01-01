@@ -19,5 +19,11 @@
 
     {% block body %}
     {% endblock %}
+    <div style="padding-top: 15px;">
+      <a href="/">Zur Startseite</a>
+    </div>
+    <div style="padding-top: 15px;">
+      <a href="{% url 'admin:index' %}">Zur Datenbank</a>
+    </div>
   </body>
 </html>
