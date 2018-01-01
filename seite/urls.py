@@ -32,9 +32,9 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Gast/fragen.html'),
         name='gast_fragen'),
-    url(r'^mitwirkende/',
-        ListeAktiveMitwirkende.as_view(),
-        name='gast_mitwirkende'),
+    # url(r'^mitwirkende/',
+    #     ListeAktiveMitwirkende.as_view(),
+    #     name='gast_mitwirkende'),
     url(r'^studium/$',
         ListeMitMenue.as_view(
             model=Studiumdings, # Achtung, es werden nur die studiendinger mit reihenfolge<>0 angezeigt, darüber auskommentieren!

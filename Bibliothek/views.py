@@ -4,7 +4,7 @@ import re, os
 from . import models
 from django.db import transaction
 import sqlite3 as lite
-from seite.settings import BASE_DIR
+from django.conf import settings
 from Grundgeruest.views import ListeMitMenue
 
 def liste_buecher(request):
@@ -31,7 +31,7 @@ attributnamen = {
 
 @transaction.atomic
 def aus_datei_einlesen(request, exlibris=''):
-    f = open(os.path.join(BASE_DIR, 'buchliste'), 'r')
+    f = open(os.path.join(settings.MEDIA_ROOT, 'buchliste'), 'r')
     text = f.read()[7:-2] # an die bibtex-Ausgabe von zotero angepasst
     f.close()
 
@@ -52,4 +52,3 @@ def aus_datei_einlesen(request, exlibris=''):
         buch.save()
         
     return HttpResponseRedirect('/warenkorb/')
-
