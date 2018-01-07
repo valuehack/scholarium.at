@@ -214,7 +214,7 @@ class DetailMitMenue(MenueMixin, DetailView):
 
 def index(request):
     if request.user.is_authenticated():
-        liste_artikel = Artikel.objects.order_by('-datum_publizieren')[:4]
+        liste_artikel = Artikel.objects.exclude(datum_publizieren=None).order_by('-datum_publizieren')[:4]
         alle_veranstaltungen = Veranstaltung.objects.order_by('datum')
         veranstaltungen = [v for v in alle_veranstaltungen if v.ist_zukunft()][-3:]
         medien = [v for v in alle_veranstaltungen if v.ob_aufzeichnung][-3:]
@@ -650,3 +650,7 @@ class ListeAktiveMitwirkende(ListeMitMenue):
 
     def get_queryset(self):
         return Mitwirkende.objects.exclude(end__lt=date.today())
+
+class ListeArtikel(ListeMitMenue):
+    def get_queryset(self):
+        return Artikel.objects.exclude(datum_publizieren=None).order_by('-datum_publizieren')
