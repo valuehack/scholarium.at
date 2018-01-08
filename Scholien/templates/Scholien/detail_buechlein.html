@@ -31,12 +31,8 @@
   </div>
   <div class="salon_content">
     {{ scholienbuechlein.beschreibung|safe }}
-    {% if request.user.my_profile.nicht_abgelaufen %}
-    {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
-    {% else %} <a href="{% url 'gast_spende' %}">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, erneuern Sie bitte Ihre Unterstützung</a>
-    {% endif %}
     <p style="text-align: right;">
-      <a href="{% url 'Scholien:buechlein_liste' %}">zurück zu den Scholienbüchlein</a>
+    <a href="{% url 'Scholien:buechlein_liste' %}">zurück zu den Scholienbüchlein</a>
     </p>
   </div>
 
