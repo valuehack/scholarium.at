@@ -26,9 +26,8 @@ def control_view(request):
             reverse('Workflow:csv', args={'unterstuetzer'}),
         'CSV (E-Mail: nur Interessenten)':
             reverse('Workflow:csv', args={'interessenten'}),
-        'CSV (E-Mail: nur Abgelaufende)':
+        'CSV (E-Mail: nur Abgelaufene)':
             reverse('Workflow:csv', args={'abgelaufen'}),
-        
     }
     context = {
         'menu': menu,
@@ -107,7 +106,7 @@ def csv_export(request, value):
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = \
-    'attachment; filename="{}"'.format(csv_filename)
+        'attachment; filename="{}"'.format(csv_filename)
 
     writer = csv.writer(response)
     
@@ -124,8 +123,8 @@ def csv_export(request, value):
         for one in ScholariumProfile.objects.filter(stufe=0):
             writer.writerow(['{}'.format(one.user.email)])
     elif value == 'abgelaufen':
-        writer.writerow(['Vorname','Nachname','Email','Ablaufdatum'])  # header-row
+        writer.writerow(['Vorname', 'Nachname', 'Email', 'Ablaufdatum'])  # header-row
         for one in ScholariumProfile.objects.filter(datum_ablauf__lt=date.today()):
-            writer.writerow([one.user.first_name, one.user.last_name,one.user.email,one.datum_ablauf])
+            writer.writerow([one.user.first_name, one.user.last_name, one.user.email, one.datum_ablauf])
 
     return response
