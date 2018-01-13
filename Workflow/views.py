@@ -1,6 +1,6 @@
 import inspect
 import csv
-from datetime import datetime
+from datetime import datetime, date
 
 from django.shortcuts import render, reverse
 from django.contrib.admin.views.decorators import staff_member_required
@@ -26,6 +26,8 @@ def control_view(request):
             reverse('Workflow:csv', args={'unterstuetzer'}),
         'CSV (E-Mail: nur Interessenten)':
             reverse('Workflow:csv', args={'interessenten'}),
+        'CSV (E-Mail: nur Abgelaufene)':
+            reverse('Workflow:csv', args={'abgelaufen'}),
     }
     context = {
         'menu': menu,
@@ -102,21 +104,27 @@ def csv_export(request, value):
     formatted_date = datetime.now().strftime('%d-%m-%Y_%H-%M')
     csv_filename = 'email_{0}_{1}.csv'.format(value, formatted_date)
 
-    if value == 'alle':
-        users = ScholariumProfile.objects.all()
-    elif value == 'unterstuetzer':
-        users = ScholariumProfile.objects.filter(stufe__gte=1)
-    elif value == 'interessenten':
-        users = ScholariumProfile.objects.filter(stufe=0)
-
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = \
         'attachment; filename="{}"'.format(csv_filename)
 
     writer = csv.writer(response)
-    writer.writerow(['Email'])  # header-row
-
-    for one in users:
-        writer.writerow(['{}'.format(one.user.email)])
+    
+    if value == 'alle':
+        writer.writerow(['Email'])  # header-row
+        for one in ScholariumProfile.objects.all():
+            writer.writerow(['{}'.format(one.user.email)])
+    elif value == 'unterstuetzer':
+        writer.writerow(['Email'])  # header-row
+        for one in ScholariumProfile.objects.filter(stufe__gte=1):
+            writer.writerow(['{}'.format(one.user.email)])
+    elif value == 'interessenten':
+        writer.writerow(['Email'])  # header-row
+        for one in ScholariumProfile.objects.filter(stufe=0):
+            writer.writerow(['{}'.format(one.user.email)])
+    elif value == 'abgelaufen':
+        writer.writerow(['Vorname', 'Nachname', 'Email', 'Ablaufdatum'])  # header-row
+        for one in ScholariumProfile.objects.filter(datum_ablauf__lt=date.today()):
+            writer.writerow([one.user.first_name, one.user.last_name, one.user.email, one.datum_ablauf])
 
     return response
