@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from . import views, models
-from Grundgeruest.views import ListeMitMenue, DetailMitMenue, TemplateMitMenue
+from Grundgeruest.views import DetailMitMenue
 from Bibliothek.views import liste_buecher
 
 app_name = 'Bibliothek'
@@ -18,4 +18,3 @@ urlpatterns = [
     url('^aus_datei_einlesen/([\w-]*)$', views.aus_datei_einlesen, name='einlesen'),
     url('^aus_datei_einlesen$', views.aus_datei_einlesen, name='einlesen'),
     ]
-

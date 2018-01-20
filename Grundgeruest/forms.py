@@ -2,14 +2,7 @@ from django import forms
 from userena.forms import SignupForm
 from django.contrib.auth import get_user_model
 from .models import ScholariumProfile#, MeinUserenaSignup
-from userena.models import UserenaSignup # das ist Absicht, dass das und Mein~ importiert wird
-from userena.models import UserenaSignup as MeinUserenaSignup # das ist Absicht, dass das und Mein~ importiert wird
-from userena.utils import generate_sha1, get_profile_model
 from django_countries.widgets import CountrySelectWidget
-
-from django.utils.translation import ugettext_lazy as _
-from collections import OrderedDict
-
 
 
 class Anmeldeformular(SignupForm):

@@ -1,27 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404, render, redirect
 
-from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from userena.models import UserenaSignup
-from userena.mail import UserenaConfirmationMail
-from userena.settings import USERENA_ACTIVATED
 from django.views.generic import ListView, DetailView, TemplateView
-from userena.utils import generate_sha1
 from django.conf import settings
-from guardian.models import UserObjectPermission
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.contrib.sites.models import Site
 
 from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives
 from userena.mail import send_mail as sendmail_von_userena
 
-from django.db import transaction
-import sqlite3 as lite
-import os, pdb, ipdb, json
 from .models import *
 from Produkte.models import Spendenstufe, Kauf
 from Scholien.models import Artikel
@@ -32,7 +21,15 @@ from datetime import date, timedelta, datetime
 from django.core.mail import send_mail
 import paypalrestsdk
 import pprint, string
-from django.views.decorators.csrf import csrf_exempt
+
+# profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
+from userena.decorators import secure_required
+from userena.utils import get_profile_model, get_user_model, get_user_profile
+from guardian.decorators import permission_required_or_403
+from userena import settings as userena_settings
+from userena.views import ExtraContextTemplateView
+from django.contrib import messages
+from userena.views import signin
 
 
 class Nachricht():
@@ -479,14 +476,6 @@ class paypal_von_merlin():
 
 
 
-# profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
-from userena.decorators import secure_required
-from userena.utils import get_profile_model, get_user_model, get_user_profile
-from guardian.decorators import permission_required_or_403
-from userena import settings as userena_settings
-from userena.views import ExtraContextTemplateView
-from django.contrib import messages
-from userena.views import signin
 
 
 def anmelden(request, *args, **kwargs):
@@ -632,7 +621,6 @@ def alles_aus_mysql_einlesen():
 
 
 def db_runterladen(request):
-    from django.utils.encoding import smart_str
     import os
     from seite.settings import BASE_DIR
 

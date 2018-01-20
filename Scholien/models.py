@@ -7,7 +7,6 @@ from django.core.files import File
 from urllib.request import urlopen
 import os, io
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 
 from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten

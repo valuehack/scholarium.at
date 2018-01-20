@@ -5,7 +5,6 @@ import os
 from trello import TrelloClient
 from slugify import slugify
 import datetime
-from datetime import timedelta, date
 
 from django.conf import settings
 from django.db import IntegrityError

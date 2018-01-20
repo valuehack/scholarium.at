@@ -17,8 +17,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, db_runterladen, zahlen, ListeAktiveMitwirkende
-from Grundgeruest.models import Mitwirkende
+from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, db_runterladen, zahlen
 import Grundgeruest.userena_urls as userena_urls
 from Veranstaltungen.urls import *
 from Veranstaltungen.models import Studiumdings

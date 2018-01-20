@@ -1,9 +1,7 @@
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import re, os
 from . import models
 from django.db import transaction
-import sqlite3 as lite
 from django.conf import settings
 from Grundgeruest.views import ListeMitMenue
 

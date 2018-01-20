@@ -3,7 +3,7 @@ Modelle für Produkt und die Grundklasse für Veranstaltungen etc., aus der man
 dann leicht Produkte erstellen können soll.
 """
 
-import json, six, functools
+import functools
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from seite.models import Grundklasse

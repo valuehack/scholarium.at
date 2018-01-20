@@ -6,8 +6,7 @@ from userena import views as userena_views
 from . import views as grundgeruest_views
 from userena.compat import auth_views_compat_quirks, password_reset_uid_kwarg
 
-from .forms import Anmeldeformular, ZahlungFormular
-from userena.forms import EditProfileForm
+from .forms import Anmeldeformular
 from .views import anmelden
 
 def merged_dict(dict_a, dict_b):

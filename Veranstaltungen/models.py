@@ -12,7 +12,6 @@ from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
 from django.core.urlresolvers import reverse
 from datetime import date
-import random, string
 
 
 class Veranstaltung(KlasseMitProdukten):

@@ -1,6 +1,4 @@
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
 from Grundgeruest.views import DetailMitMenue, ListeMitMenue, TemplateMitMenue, ListeArtikel
 from . import models
 
@@ -8,7 +6,7 @@ from django.db import transaction
 import sqlite3 as lite
 
 from django.conf import settings
-import os, pdb
+import os
 
 # Create your views here.
 

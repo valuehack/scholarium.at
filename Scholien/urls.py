@@ -1,7 +1,6 @@
 from django.conf.urls import url
 
-from . import models, views
-from Grundgeruest.views import DetailMitMenue, ListeMitMenue
+from . import views
 from .views import *
 
 app_name = 'Scholien'

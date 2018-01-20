@@ -1,11 +1,9 @@
-from django.shortcuts import get_object_or_404, render
-from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.contrib import messages
 
 from .models import *
-from Produkte.models import Kauf
-from Grundgeruest.views import ListeMitMenue, DetailMitMenue, TemplateMitMenue
+from Grundgeruest.views import ListeMitMenue, DetailMitMenue
 
 
 class ListeAlle(ListeMitMenue):

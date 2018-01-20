@@ -1,7 +1,6 @@
 from django.conf.urls import url, include
 
-from . import views, models
-from django.views.generic import TemplateView, ListView
+from . import views
 from Grundgeruest.views import TemplateMitMenue
 
 app_name = 'Produkte'

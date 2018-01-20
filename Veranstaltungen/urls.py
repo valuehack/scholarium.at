@@ -1,8 +1,6 @@
 from django.conf.urls import url
 
 from . import views
-from Grundgeruest.views import DetailMitMenue
-from .models import Veranstaltung
 
 app_name = 'Veranstaltungen'
 
