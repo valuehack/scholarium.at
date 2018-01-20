@@ -17,6 +17,7 @@ from django.core.exceptions import ImproperlyConfigured
 DATA_DIR = os.path.dirname(os.path.dirname(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 def get_env_variable(name):
     '''
     Gets the environment variable or throws ImproperlyConfigured exception
@@ -120,11 +121,11 @@ ANONYMOUS_USER_ID = -1
 
 USERENA_WITHOUT_USERNAMES = True
 USERENA_SIGNIN_REDIRECT_URL = '/nutzer/%(username)s/'
-USERENA_REGISTER_PROFILE = False 
+USERENA_REGISTER_PROFILE = False
 LOGIN_URL = '/nutzer/anmelden/'
 LOGOUT_URL = '/nutzer/abmelden/'
 
-SITE_ID = 2 # für localhost in der ursprünglichen DB
+SITE_ID = 2  # für localhost in der ursprünglichen DB
 
 # easycart-specific settings
 
@@ -177,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
- 
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -225,12 +226,14 @@ DEFAULT_TO_EMAILS = ['mb@scholarium.at', 'ilja1988@gmail.com']
 
 # Paypal
 PAYPAL_MODE = 'sandbox'   # sandbox or live
-PAYPAL_CLIENT_ID = 'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B' #get_env_variable('PAYPAL_CLIENT_ID')
-PAYPAL_CLIENT_SECRET = 'EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz' #get_env_variable('PAYPAL_CLIENT_SECRET')
+PAYPAL_CLIENT_ID = 'AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B'
+# get_env_variable('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = 'EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz'
+# get_env_variable('PAYPAL_CLIENT_SECRET')
 
 HOSTNAME = 'https://scholarium.at'
 
-## Cron
+# Cron
 CRON_CLASSES = [
     # 'seite.cron.cron_t2sql',
     'seite.cron.cron_publish',

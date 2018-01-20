@@ -5,8 +5,10 @@ Die Modelle der Scholien-Artikel und Büchlein
 from django.db import models
 from django.core.files import File
 from urllib.request import urlopen
-import os, io
+import os
+import io
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 
 from seite.models import Grundklasse
 from Produkte.models import KlasseMitProdukten
@@ -18,43 +20,45 @@ class Artikel(Grundklasse):
     inhalt_nur_fuer_angemeldet = models.TextField(null=True, blank=True)
     datum_publizieren = models.DateField(null=True, blank=True)
     prioritaet = models.PositiveSmallIntegerField(default=0)
+
     class Meta:
         verbose_name_plural = "Artikel"
         verbose_name = "Artikel"
         ordering = ['-datum_publizieren']
 
+
 class MarkdownArtikel(Grundklasse):
     text = models.TextField()
     prioritaet = models.PositiveSmallIntegerField(default=0)
     artikel = models.OneToOneField(Artikel, on_delete=models.SET_NULL, null=True, blank=True)
-    
+
     class Meta:
         verbose_name_plural = "Markdown Artikel"
         verbose_name = "Markdown Artikel"
         ordering = ['-zeit_erstellt']
-    
+
     def artikel_erstellen(self):
         inhalt, inhalt_angemeldet = markdown_to_html(self.text)
-        if self.artikel: 
+        if self.artikel:
             art = self.artikel
             art.slug = self.slug
-            art.bezeichnung = self.bezeichnung    
+            art.bezeichnung = self.bezeichnung
             art.inhalt = inhalt
             art.inhalt_nur_fuer_angemeldet = inhalt_angemeldet
             art.prioritaet = self.prioritaet
         elif Artikel.objects.filter(slug=self.slug).exists():
             raise ValidationError('Artikel-slug existiert bereits.')
         else:
-            art = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt, inhalt_nur_fuer_angemeldet=inhalt_angemeldet, prioritaet=self.prioritaet)
+            art = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt,
+                                         inhalt_nur_fuer_angemeldet=inhalt_angemeldet, prioritaet=self.prioritaet)
             self.artikel = art
         art.save()
         print('%s erfolgreich gespeichert.' % self.bezeichnung)
-            
 
     def save(self, *args, **kwargs):
         self.artikel_erstellen()
         super().save(*args, **kwargs)
-        
+
 
 class Buechlein(KlasseMitProdukten):
     pdf = models.FileField(upload_to='scholienbuechlein', null=True, blank=True)

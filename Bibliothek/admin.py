@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from .models import *
+from .models import Buch
 
-# Register your models here.
 
 @admin.register(Buch)
 class BuchAdmin(admin.ModelAdmin):

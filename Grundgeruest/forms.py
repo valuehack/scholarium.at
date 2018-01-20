@@ -1,7 +1,7 @@
 from django import forms
 from userena.forms import SignupForm
 from django.contrib.auth import get_user_model
-from .models import ScholariumProfile#, MeinUserenaSignup
+from .models import ScholariumProfile
 from django_countries.widgets import CountrySelectWidget
 
 
@@ -41,7 +41,7 @@ class ZahlungFormular(forms.ModelForm):
     class Meta:
         model = ScholariumProfile
         fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma',
-            'strasse', 'plz', 'ort', 'zahlungsweise', 'land']
+                  'strasse', 'plz', 'ort', 'zahlungsweise', 'land']
         widgets = {'land': CountrySelectWidget()}
 
 
@@ -53,7 +53,7 @@ class ProfilEditFormular(forms.ModelForm):
     class Meta:
         model = ScholariumProfile
         fields = ['email', 'anrede', 'vorname', 'nachname', 'tel', 'firma',
-            'strasse', 'plz', 'ort', 'land']
+                  'strasse', 'plz', 'ort', 'land']
         widgets = {'land': CountrySelectWidget()}
 
     def save(self, force_insert=False, force_update=False, commit=True):

@@ -1,22 +1,24 @@
 from django.http import HttpResponseRedirect
-import re, os
+import re
+import os
 from . import models
 from django.db import transaction
 from django.conf import settings
 from Grundgeruest.views import ListeMitMenue
+
 
 def liste_buecher(request):
     return ListeMitMenue.as_view(
         template_name='Bibliothek/buecher_alt.html',
         model=models.Buch,
         context_object_name='buecher',
-        paginate_by = 80)(request, page=request.GET.get('seite')) 
+        paginate_by=80)(request, page=request.GET.get('seite'))
 
 
 attributnamen = {
     'author': 'autor',
     'isbn': 'isbn',
-    'title': 'titel', 
+    'title': 'titel',
     'address': 'adresse',
     'edition': 'ausgabe',
     'publisher': 'herausgeber',
@@ -27,10 +29,11 @@ attributnamen = {
     'series': 'serie',
     'year': 'jahr'}
 
+
 @transaction.atomic
 def aus_datei_einlesen(request, exlibris=''):
     f = open(os.path.join(settings.MEDIA_ROOT, 'buchliste'), 'r')
-    text = f.read()[7:-2] # an die bibtex-Ausgabe von zotero angepasst
+    text = f.read()[7:-2]  # an die bibtex-Ausgabe von zotero angepasst
     f.close()
 
     trennung = re.compile('\}\n\n(?P<name>[@, \w]*)\{')
@@ -41,12 +44,12 @@ def aus_datei_einlesen(request, exlibris=''):
         bezeichnung = zeilen[0]
         matches = [teilsplit.match(zeile) for zeile in zeilen[1:]]
         daten = dict([match.groups() for match in matches if match])
-    
+
         buch = models.Buch.objects.create(bezeichnung=bezeichnung)
         buch.exlibris = exlibris
         for key in daten:
             if key in attributnamen:
                 setattr(buch, attributnamen[key], daten[key])
         buch.save()
-        
+
     return HttpResponseRedirect('/warenkorb/')

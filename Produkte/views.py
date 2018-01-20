@@ -4,7 +4,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
-
+from easycart.cart import CartException
+from django.views.generic import View
 # Create your views here.
 
 from easycart import BaseCart, BaseItem
@@ -65,12 +66,13 @@ Idee der built-in-Implementation:
      über die pk, und fügt Item(...) zum items-dict unter dem key pk hinzu.
 """
 
+
 class Ware(BaseItem):
     def __init__(self, obj, quantity=1, **kwargs):
-        if not 'art' in kwargs:
+        if 'art' not in kwargs:
             kwargs.update([('art', 1)])
         self._quantity = self.clean_quantity(quantity)
-        #pdb.set_trace()
+        # pdb.set_trace()
         self.price = obj.preis_ausgeben(kwargs['art'])
         self.obj = obj
         self.art = kwargs['art']
@@ -85,10 +87,11 @@ class Ware(BaseItem):
             self.quantity)
         extra_args = ['{}={}'.format(k, getattr(self, k)) for k in self._kwargs]
         args_repr = ', '.join([main_args] + extra_args)
-        return  '<Ware: ' + args_repr + '>'
+        return '<Ware: ' + args_repr + '>'
 
     def model_ausgeben(self):
         return self.obj.__class__.__name__.lower()
+
 
 class Warenkorb(BaseCart):
     item_class = Ware
@@ -218,7 +221,7 @@ class Warenkorb(BaseCart):
     def was_zu_versand(self):
         self.liste_zu_versand = []
         for item in self.items.values():
-            if arten_attribute[item.art][0] and item.art not in ['teilnahme', 'buchung']: # wenn max. Anzahl angegeben
+            if arten_attribute[item.art][0] and item.art not in ['teilnahme', 'buchung']:  # wenn max. Anzahl angegeben
                 self.liste_zu_versand.append(item)
         return self.liste_zu_versand
 
@@ -268,25 +271,27 @@ def bestellungen(request):
             continue
 
         if (kauf.model_ausgeben() == 'veranstaltung' and
-            kauf.art_ausgeben() in ['teilnahme', 'livestream'] and
-            kauf.objekt_ausgeben().ist_zukunft()):
+                kauf.art_ausgeben() in ['teilnahme', 'livestream'] and
+                kauf.objekt_ausgeben().ist_zukunft()):
             kaeufe['teilnahmen'].append(kauf)
         elif kauf.art_ausgeben() in ['pdf', 'epub', 'mobi', 'aufzeichnung']:
             kaeufe['digital'].append(kauf)
-# wär nett das reinzunehmen, aber dafür download-button flexibler anzeigen:
-#        elif kauf.art_ausgeben() == 'livestream': # bleibt nur vergangen
-#            kaeufe['digital'].append(kauf)            
+            # wär nett das reinzunehmen, aber dafür download-button flexibler anzeigen:
+            #        elif kauf.art_ausgeben() == 'livestream': # bleibt nur vergangen
+            #            kaeufe['digital'].append(kauf)
         else:
             kaeufe['rest'].append(kauf)
     return render(request,
-        'Produkte/bestellungen.html',
-        {'kaeufe': kaeufe, 'liste_menue': liste_menue})
+                  'Produkte/bestellungen.html',
+                  {'kaeufe': kaeufe, 'liste_menue': liste_menue})
+
 
 def kaufen(request):
     warenkorb = Warenkorb(request)
     nutzer = request.user.my_profile
     if nutzer.guthaben < warenkorb.count_total_price():
-        messages.error(request, 'Ihr Guthaben reicht leider nicht aus. Laden Sie ihr Guthaben auf, indem Sie ihre Unterstützung erneuern.')
+        messages.error(request, 'Ihr Guthaben reicht leider nicht aus. Laden Sie ihr Guthaben auf, '
+                                'indem Sie ihre Unterstützung erneuern.')
         return HttpResponseRedirect(reverse('Produkte:warenkorb'))
 
     if warenkorb.ob_versand:
@@ -295,19 +300,19 @@ def kaufen(request):
     ob_studien = ob_teilnahmen = False
     for pk, ware in list(warenkorb.items.items()):
         kauf = Kauf.kauf_ausfuehren(nutzer, pk, ware)
-        if kauf is None: # Rückgabewert wenn Menge nicht gereicht hat
+        if kauf is None:  # Rückgabewert wenn Menge nicht gereicht hat
             messages.error(request, 'Entschuldigung, die Menge des Produktes reicht für den Kauf nicht aus.')
             return HttpResponseRedirect(reverse('Produkte:warenkorb'))
         objekt = kauf.objekt_ausgeben()
         if isinstance(objekt, Studiumdings):
             ob_studien = True
-        if isinstance(objekt, Veranstaltung) and kauf.art_ausgeben()=='teilnahme':
+        if isinstance(objekt, Veranstaltung) and kauf.art_ausgeben() == 'teilnahme':
             ob_teilnahmen = True
 
     if ob_studien:
         Nachricht.studiumdings_gebucht(request)
     if ob_teilnahmen:
-        Nachricht.teilnahme_gebucht(request)        
+        Nachricht.teilnahme_gebucht(request)
     warenkorb.empty()
 
     return HttpResponseRedirect(reverse('Produkte:bestellungen'))
@@ -316,9 +321,7 @@ def kaufen(request):
 def medien_runterladen(request):
     """ bekommt als POST, welches Objekt heruntergeladen werden soll, prüft
     ob der user das darf, und gibt response mit Anhang zurück """
-    from django.utils.encoding import smart_str
     import os
-    from seite.settings import MEDIA_ROOT
 
     kauf = get_object_or_404(Kauf, id=request.POST['kauf_id'])
     if not kauf.nutzer.user == request.user:
@@ -326,7 +329,7 @@ def medien_runterladen(request):
     # sonst setze fort, falls der Nutzer das darf:
 
     obj, art = kauf.objekt_ausgeben(mit_art=True)
-    filefield = obj.datei if art=='aufzeichnung' else getattr(obj, art)
+    filefield = obj.datei if art == 'aufzeichnung' else getattr(obj, art)
     with open(filefield.path, 'rb') as datei:
         medium = datei.read()
 
@@ -334,14 +337,10 @@ def medien_runterladen(request):
     print(ext)
 
     response = HttpResponse(medium, content_type='application/force-download')
-    response['Content-Disposition'] = ('attachment; filename=' +
-        obj.slug + ext)
+    response['Content-Disposition'] = ('attachment; filename=' + obj.slug + ext)
 
     return response
 
-
-from easycart.cart import CartException
-from django.views.generic import View
 
 class CartView(View):
     """ kopiert aus easycart.views um den return-Wert zu ändern - statt
@@ -407,6 +406,7 @@ class AddItem(CartView):
             return JsonResponse(dict({'error': exc.__class__.__name__},
                                      **exc.kwargs))
         return HttpResponseRedirect(reverse('Produkte:warenkorb'))
+
 
 class RemoveItem(CartView):
     """ kopiert aus easycart.views, nutzt lokales CartView """

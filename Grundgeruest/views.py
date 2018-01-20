@@ -11,7 +11,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from userena.mail import send_mail as sendmail_von_userena
 
-from .models import *
+from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende
 from Produkte.models import Spendenstufe, Kauf
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
@@ -20,20 +20,23 @@ from .forms import ZahlungFormular, ProfilEditFormular
 from datetime import date, timedelta, datetime
 from django.core.mail import send_mail
 import paypalrestsdk
-import pprint, string
+import pprint
+import string
+import random  # was missing. Doesn't matter?
 
-# profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
+# profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten
+# (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
 from userena.decorators import secure_required
 from userena.utils import get_profile_model, get_user_model, get_user_profile
 from guardian.decorators import permission_required_or_403
 from userena import settings as userena_settings
 from userena.views import ExtraContextTemplateView
-from django.contrib import messages
 from userena.views import signin
 
 
 class Nachricht():
-    mailadresse = settings.DEFAULT_TO_EMAILS[0] # die von Georg
+    mailadresse = settings.DEFAULT_TO_EMAILS[0]  # die von Georg
+
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
         nutzer = Nutzer.objects.get(pk=nutzer_pk)
@@ -50,27 +53,27 @@ Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
             message=text,
             from_email='iljasseite@googlemail.com',
             recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
-            fail_silently = False,
+            fail_silently=False,
         )
 
-        rHerr = 'r Herr' if nutzer.my_profile.anrede=='Herr' else ' Frau'
+        rHerr = 'r Herr' if nutzer.my_profile.anrede == 'Herr' else ' Frau'
         subject = 'Herzlich willkommen'
         message_plain = None
         message_html = render_to_string(
-            'Grundgeruest/email/dank_unterstuetzung.html', {
-            'betrag': betrag, 
-            'datum': str(datetime.now()).split('.')[0],
-            'nachname': nutzer.last_name,
-            'rHerr': rHerr,
-            'pk': nutzer.pk, 
-            'zahlart': zahlart,
-            'host': settings.HOSTNAME,
-        })
+            'Grundgeruest/email/dank_unterstuetzung.html',
+            {
+             'betrag': betrag,
+             'datum': str(datetime.now()).split('.')[0],
+             'nachname': nutzer.last_name,
+             'rHerr': rHerr,
+             'pk': nutzer.pk,
+             'zahlart': zahlart,
+             'host': settings.HOSTNAME,
+            })
         email_from = settings.DEFAULT_FROM_EMAIL
         email_to = [nutzer.email]
         sendmail_von_userena(subject, message_plain, message_html, email_from, email_to,
-              custom_headers={}, attachments=())
-
+                             custom_headers={}, attachments=())
 
     @classmethod
     def bestellung_versenden(cls, request):
@@ -96,12 +99,12 @@ Waren:
             message=text,
             from_email='iljasseite@googlemail.com',
             recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
-            fail_silently = False,
+            fail_silently=False,
         )
 
     @classmethod
     def studiumdings_gebucht(cls, request):
-        nutzer = request.user
+        # nutzer = request.user
         from Produkte.views import Warenkorb
         text_warenkorb = ''
         for pk, ware in Warenkorb(request).items.items():
@@ -122,12 +125,12 @@ Vermutlich muss er eine händische Mail zur weiteren Vorgehensweise bekommen:
             message=text,
             from_email='iljasseite@googlemail.com',
             recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
-            fail_silently = False,
+            fail_silently=False,
         )
 
     @classmethod
     def teilnahme_gebucht(cls, request):
-        nutzer = request.user
+        # nutzer = request.user
         from Produkte.views import Warenkorb
         text_warenkorb = ''
         for pk, ware in Warenkorb(request).items.items():
@@ -148,33 +151,33 @@ Mailadresse für eventuelle Rückfragen:
             message=text,
             from_email='iljasseite@googlemail.com',
             recipient_list=['ilja1988@googlemail.com', cls.mailadresse],
-            fail_silently = False,
+            fail_silently=False,
         )
 
 
 def erstelle_liste_menue(user=None):
     if user is None or not user.is_authenticated() or user.my_profile.get_Status()[0] == 0:
         menue = GanzesMenue.objects.get(bezeichnung='Gast')
-    else: # d.h. wenn nicht AnonymousUser zugreift
+    else:  # d.h. wenn nicht AnonymousUser zugreift
         return [
             ({'bezeichnung': 'Scholien', 'slug': 'scholien'}, [
-            {'bezeichnung': 'Artikel', 'slug': 'scholien'},
-            {'bezeichnung': 'Büchlein', 'slug': 'scholienbuechlein'}
-            ]),
+             {'bezeichnung': 'Artikel', 'slug': 'scholien'},
+             {'bezeichnung': 'Büchlein', 'slug': 'scholienbuechlein'}
+             ]),
             ({'bezeichnung': 'Salons', 'slug': 'salons'}, [
-            ]),
+             ]),
             ({'bezeichnung': 'Seminare', 'slug': 'seminare'}, [
-            ]),
+             ]),
             ({'bezeichnung': 'Vortrag', 'slug': 'vortrag'}, [
-            ]),
+             ]),
             ({'bezeichnung': 'Bücher', 'slug': 'buecher'}, [
-            ]),
+             ]),
             ({'bezeichnung': 'Studium', 'slug': 'studium'}, [
-            {'bezeichnung': 'Studium Generale', 'slug': 'studium/studium'},
-            {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
-            {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
-            {'bezeichnung': 'Orientierungscoaching', 'slug': 'studium/orientierungscoaching'},
-            ]),
+             {'bezeichnung': 'Studium Generale', 'slug': 'studium/studium'},
+             {'bezeichnung': 'Stipendium', 'slug': 'studium/baader-stipendium'},
+             {'bezeichnung': 'Beratung', 'slug': 'studium/beratung'},
+             {'bezeichnung': 'Orientierungscoaching', 'slug': 'studium/orientierungscoaching'},
+             ]),
         ]
     liste_punkte = []
     for punkt in menue.hauptpunkt_set.all():
@@ -182,15 +185,18 @@ def erstelle_liste_menue(user=None):
         liste_punkte.append((punkt, unterpunkte))
     return liste_punkte
 
+
 def liste_menue_zurueckgeben(request):
     """ context-processor """
     liste_punkte = erstelle_liste_menue(request.user)
     return {'liste_menue': liste_punkte}
 
+
 class MenueMixin():
     from functools import partial
     extra_context = {}
     url_hier = '/'
+
     def get_context_data(self, **kwargs):
         liste_menue = erstelle_liste_menue(self.request.user)
         context = super().get_context_data(**kwargs)
@@ -203,11 +209,14 @@ class MenueMixin():
 class TemplateMitMenue(MenueMixin, TemplateView):
     pass
 
+
 class ListeMitMenue(MenueMixin, ListView):
     pass
 
+
 class DetailMitMenue(MenueMixin, DetailView):
     pass
+
 
 def index(request):
     if request.user.is_authenticated():
@@ -232,15 +241,15 @@ def index(request):
 
 
 def paypal_bestaetigung(request):
-    #from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
-    #access_token = anfrage_token()
-    #zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
+    # from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
+    # access_token = anfrage_token()
+    # zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
     # (der 'state' der Antwort wird nicht genutzt, da wir kein reproduzierbares Muster gefunden haben)
 
     paypalrestsdk.configure({
         "mode": settings.PAYPAL_MODE,
         "client_id": settings.PAYPAL_CLIENT_ID,
-        "client_secret": settings.PAYPAL_CLIENT_SECRET })
+        "client_secret": settings.PAYPAL_CLIENT_SECRET})
 
     if 'paymentID' in request.GET:
         payment = paypalrestsdk.Payment.find(request.GET['paymentID'])
@@ -249,18 +258,19 @@ def paypal_bestaetigung(request):
             betrag = int(float(payment.to_dict()['transactions'][0]['amount']['total']))
             stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
             if request.user.is_authenticated:
-                pk=request.user.pk
-                email=request.user.email
+                pk = request.user.pk
+                email = request.user.email
             else:
-                pk=request.session['neuer_nutzer_pk']
+                pk = request.session['neuer_nutzer_pk']
                 email = Nutzer.objects.get(pk=pk).email
             datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
             upgrade_nutzer(request, datendict)
             Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
 
             return HttpResponseRedirect("/spende/zahlung/")
-            #messages.error(request, 'Transaktion nicht bestätigt.')
-            #return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
+            # messages.error(request, 'Transaktion nicht bestätigt.')
+            # return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
+
 
 def upgrade_nutzer(request, datendict):
     ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
@@ -279,13 +289,14 @@ def upgrade_nutzer(request, datendict):
     messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
     return HttpResponseRedirect(reverse('Grundgeruest:index'))
 
+
 def zahlen(request):
     def formular_init():
         if request.user.is_authenticated():
             formular = ZahlungFormular(instance=request.user.my_profile,
-                    initial = {'vorname': request.user.first_name,
-                               'nachname': request.user.last_name,
-                               'email': request.user.email})
+                                       initial={'vorname': request.user.first_name,
+                                                'nachname': request.user.last_name,
+                                                'email': request.user.email})
             return formular
         else:
             return ZahlungFormular()
@@ -297,14 +308,16 @@ def zahlen(request):
         noch nicht eingeloggt ist, muss man ihn """
         if request.user.is_authenticated():
             nutzer = request.user
-            #if request.post['email'] != nutzer.email:
-            #    messages.warning(request, 'ihre emailadresse konnte nicht geändert werden. bitte nutzen sie das formular auf der profilseite unten.')
+            # if request.post['email'] != nutzer.email:
+            #    messages.warning(request, 'ihre emailadresse konnte nicht geändert werden.'
+            #                              ' bitte nutzen sie das formular auf der profilseite unten.')
         elif not (Nutzer.objects.filter(email=request.POST['email'])):
             # erstelle neuen nutzer mit eingegebenen daten:
             nutzer = Nutzer.neuen_erstellen(request.POST['email'])
             request.session['neuer_nutzer_pk'] = nutzer.pk
         else:
-            messages.warning(request, 'Wir kennen Sie schon. Bitte loggen Sie sich zur Sicherheit ein, um Ihre Daten bearbeiten und Unerstützungen eintragen.')
+            messages.warning(request, 'Wir kennen Sie schon. Bitte loggen Sie sich zur Sicherheit ein,'
+                                      ' um Ihre Daten bearbeiten und Unerstützungen eintragen.')
             return 'zu_login'
 
         profil = nutzer.my_profile
@@ -326,20 +339,21 @@ def zahlen(request):
     if request.method == 'POST':
         pprint.pprint(request.POST)
 
-        if 'von_spende' in request.POST: # falls POST von unangemeldet, keine Fehlermeldungen:
-            pass # TODO: Übertragen, von wo User gekommen sind
+        if 'von_spende' in request.POST:  # falls POST von unangemeldet, keine Fehlermeldungen:
+            pass  # TODO: Übertragen, von wo User gekommen sind
         elif 'state' in request.POST:
             return nutzer_upgrade()
         elif 'bestaetigung' in request.POST:
-            Nachricht.nutzer_gezahlt(Nutzer.objects.get(email=request.POST['email']).pk, request.POST['betrag'], {'b': 'Bar', 'u': 'Überweisung'}[request.POST['zahlungsweise']])
+            Nachricht.nutzer_gezahlt(Nutzer.objects.get(email=request.POST['email']).pk, request.POST['betrag'],
+                                     {'b': 'Bar', 'u': 'Überweisung'}[request.POST['zahlungsweise']])
             return nutzer_upgrade()
-        else: # dann POST von hier, also Daten verarbeiten:
+        else:  # dann POST von hier, also Daten verarbeiten:
             formular = ZahlungFormular(request.POST)
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
             if formular.is_valid():
-                if nutzerdaten_speichern() == 'zu_login': # dann gibt's redirect, sonst wird schlicht gespeichert
+                if nutzerdaten_speichern() == 'zu_login':  # dann gibt's redirect, sonst wird schlicht gespeichert
                     return HttpResponseRedirect('/nutzer/anmelden/?next=/spende/zahlung/')
-                if request.POST['zahlungsweise']=='p':
+                if request.POST['zahlungsweise'] == 'p':
                     context.update({'sichtbar': True})
                 else:
                     return zahlungsabwicklung_rest(request, formular)
@@ -349,7 +363,7 @@ def zahlen(request):
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
     if request.user.is_authenticated:
-        default_stufe = request.user.my_profile.stufe or 1 # also 1 falls sie 0 war
+        default_stufe = request.user.my_profile.stufe or 1  # also 1 falls sie 0 war
     else:
         default_stufe = 1
     default_betrag = Spendenstufe.objects.get(pk=default_stufe).spendenbeitrag
@@ -370,6 +384,7 @@ def zahlen(request):
 def zahlungsabwicklung_paypal(request):
     pass
 
+
 def zahlungsabwicklung_rest(request, formular):
     context = {
         'nutzer': Nutzer.objects.get(email=request.POST['email']),
@@ -379,29 +394,32 @@ def zahlungsabwicklung_rest(request, formular):
 
 
 class paypal_von_merlin():
+    '''
+    Provisorisch verschoben. Nicht verwendete Implementierung der PayPal API.
+    '''
 
     def getWebProfile():
         # Gets Paypal Web Profile
         wpn = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
 
         web_profile = paypalrestsdk.WebProfile({
-        "name": wpn,
-        # "temporary": "true",
-        "presentation": {
-            "brand_name": "scholarium",
-            "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
-            "locale_code": "AT"
-        },
-        "input_fields": {
-            "allow_note": True,
-            "no_shipping": 1,
-            "address_override": 1
-        },
-        "flow_config": {
-            "landing_page_type": "login",
-            "bank_txn_pending_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
-            "user_action": "commit"
-        }})
+            "name": wpn,
+            # "temporary": "true",
+            "presentation": {
+                "brand_name": "scholarium",
+                "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
+                "locale_code": "AT"
+            },
+            "input_fields": {
+                "allow_note": True,
+                "no_shipping": 1,
+                "address_override": 1
+            },
+            "flow_config": {
+                "landing_page_type": "login",
+                "bank_txn_pending_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+                "user_action": "commit"
+            }})
 
         if web_profile.create():
             print("Web Profile[%s] created successfully" % (web_profile.id))
@@ -410,7 +428,6 @@ class paypal_von_merlin():
             print(web_profile.error)
             return None
 
-
     def paypalZahlungErstellen(stufe):
         payment = paypalrestsdk.Payment({
             "intent": "sale",
@@ -418,7 +435,8 @@ class paypal_von_merlin():
             "payer": {
                 "payment_method": "paypal"},
             "redirect_urls": {
-                "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'), # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
+                "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+                # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
                 "cancel_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
             # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
             "transactions": [{
@@ -443,14 +461,14 @@ class paypal_von_merlin():
             pprint.pprint(payment)
             return payment
         else:
-          print(payment.error)
-          return None
+            print(payment.error)
+            return None
 
     def weiterleiten_zu_confirm():
         paypalrestsdk.configure({
             "mode": settings.PAYPAL_MODE,
             "client_id": settings.PAYPAL_CLIENT_ID,
-            "client_secret": settings.PAYPAL_CLIENT_SECRET })
+            "client_secret": settings.PAYPAL_CLIENT_SECRET})
 
         web_profile = getWebProfile()
         payment = paypalZahlungErstellen(stufe)
@@ -475,9 +493,6 @@ class paypal_von_merlin():
                 messages.error(request, 'Transaktion nicht bestätigt.')
 
 
-
-
-
 def anmelden(request, *args, **kwargs):
     '''
     Zeigt nach erfolgreicher Anmeldung definierte Meldungen an.
@@ -485,9 +500,12 @@ def anmelden(request, *args, **kwargs):
     s = signin(request, *args, **kwargs)
     if request.user.is_authenticated():
         if request.user.my_profile.get_Status()[0] == 1:
-            messages.error(request, 'Ihre Unterstützung ist abgelaufen. Um wieder Zugang zu den Inhalten zu erhalten, erneuern Sie diese bitte - <a href="/spende/zahlung">Unterstützung erneuern!</a>', extra_tags="safe")
+            messages.error(request, 'Ihre Unterstützung ist abgelaufen. Um wieder Zugang zu den Inhalten zu erhalten, '
+                                    'erneuern Sie diese bitte - <a href="/spende/zahlung">Unterstützung erneuern!</a>',
+                                    extra_tags="safe")
         if request.user.my_profile.get_Status()[0] == 2:
-            messages.error(request, 'Ihre Unterstützung läuft in weniger als 30 Tagen ab - <a href="/spende/zahlung">Unterstützung erneuern!</a>', extra_tags="safe")
+            messages.error(request, 'Ihre Unterstützung läuft in weniger als 30 Tagen ab - <a href="/spende/zahlung">'
+                                    'Unterstützung erneuern!</a>', extra_tags="safe")
     return s
 
 
@@ -543,7 +561,7 @@ def profile_edit(request, username, edit_profile_form=ProfilEditFormular,
 
     user_initial = {'vorname': user.first_name,
                     'nachname': user.last_name,
-                    'email': user.email,}
+                    'email': user.email}
 
     form = edit_profile_form(instance=profile, initial=user_initial)
 
@@ -560,21 +578,24 @@ def profile_edit(request, username, edit_profile_form=ProfilEditFormular,
 
             if success_url:
                 # Send a signal that the profile has changed
-                userena_signals.profile_change.send(sender=None,
+                userena_signals.profile_change.send(sender=None,  # Missing userena_signals import?
                                                     user=user)
                 redirect_to = success_url
-            else: redirect_to = reverse('userena_profile_detail', kwargs={'username': username})
+            else:
+                redirect_to = reverse('userena_profile_detail', kwargs={'username': username})
             return redirect(redirect_to)
 
-    if not extra_context: extra_context = dict()
+    if not extra_context:
+        extra_context = dict()
     extra_context['form'] = form
     extra_context['profile'] = profile
     return ExtraContextTemplateView.as_view(template_name=template_name,
                                             extra_context=extra_context)(request)
 
+
 def profile_detail(request, username,
-    template_name=userena_settings.USERENA_PROFILE_DETAIL_TEMPLATE,
-    extra_context=None, **kwargs):
+                   template_name=userena_settings.USERENA_PROFILE_DETAIL_TEMPLATE,
+                   extra_context=None, **kwargs):
     return HttpResponseRedirect(reverse('userena_profile_edit', kwargs={'username': username}))
 
 
@@ -601,19 +622,22 @@ def alles_aus_mysql_einlesen():
     from Veranstaltungen.views import aus_alter_db_einlesen as einlesen_v
     from Scholien.views import aus_alter_db_einlesen as einlesen_s
     liste_dateien = os.listdir('.')
-    if not 'alte_db.sql' in liste_dateien:
+    if 'alte_db.sql' not in liste_dateien:
         print("ich will jetzt die newBig Datenbank runterladen...")
-        os.system('mysqldump --extended-insert=FALSE --complete-insert=TRUE -h 37.148.204.116 -u newBig -p newBig > alte_db.sql')
+        os.system('mysqldump --extended-insert=FALSE --complete-insert=TRUE -h 37.148.204.116 '
+                  '-u newBig -p newBig > alte_db.sql')
         print('habe newBig nach alte_db.sql runtergeladen')
-    if not 'alte_db.sqlite3' in liste_dateien:
+    if 'alte_db.sqlite3' not in liste_dateien:
         os.system('./mysql2sqlite alte_db.sql | sqlite3 alte_db.sqlite3')
         print('habe alte_db.sqlite3 erzeugt')
-    if input('...werde jetzt Veranstaltungen und Medien löschen und aus alter DB übernehmen - richtig? Zum Abbrechen etwas eingeben, Fortfahren mit nur Eingabetaste'):
+    if input('...werde jetzt Veranstaltungen und Medien löschen und aus alter DB übernehmen - richtig? '
+             'Zum Abbrechen etwas eingeben, Fortfahren mit nur Eingabetaste'):
         print('abgebrochen')
     else:
         einlesen_v()
         print('eingelesen')
-    if input('...werde jetzt Scholienartikel löschen und aus alter DB übernehmen - richtig? Zum Abbrechen etwas eingeben, Fortfahren mit nur Eingabetaste'):
+    if input('...werde jetzt Scholienartikel löschen und aus alter DB übernehmen - richtig? '
+             'Zum Abbrechen etwas eingeben, Fortfahren mit nur Eingabetaste'):
         print('abgebrochen')
     else:
         einlesen_s()
@@ -632,12 +656,14 @@ def db_runterladen(request):
 
     return response
 
+
 class ListeAktiveMitwirkende(ListeMitMenue):
-    template_name='Gast/mitwirkende.html'
-    context_object_name='mitwirkende'
+    template_name = 'Gast/mitwirkende.html'
+    context_object_name = 'mitwirkende'
 
     def get_queryset(self):
         return Mitwirkende.objects.exclude(end__lt=date.today())
+
 
 class ListeArtikel(ListeMitMenue):
     def get_queryset(self):

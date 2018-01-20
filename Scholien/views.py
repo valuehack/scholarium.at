@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
 from Grundgeruest.views import DetailMitMenue, ListeMitMenue, TemplateMitMenue, ListeArtikel
+from seite.settings import BASE_DIR, MEDIA_ROOT
+from Grundgeruest.models import Nutzer
 from . import models
 
 from django.db import transaction
@@ -8,14 +10,13 @@ import sqlite3 as lite
 from django.conf import settings
 import os
 
-# Create your views here.
 
 def liste_artikel(request):
     """ Gibt Übersichtsseite mit Artikeln aus; oder, wenn GET-Daten da
     sind, ein Detail-view zu dem Artikel (Rückwärtskompatibilität!) """
 
     slug = request.GET.get('q')
-    if slug: # erst prüfen, ob was da ist
+    if slug:  # erst prüfen, ob was da ist
         return ein_artikel(request, slug)
 
     # nur wenn kein 'q' im GET, wird Liste ausgegeben:
@@ -24,18 +25,19 @@ def liste_artikel(request):
             model=models.Artikel,
             template_name='Scholien/liste_artikel.html',
             context_object_name='liste_artikel',
-            paginate_by = 5)(request, page=request.GET.get('seite'))
+            paginate_by=5)(request, page=request.GET.get('seite'))
     elif request.user.is_authenticated():
         return ListeArtikel.as_view(
             template_name='Gast/scholien_angemeldet.html',
             model=models.Artikel,
             context_object_name='liste_artikel',
-            paginate_by = 5)(request, page=request.GET.get('seite'))
+            paginate_by=5)(request, page=request.GET.get('seite'))
     else:
         return TemplateMitMenue.as_view(
             template_name='Gast/scholien.html',
             url_hier='/scholien',
             )(request)
+
 
 def liste_buechlein(request):
     if request.user.is_authenticated() and request.user.hat_guthaben():
@@ -43,7 +45,7 @@ def liste_buechlein(request):
             model=models.Buechlein,
             template_name='Scholien/liste_buechlein.html',
             context_object_name='buechlein',
-            paginate_by = 5)(request, page=request.GET.get('seite'))
+            paginate_by=5)(request, page=request.GET.get('seite'))
     else:
         # im Template wird Kleinigkeit unterschieden:
         return TemplateMitMenue.as_view(
@@ -55,20 +57,20 @@ def ein_artikel(request, slug):
     return DetailMitMenue.as_view(
         template_name='Scholien/detail.html',
         model=models.Artikel,
-        context_object_name = 'scholie')(request, slug=slug)
+        context_object_name='scholie')(request, slug=slug)
+
 
 def ein_buechlein(request, slug):
     return DetailMitMenue.as_view(
         template_name='Scholien/detail_buechlein.html',
         model=models.Buechlein,
-        context_object_name = 'scholienbuechlein')(request, slug=slug)
+        context_object_name='scholienbuechlein')(request, slug=slug)
+
 
 def daten_einlesen(request):
     aus_alter_db_einlesen()
     return HttpResponseRedirect('/scholien')
 
-from seite.settings import BASE_DIR, MEDIA_ROOT
-from Grundgeruest.models import Nutzer
 
 def pdfs_etc_einlesen():
     liste = models.Buechlein.objects.all()[2:4]
@@ -77,8 +79,8 @@ def pdfs_etc_einlesen():
         f.write('\n'.join(namen))
 
     os.system(("rsync -a --files-from=" + os.path.join(BASE_DIR, 'hey') +
-        " wertewirt@scholarium.at:~/html/production/down_secure/" +
-        "content_secure/ " + os.path.join(MEDIA_ROOT, 'scholienbuechlein')))
+               " wertewirt@scholarium.at:~/html/production/down_secure/" +
+               "content_secure/ " + os.path.join(MEDIA_ROOT, 'scholienbuechlein')))
 
     os.system("rm " + os.path.join(BASE_DIR, 'hey'))
 
@@ -99,6 +101,7 @@ def pdfs_etc_einlesen():
         bild = b.slug + '.jpg'
         b.bild_holen('http://www.scholarium.at/schriften/'+bild, bild)
         b.save()
+
 
 def aus_alter_db_einlesen():
     """ liest scholienartikel aus alter db (als

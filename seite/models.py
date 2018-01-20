@@ -5,6 +5,7 @@ Das Grundklasse-Modell, von dem die apps der Seite erben
 from django.db import models
 from django.template.defaultfilters import slugify
 
+
 class Grundklasse(models.Model):
     bezeichnung = models.CharField(max_length=200)
     slug = models.SlugField(

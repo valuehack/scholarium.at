@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import *
+from .models import Artikel, Buechlein, MarkdownArtikel
 
 # Register your models here.
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import *
+from .models import Veranstaltung, ArtDerVeranstaltung, Studiumdings
 
 admin.site.register(Veranstaltung)
 admin.site.register(ArtDerVeranstaltung)

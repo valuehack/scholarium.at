@@ -1,14 +1,20 @@
-import os, ipdb, json
+import os
+import ipdb
+import json
 
 
 def anfrage_token():
-    befehl = """cd /home/scholarium; curl -v https://api.sandbox.paypal.com/v1/oauth2/token -H "Accept: application/json" -H "Accept-Language: en_US" -u "AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B:EI3An34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz" -d "grant_type=client_credentials" > hallo.txt"""
+    befehl = """cd /home/scholarium; curl -v https://api.sandbox.paypal.com/v1/oauth2/token -H "Accept: application/json"
+    -H "Accept-Language: en_US" -u "AasKeJoihSdkebF5q7QCuubWoIpnlZiV5vfklRN6onwfU9AJYOwXJ5HvDO-PFghOdi26gGzzpc38qb7B:EI3A
+    n34Ea1-D5oKS59QwAI0mGu8ELZRT3m9YxPKfRCdoGlqlYL3Oqc8jlelBMpebtxXsKBjO4GCZmnOz"
+    -d "grant_type=client_credentials" > hallo.txt"""
     os.chdir('/home/scholarium/')
     os.system(befehl)
     with open("hallo.txt", 'r') as f:
         antwort = f.read()
     os.system('rm hallo.txt')
     return json.loads(antwort)['access_token']
+
 
 def erstelle_payment(token):
     befehl = """curl -v -X POST https://api.sandbox.paypal.com/v1/payments/payment \
@@ -83,6 +89,7 @@ def erstelle_payment(token):
     antwort = os.popen(befehl).read()
     return json.loads(antwort)
 
+
 def pruefe_payment(paymentID, token):
     befehl = """curl -v -X GET https://api.sandbox.paypal.com/v1/payments/payment/%s \\
   -H "Content-Type:application/json" \\
@@ -90,18 +97,20 @@ def pruefe_payment(paymentID, token):
     antwort = os.popen(befehl).read()
     return json.loads(antwort)
 
+
 def fuehre_payment_aus(paymentID, token, transactions, payer_id):
     befehl = """curl -v -X POST https://api.sandbox.paypal.com/v1/payments/payment/%s/execute \
 -H "Content-Type:application/json" \
 -H "Authorization: Bearer %s" \
 -d '{
-  "payer_id": "%s", 
+  "payer_id": "%s",
   "transactions": %s
 }' """ % (paymentID, token, transactions, payer_id)
     antwort = os.popen(befehl).read()
     return json.loads(antwort)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     access_token = anfrage_token()
     zahlung = erstelle_payment(access_token)
     zahlung = pruefe_payment(zahlung['id'], access_token)

@@ -109,7 +109,7 @@ def csv_export(request, value):
         'attachment; filename="{}"'.format(csv_filename)
 
     writer = csv.writer(response)
-    
+
     if value == 'alle':
         writer.writerow(['Email'])  # header-row
         for one in ScholariumProfile.objects.all():
