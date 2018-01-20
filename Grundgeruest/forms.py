@@ -27,7 +27,7 @@ class Anmeldeformular(SignupForm):
     def save(self):
         # erzeuge zufallsnamen, wie in SignupFormOnlyEmail
         Nutzer = get_user_model()
-        new_user = Nutzer.neuen_erstellen(self.cleaned_data['email'])
+        new_user = Nutzer.neuen_erstellen(self.cleaned_data['email'].lower())
 
         return new_user
 
