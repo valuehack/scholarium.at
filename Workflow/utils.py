@@ -8,7 +8,11 @@ import datetime
 
 from django.conf import settings
 from django.db import IntegrityError
-from Scholien.models import Artikel  # was missing?
+
+# from Scholien.models import Artikel
+# [Import only in line 58; therefore, *Artikel* is currently undefined in
+# *def publish()*. But if *Artikel* were imported here above,
+# a circular dependency ImportError would occur.]
 
 base_dir = os.path.join(settings.MEDIA_ROOT, 'Schriften')
 bib = os.path.join(base_dir, "scholarium.bib")
@@ -110,8 +114,10 @@ def trelloToSQL():
                     # print(html)
 
                 try:
-                    _ = Artikel.objects.create(slug=id, bezeichnung=title, inhalt=public,
-                                               inhalt_nur_fuer_angemeldet=private, prioritaet=priority)
+                    art_neu = Artikel.objects.create(
+                        slug=id, bezeichnung=title, inhalt=public,
+                        inhalt_nur_fuer_angemeldet=private, prioritaet=priority
+                    )  # *art_neu* currently not in use
                     print('%s erfolgreich in DB übertragen.' % title)
                 except IntegrityError as e:
                     print('Artikel schon vorhanden')
