@@ -177,7 +177,7 @@ class ScholariumProfile(UserenaBaseProfile):
         max_length=30,
         null=True, blank=True)
     plz = models.CharField(
-        max_length=5,
+        max_length=10,
         validators=[RegexValidator('^[0-9]+$')],
         null=True, blank=True)
     ort = models.CharField(
