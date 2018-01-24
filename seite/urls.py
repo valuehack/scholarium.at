@@ -17,10 +17,9 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, db_runterladen, zahlen, ListeAktiveMitwirkende
-from Grundgeruest.models import Mitwirkende
+from Grundgeruest.views import TemplateMitMenue, ListeMitMenue, db_runterladen, zahlen
 import Grundgeruest.userena_urls as userena_urls
-from Veranstaltungen.urls import *
+from Veranstaltungen.urls import veranstaltungen_urls, salons_urls, seminare_urls
 from Veranstaltungen.models import Studiumdings
 from Veranstaltungen.views import studiumdings_detail, vortrag
 from Produkte.models import Spendenstufe
@@ -37,10 +36,11 @@ urlpatterns = [
     #     name='gast_mitwirkende'),
     url(r'^studium/$',
         ListeMitMenue.as_view(
-            model=Studiumdings, # Achtung, es werden nur die studiendinger mit reihenfolge<>0 angezeigt, darüber auskommentieren!
-    	    template_name='Veranstaltungen/liste_studien.html',
+            model=Studiumdings,
+            # Achtung, es werden nur die studiendinger mit reihenfolge<>0 angezeigt, darüber auskommentieren!
+            template_name='Veranstaltungen/liste_studien.html',
             url_hier='/studium/',
-	        context_object_name = 'studien',
+            context_object_name='studien',
         ),
         name='liste_studium'),
     url(r'^studium/(?P<slug>[-\w]+)/$',
@@ -66,7 +66,7 @@ urlpatterns = [
         ListeMitMenue.as_view(
             template_name='Produkte/spende.html',
             model=Spendenstufe,
-            context_object_name = 'stufen'),
+            context_object_name='stufen'),
         name='gast_spende'),
     url(r'^projekte',
         TemplateMitMenue.as_view(

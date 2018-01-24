@@ -9,7 +9,6 @@ from Produkte.models import Kauf
 from django.db import transaction
 import sqlite3 as lite
 
-import ipdb
 
 try:
     os.chdir('/home/scholarium/godaddy_daten/')
@@ -49,9 +48,7 @@ def veranstaltungen_aus_db():
     
     from django.db import transaction
     import sqlite3 as lite
-    from django.conf import settings
     import os 
-    from django.http import HttpResponseRedirect
     
     # Seminare, Salons, Vorlesungen, Vorträge einlesen
     Veranstaltung.objects.all().delete()
@@ -644,4 +641,3 @@ def mediendateien_einlesen():
             if name == dateiname.split('.')[0]:
                 print("%s in %s" % (name, dateiname))
                 datei_zuordnen(name_zu_objekt[name], dateiname)
-

@@ -3,7 +3,7 @@ Modelle für Produkt und die Grundklasse für Veranstaltungen etc., aus der man
 dann leicht Produkte erstellen können soll.
 """
 
-import json, six, functools
+import functools
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from seite.models import Grundklasse
@@ -22,7 +22,7 @@ class PreiseMetaklasse(ModelBase):
     auch einfacher, habe ich aber erst später gefunden
     """
     def __new__(cls, name, parents, attribute):
-        super_new = super().__new__ # der Konstruktor von ModelBase
+        super_new = super().__new__  # der Konstruktor von ModelBase
         NeueKlasse = super_new(cls, name, parents, attribute)
 
         def setze_anzahl(self, art, anzahl):
@@ -42,7 +42,7 @@ class PreiseMetaklasse(ModelBase):
         # für KlasseMitProdukten allgemeine Funktionen setzen, die werden
         # an die Kinder vererbt; spezielle Funktionen erst bei den Kindern
         # setzen und vor allem Felder nur bei Kindern initialisieren
-        if name=='KlasseMitProdukten':
+        if name == 'KlasseMitProdukten':
             for fkt in fkts:
                 setattr(NeueKlasse, fkt.__name__, fkt)
         else:
@@ -50,18 +50,18 @@ class PreiseMetaklasse(ModelBase):
                 NeueKlasse.add_to_class(
                     'preis_%s' % art,
                     models.SmallIntegerField(null=True, blank=True))
-                if arten_attribute[art][0]: # wenn beschränkt
+                if arten_attribute[art][0]:  # wenn beschränkt
                     NeueKlasse.add_to_class(
                         'anzahl_%s' % art,
                         models.SmallIntegerField(default=0, blank=True))
-                else: # sonst keine Anzahl, sondern boolean ob aktiv
+                else:  # sonst keine Anzahl, sondern boolean ob aktiv
                     NeueKlasse.add_to_class(
                         'ob_%s' % art,
                         models.BooleanField(default=0, blank=True))
                 for fkt in fkts:
                     setattr(NeueKlasse,
-                        fkt.__name__+'_'+art,
-                        functools.partialmethod(fkt, art))
+                            fkt.__name__+'_'+art,
+                            functools.partialmethod(fkt, art))
 
         return NeueKlasse
 
@@ -81,12 +81,13 @@ arten_attribute = {
     'buchung': (1, 'Buchen', ''),
 }
 
+
 class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
     """ Von dieser Klasse erbt alles, was man in den Warenkorb legen kann
     """
 
     """ Liste aller möglichen Formate der Produktklasse """
-    arten_liste = ['spam'] # Liste von <art> str
+    arten_liste = ['spam']  # Liste von <art> str
     admin_kaeufe = models.TextField(default='', blank=True)
 
     def anzeigemodus(self, art=0):
@@ -95,33 +96,33 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         if art not in self.arten_liste:
             raise ValueError('Anzeigemodus: Bitte gültige Art angeben')
         if self.__class__.__name__ == "Buechlein":
-            if art=="druck" and self.finde_anzahl(art) == 0:
+            if art == "druck" and self.finde_anzahl(art) == 0:
                 return "verbergen"
-            elif art!="druck" and getattr(self, "ob_"+art)==False:
+            elif art != "druck" and getattr(self, "ob_"+art) is False:
                 return "verbergen"
             else:
-                return "inline" # unabhängig von der art
+                return "inline"  # unabhängig von der art
 
-        if arten_attribute[art][0]: # falls beschränkt
-            if self.finde_anzahl(art) == 0 and art=='teilnahme':
-                modus = 'ausgegraut' # ausgebuchte Veranstaltung
+        if arten_attribute[art][0]:  # falls beschränkt
+            if self.finde_anzahl(art) == 0 and art == 'teilnahme':
+                modus = 'ausgegraut'  # ausgebuchte Veranstaltung
             elif self.finde_anzahl(art) == 0:
                 modus = 'verbergen'
-            elif art=='teilnahme':
-                modus = 'mit_menge' # Veranstaltung mit select-box
+            elif art == 'teilnahme':
+                modus = 'mit_menge'  # Veranstaltung mit select-box
             # sonst nicht teilnahme, also nur beschränktes Buch (?)
-            #elif self.finde_anzahl(art) == 0:
+            # elif self.finde_anzahl(art) == 0:
             #    modus = 'verbergen'
-            elif art=='buchung':
+            elif art == 'buchung':
                 modus = 'ohne_menge'
             else:
                 modus = 'inline'
         else:
-            if art=='livestream' and self.ist_vergangen():
+            if art == 'livestream' and self.ist_vergangen():
                 modus = 'verbergen'
             elif getattr(self, 'ob_'+art) and bool(getattr(self, art)):
                 modus = 'ohne_menge'
-            elif art=='livestream' and self.ob_livestream: # auch vor dem Eintragen vom Link anzeigen
+            elif art == 'livestream' and self.ob_livestream:  # auch vor dem Eintragen vom Link anzeigen
                 modus = 'ohne_menge'
             else:
                 modus = 'verbergen'
@@ -159,7 +160,7 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
         if art not in self.arten_liste:
             raise ValueError('Bitte gültige Art für Menge angeben')
 
-        if arten_attribute[art][0]: # falls beschränkt
+        if arten_attribute[art][0]:  # falls beschränkt
             if self.finde_anzahl(art) == 0:
                 return 0
             else:
@@ -170,14 +171,14 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
 
     def ob_gekauft_von(self, kunde, art):
         for k in kunde.kauf_set.all():
-            if k.art_ausgeben()==art and int(k.obj_pk_ausgeben())==self.pk:
+            if k.art_ausgeben() == art and int(k.obj_pk_ausgeben()) == self.pk:
                 return True
         return False
 
     def format_text(self, art=0):
         """Gibt für Veranstaltungen den Text des jeweiligen Formats aus"""
         return arten_attribute[art][2]
-    
+
     def kaeufe_finden(self, qs=False, art=0):
         pk_lang = Kauf.obj_zu_pk(self, art=art)
         if not art:
@@ -185,18 +186,18 @@ class KlasseMitProdukten(Grundklasse, metaclass=PreiseMetaklasse):
             queryset = Kauf.objects.filter(produkt_pk__startswith=pk_start)
         else:
             queryset = Kauf.objects.filter(produkt_pk=pk_lang)
-            
+
         if qs:
             return queryset
         else:
             return [k for k in queryset]
-    
+
     def save(self, *args, **kwargs):
         # bei jeden save Käufe eintragen:
         kaeufe = self.kaeufe_finden()
-        self.admin_kaeufe = '\n'.join([str(k) for k in kaeufe])   
+        self.admin_kaeufe = '\n'.join([str(k) for k in kaeufe])
         return super().save(*args, **kwargs)
-        
+
     class Meta:
         abstract = True
 
@@ -222,7 +223,6 @@ class Kauf(models.Model):
     kommentar = models.CharField(max_length=255, blank=True)
     # falls was schief geht, wird das Guthaben gecached:
     guthaben_davor = models.SmallIntegerField(editable=False, null=True)
-
 
     # 2 Hilfsfunktionen um pk in drei Teile zu spalten und zurück:
     @staticmethod
@@ -296,19 +296,20 @@ class Kauf(models.Model):
         wird für den Preis.
         *** offen: Sollte der Ware Anzahl abziehen, falls beschränkt! """
         guthaben = nutzer.guthaben
-        art = Kauf.tupel_aus_pk(pk)[2] 
-        if arten_attribute[art][0]: # also falls beschränkt
+        art = Kauf.tupel_aus_pk(pk)[2]
+        if arten_attribute[art][0]:  # also falls beschränkt
             objekt = Kauf.obj_aus_pk(pk)
             menge = int(getattr(objekt, 'anzahl_'+art))
             if menge < ware.quantity:
-                return None # Kaufvorgang abbrechen wenn Menge nicht reicht 
+                return None  # Kaufvorgang abbrechen wenn Menge nicht reicht
             else:
                 menge += - ware.quantity
                 setattr(objekt, 'anzahl_'+art, menge)
                 objekt.save()
-                
+
         kauf = None
-        if art == 'teilnahme': # zusammenfassen, wenn schon vorhanden; bei anderen erstmal nicht, da vll. wichtig, dass Bücher getrennt versendet wurden, oder so
+        if art == 'teilnahme':  # zusammenfassen, wenn schon vorhanden; bei anderen erstmal nicht, da vll.
+                                # wichtig, dass Bücher getrennt versendet wurden, oder so
             kaeufe = Kauf.objects.filter(nutzer=nutzer, produkt_pk=pk)
             if len(kaeufe) == 1:
                 kauf = kaeufe[0]
@@ -345,8 +346,8 @@ class Kauf(models.Model):
         preis1 = self.objekt_ausgeben().preis_ausgeben(self.art_ausgeben())
         preis = self.menge * preis1
         self.nutzer.guthaben += preis
-        self.delete()        
-        
+        self.delete()
+
     def __str__(self):
         objekt, art = self.objekt_ausgeben(mit_art=True)
         text = '{} hat am {} gekauft: {}x {}'.format(
@@ -362,6 +363,7 @@ class Kauf(models.Model):
     class Meta():
         verbose_name_plural = 'Käufe'
 
+
 class Spendenstufe(Grundklasse):
     spendenbeitrag = models.SmallIntegerField()
     beschreibung = models.TextField()
@@ -371,6 +373,7 @@ class Spendenstufe(Grundklasse):
     gegenwert4 = models.TextField(null=True, blank=True)
     gegenwert5 = models.TextField(null=True, blank=True)
     gegenwert6 = models.TextField(null=True, blank=True)
+
     class Meta:
         verbose_name_plural = "Spendenstufen"
 

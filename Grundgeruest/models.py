@@ -20,6 +20,7 @@ from datetime import datetime
 
 from seite.models import Grundklasse
 
+
 class Menuepunkt(Grundklasse):
     sichtbar_ab = models.IntegerField(
         blank=True,
@@ -30,29 +31,38 @@ class Menuepunkt(Grundklasse):
         abstract = True
         ordering = ['nummer']
 
+
 class GanzesMenue(Grundklasse):
     pass
 
+
 class Hauptpunkt(Menuepunkt):
     gehoert_zu = models.ForeignKey(GanzesMenue)
-    class Meta: verbose_name_plural = 'Menü - Hauptpunkte'
+
+    class Meta:
+        verbose_name_plural = 'Menü - Hauptpunkte'
+
 
 class Unterpunkt(Menuepunkt):
     gehoert_zu = models.ForeignKey(Hauptpunkt)
-    class Meta: verbose_name_plural = 'Menü - Unterpunkte'
+
+    class Meta:
+        verbose_name_plural = 'Menü - Unterpunkte'
+
     def __str__(self):
         return "{}: {} - {}".format(
             self.gehoert_zu.gehoert_zu.bezeichnung,
             self.gehoert_zu.bezeichnung,
             self.bezeichnung)
 
+
 class Nutzer(AbstractUser):
     @staticmethod
     def erzeuge_zufall(laenge, sonderzeichen=3):
         s = ['abcdefghijkmnopqrstuvwxyz',
-            'ABCDEFGHJKLMNPQRSTUVWXYZ',
-            '23456789_-',
-            '@.%&+!$?/()#*']
+             'ABCDEFGHJKLMNPQRSTUVWXYZ',
+             '23456789_-',
+             '@.%&+!$?/()#*']
         zufall = []
         for i in range(laenge):
             zufall.append(random.sample(s[i % sonderzeichen], 1)[0])
@@ -74,10 +84,10 @@ class Nutzer(AbstractUser):
         username = cls.erzeuge_username()
 
         nutzer = UserenaSignup.objects.create_user(username,
-                                                     email='spam@spam.de',
-                                                     password='spam',
-                                                     active=False,
-                                                     send_email=False)
+                                                   email='spam@spam.de',
+                                                   password='spam',
+                                                   active=False,
+                                                   send_email=False)
 
         signup = nutzer.userena_signup
         salt, hash = generate_sha1(nutzer.username)
@@ -98,12 +108,12 @@ class Nutzer(AbstractUser):
         password = self.erzeuge_pw()
 
         context = {'user': signup.user,
-                  'without_usernames': userena_settings.USERENA_WITHOUT_USERNAMES,
-                  'protocol': get_protocol(),
-                  'activation_days': userena_settings.USERENA_ACTIVATION_DAYS,
-                  'activation_key': signup.activation_key,
-                  'site': Site.objects.get_current(),
-                  'passwort': password}
+                   'without_usernames': userena_settings.USERENA_WITHOUT_USERNAMES,
+                   'protocol': get_protocol(),
+                   'activation_days': userena_settings.USERENA_ACTIVATION_DAYS,
+                   'activation_key': signup.activation_key,
+                   'site': Site.objects.get_current(),
+                   'passwort': password}
 
         mailer = UserenaConfirmationMail(context=context)
         mailer.generate_mail("activation")
@@ -137,18 +147,19 @@ class Nutzer(AbstractUser):
     def __str__(self):
         return 'Nutzer {}'.format(self.email)
 
+
 class ScholariumProfile(UserenaBaseProfile):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
                                 unique=True,
                                 verbose_name=_('user'),
                                 related_name='my_profile')
     stufe_choices = [(0, 'Interessent'),
-        (1, 'Gast'),
-        (2, 'Teilnehmer'),
-        (3, 'Scholar'),
-        (4, 'Partner'),
-        (5, 'Beirat'),
-        (6, 'Patron')]
+                     (1, 'Gast'),
+                     (2, 'Teilnehmer'),
+                     (3, 'Scholar'),
+                     (4, 'Partner'),
+                     (5, 'Beirat'),
+                     (6, 'Patron')]
     stufe = models.IntegerField(
         choices=stufe_choices,
         default=0)
@@ -166,7 +177,7 @@ class ScholariumProfile(UserenaBaseProfile):
         max_length=30,
         null=True, blank=True)
     plz = models.CharField(
-        max_length = 5,
+        max_length=5,
         validators=[RegexValidator('^[0-9]+$')],
         null=True, blank=True)
     ort = models.CharField(
@@ -207,7 +218,7 @@ class ScholariumProfile(UserenaBaseProfile):
             (2, "30 Tage bis Ablauf"),
             (3, "Aktiv")
         ]
-        if self.datum_ablauf == None:
+        if self.datum_ablauf is None:
             return status[0]
         else:
             verbleibend = (self.datum_ablauf - datetime.now().date()).days
@@ -221,10 +232,10 @@ class ScholariumProfile(UserenaBaseProfile):
                 return status[3]
 
     def guthaben_aufladen(self, betrag):
-        """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """        
+        """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """
         self.guthaben += int(betrag)
         self.save()
-    
+
     def adresse_ausgeben(self):
         return """%s
 %s
@@ -238,13 +249,14 @@ class ScholariumProfile(UserenaBaseProfile):
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
 
+
 class Mitwirkende(models.Model):
 
     level_choices = [(1, 'Rektor'),
-        (2, 'Gründer'),
-        (3, 'Mitarbeiter'),
-        (4, 'Mentor'),
-        (8, 'Student')]
+                     (2, 'Gründer'),
+                     (3, 'Mitarbeiter'),
+                     (4, 'Mentor'),
+                     (8, 'Student')]
 
     name = models.CharField(max_length=100)
     alt_id = models.PositiveSmallIntegerField(default=0)
@@ -252,7 +264,7 @@ class Mitwirkende(models.Model):
     text_en = models.TextField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
     level = models.PositiveSmallIntegerField(default=1,
-        choices=level_choices)
+                                             choices=level_choices)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
 

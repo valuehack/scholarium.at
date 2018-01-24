@@ -1,22 +1,20 @@
-"""
-
-"""
-
 from django.db import models
 from Produkte.models import KlasseMitProdukten
 from django.urls import reverse
+
 
 class Altes_Buch(KlasseMitProdukten):
     arten_liste = ['kaufen']
     autor_und_titel = models.CharField(
         max_length=255,
         null=True, blank=True)
+
     def button_text(self, _):
         return 'Auswählen'
 
 
 class Buch(KlasseMitProdukten):
-    arten_liste = ['kaufen', 'leihen', 'druck', 'pdf', 'mobi', 'epub'] #
+    arten_liste = ['kaufen', 'leihen', 'druck', 'pdf', 'mobi', 'epub']
     # druck bedeutet neu und kaufen ist ein gebrauchtes Bibliotheksbuch
     titel = models.CharField(
         max_length=255,
@@ -66,13 +64,13 @@ class Buch(KlasseMitProdukten):
         return reverse('Bibliothek:detail_buch', kwargs={'slug': self.slug})
 
     def preis_ausgeben(self, art):
-        if art=='leihen':
+        if art == 'leihen':
             return self.finde_preis(art) or 13
-        elif art=='kaufen':
+        elif art == 'kaufen':
             return self.finde_preis(art) or 37
         elif art in ['pdf', 'epub', 'mobi']:
             return self.finde_preis(art) or 5
-        elif art=='druck':
+        elif art == 'druck':
             return self.finde_preis(art) or 20
 
     def button_text(self, art):
@@ -89,9 +87,10 @@ class Buch(KlasseMitProdukten):
             return 'mit_menge'
         elif arten_attribute[art][0] and self.finde_anzahl(art) == 0:
             return 'verbergen'
-        elif arten_attribute[art][0]: # beschränkt, genau eins
+        elif arten_attribute[art][0]:  # beschränkt, genau eins
             return 'ohne_menge'
-        elif getattr(self, 'ob_'+art) and bool(getattr(self, art)): # wenn unbeschränkt, gucke nach Datei und ob aktiviert
+        elif getattr(self, 'ob_'+art) and bool(getattr(self, art)):
+            # wenn unbeschränkt, gucke nach Datei und ob aktiviert
             return 'inline'
         else:
             return 'verbergen'
