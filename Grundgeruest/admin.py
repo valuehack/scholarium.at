@@ -9,8 +9,31 @@ from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende
 # Register your models here.
 
 
+class StufenPlusUnterstuetzerListFilter(admin.SimpleListFilter):
+    """
+    This filter extends the common list_filter = ('stufe') by the option
+    "Unterstützer (alle)", i.e. stufe > 0.
+    """
+    title = 'Stufe'
+    parameter_name = 'stufe'
+
+    extended_stufe_choices = ScholariumProfile.stufe_choices.copy()
+    extended_stufe_choices.insert(1, ('unterstuetzer', 'Unterstützer (alle)'))
+
+    def lookups(self, request, model_admin):
+        return self.extended_stufe_choices
+
+    def queryset(self, request, queryset):
+        if self.value() == 'unterstuetzer':
+            return queryset.filter(stufe__gte=1)
+        else:
+            for stufe_nr, stufe_name in self.extended_stufe_choices:
+                if self.value() == str(stufe_nr):
+                    return queryset.filter(stufe__exact=stufe_nr)
+
+
 class ProfileAdmin(admin.ModelAdmin):
-    list_filter = ('stufe', 'land')
+    list_filter = (StufenPlusUnterstuetzerListFilter, 'land')
     search_fields = ['user__email']
 
 
