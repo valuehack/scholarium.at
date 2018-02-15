@@ -46,7 +46,7 @@ class ZahlungFormular(forms.ModelForm):
 
 
 class ProfilEditFormular(forms.ModelForm):
-    email = forms.EmailField()
+    email = forms.EmailField(disabled=True)
     vorname = forms.CharField(required=False)
     nachname = forms.CharField(required=False)
 
