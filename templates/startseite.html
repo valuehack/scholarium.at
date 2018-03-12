@@ -37,7 +37,7 @@
     <div>
       <h1>Scholien</h1>
       <div>
-        {% for artikel in liste_artikel|slice:"1:4" %}
+        {% for artikel in liste_artikel|slice:"1:" %}
         <p>
           <a href="{% url 'Scholien:artikel_detail' artikel.slug %}">{{ artikel.bezeichnung|safe }}</a>
           <br>{{ artikel.datum_publizieren }}
