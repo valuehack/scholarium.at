@@ -9,11 +9,6 @@ import datetime
 from django.conf import settings
 from django.db import IntegrityError
 
-# from Scholien.models import Artikel
-# [Import only in line 58; therefore, *Artikel* is currently undefined in
-# *def publish()*. But if *Artikel* were imported here above,
-# a circular dependency ImportError would occur.]
-
 base_dir = os.path.join(settings.MEDIA_ROOT, 'Schriften')
 bib = os.path.join(base_dir, "scholarium.bib")
 md_path = os.path.join(base_dir, "Markdown")
@@ -133,6 +128,8 @@ def publish():
     '''
     Neuer Post alle 6 Tage. Nach Priorität sortieren.
     '''
+    from Scholien.models import Artikel
+    
     artikel_pub = Artikel.objects.all().order_by('-datum_publizieren')
     last = (datetime.date.today() - artikel_pub[0].datum_publizieren).days
 
