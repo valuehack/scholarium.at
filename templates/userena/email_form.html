@@ -1,0 +1,16 @@
+{% extends 'userena/base_userena.html' %}
+{% load i18n %}
+
+{% block content_title %}<h2>{% blocktrans with user.username as username %}Account &raquo; {{ username }}{% endblocktrans %}</h2>{% endblock %}
+
+{% block content %}
+<div class="profil wrapper">
+<form action="" method="post">
+  {% csrf_token %}
+  <fieldset>
+    <p>{{ form.as_p }}</p>
+  </fieldset>
+  <input type="submit" value="{% trans "Change email" %}" />
+</form>
+</div>
+{% endblock %}
