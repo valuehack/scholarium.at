@@ -9,8 +9,8 @@
       <tr>
         {% for key, tab in menu.items %}
         <td>
-          <form action='{{tab}}'>
-            <button type='submit'>{{ key }}</button>
+          <form action="{{tab}}">
+            <button type="submit">{{ key }}</button>
           </form>
         </td>
         {% endfor %}
@@ -18,6 +18,12 @@
     </table>
 
     {% block body %}
+    <h2>Nutzerdaten herunterladen</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {{ csv_form }}
+      <input type="submit" value="Submit" />
+    </form>
     {% endblock %}
     <div style="padding-top: 15px;">
       <a href="/">Zur Startseite</a>

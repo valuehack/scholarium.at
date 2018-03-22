@@ -1,4 +1,5 @@
 from django import forms
+from Grundgeruest.models import ScholariumProfile
 
 
 class Rechnung2PdfForm(forms.Form):
@@ -29,3 +30,24 @@ Deutschland''', widget=forms.Textarea)
 
 class TrelloToSQLForm():
     pass
+
+
+class CSVForm(forms.Form):
+    fields = [
+        ('anrede', 'Anrede'),
+        ('first_name', 'Vorname'),
+        ('last_name', 'Nachname'),
+        ('email', 'Email'),
+        ('strasse', 'Straße'),
+        ('ort', 'Ort'),
+        ('land', 'Land'),
+        ('firma', 'Firma'),
+        ('plz', 'Postleitzahl'),
+    ]
+    state_fields = [
+        ('abgelaufen', 'abgelaufen'),
+        ('aktiv', 'aktiv'),
+    ]
+    values = forms.MultipleChoiceField(fields, widget=forms.CheckboxSelectMultiple)
+    stufen = forms.MultipleChoiceField(ScholariumProfile.stufe_choices, widget=forms.CheckboxSelectMultiple)
+    states = forms.MultipleChoiceField(state_fields, widget=forms.CheckboxSelectMultiple)

@@ -6,31 +6,27 @@ from django.shortcuts import render, reverse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 
-# from .forms import Rechnung2PdfForm
+from .forms import CSVForm
 from Grundgeruest.models import ScholariumProfile
 from . import utils
 
 skripte_dir = "/home/scholarium/Skripte/"
-python_bin = skripte_dir+"venv/bin/python3.6"
+python_bin = skripte_dir + "venv/bin/python3.6"
 
 
 @staff_member_required
 def control_view(request):
+    if request.method == 'POST':
+        return csv_export(request)
 
     menu = {
-        'Skripte': reverse('Workflow:skripte'),
         'Rechnungen': reverse('Workflow:rechnungen'),
-        'CSV (E-Mail: Unterstützer & Interessenten)':
-            reverse('Workflow:csv', args={'alle'}),
-        'CSV (E-Mail: nur Unterstützer)':
-            reverse('Workflow:csv', args={'unterstuetzer'}),
-        'CSV (E-Mail: nur Interessenten)':
-            reverse('Workflow:csv', args={'interessenten'}),
-        'CSV (E-Mail: nur Abgelaufene)':
-            reverse('Workflow:csv', args={'abgelaufen'}),
     }
+
+    csv_form = CSVForm()
     context = {
         'menu': menu,
+        'csv_form': csv_form,
     }
 
     return render(request, 'workflow/control-frame.html', context)
@@ -95,14 +91,17 @@ def rechnung_view(request):
 
 
 @staff_member_required
-def csv_export(request, value):
+def csv_export(request):
     """
-    Generates csv-files with email addresses for manual import to Sendgrid
-    (to send the newsletter); *value* has 3 cases according to which button is
-    clicked (see control_view): alle, unterstuetzer and interessenten.
+    Generates csv-files with selected filters. (i.e. for manual import to Sendgrid)
     """
+    values = request.POST.getlist('values')
+
     formatted_date = datetime.now().strftime('%d-%m-%Y_%H-%M')
-    csv_filename = 'email_{0}_{1}.csv'.format(value, formatted_date)
+    csv_filename = '{0}_{1}_{2}_{3}.csv'.format('+'.join(request.POST.getlist('stufen')),
+                                                formatted_date,
+                                                '+'.join(request.POST.getlist('values')),
+                                                '+'.join(request.POST.getlist('states')))
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = \
@@ -110,21 +109,28 @@ def csv_export(request, value):
 
     writer = csv.writer(response)
 
-    if value == 'alle':
-        writer.writerow(['Email'])  # header-row
-        for one in ScholariumProfile.objects.all():
-            writer.writerow(['{}'.format(one.user.email)])
-    elif value == 'unterstuetzer':
-        writer.writerow(['Email'])  # header-row
-        for one in ScholariumProfile.objects.filter(stufe__gte=1):
-            writer.writerow(['{}'.format(one.user.email)])
-    elif value == 'interessenten':
-        writer.writerow(['Email'])  # header-row
-        for one in ScholariumProfile.objects.filter(stufe=0):
-            writer.writerow(['{}'.format(one.user.email)])
-    elif value == 'abgelaufen':
-        writer.writerow(['Vorname', 'Nachname', 'Email', 'Ablaufdatum'])  # header-row
-        for one in ScholariumProfile.objects.filter(datum_ablauf__lt=date.today()):
-            writer.writerow([one.user.first_name, one.user.last_name, one.user.email, one.datum_ablauf])
+    # Filter for selected tiers
+    profiles = ScholariumProfile.objects.filter(stufe__in=request.POST.getlist('stufen'))
+
+    states = request.POST.getlist('states')
+    if 'abgelaufen' not in states:
+        profiles = profiles.filter(datum_ablauf__gte=date.today())
+
+    if 'aktiv' not in states:
+        profiles = profiles.filter(datum_ablauf__lt=date.today())
+
+    # Split Nutzer values from Scholariumprofil values, because getattr() can't handle nested values
+    user_values = []
+    profile_values = []
+
+    for i in values:
+        if i in ['first_name', 'last_name', 'email']:
+            user_values.append(i)
+        else:
+            profile_values.append(i)
+
+    writer.writerow(user_values + profile_values)  # header-row
+    for profile in profiles:
+        writer.writerow([getattr(profile.user, value) for value in user_values] + [getattr(profile, value) for value in profile_values])
 
     return response
