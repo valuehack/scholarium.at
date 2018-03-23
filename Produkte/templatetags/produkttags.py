@@ -67,15 +67,17 @@ def ob_kaufbutton_zeigen(objekt, kunde, art):
 
 from Veranstaltungen.models import Veranstaltung, ArtDerVeranstaltung
 @register.simple_tag
-def ob_livestream_zeigen(veranstaltung, kunde):
-    """ ob der livestream-Block im Detail-view zu sehen ist """
+def ob_video_zeigen(veranstaltung, kunde):
+    """ ob der Video-Block im Detail-view zu sehen ist """
     salonart = ArtDerVeranstaltung.objects.get(bezeichnung="Salon")
+    seminarart = ArtDerVeranstaltung.objects.get(bezeichnung="Seminar")
+    
     if not kunde:
         return False
-    if not veranstaltung.art_veranstaltung == salonart:
+    if not (veranstaltung.art_veranstaltung == salonart or veranstaltung.art_veranstaltung == seminarart):
         return False
 
-    if not veranstaltung.ob_aktiv('livestream'):
+    if not (veranstaltung.ob_aktiv('livestream') or veranstaltung.ob_aktiv('aufzeichnung')):
         return False
 
     if veranstaltung.ist_zukunft() and not veranstaltung.ist_bald(60):

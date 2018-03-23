@@ -1,9 +1,9 @@
 <div class="separator">
   <h2>
     {% if veranstaltung.ist_vergangen %}
-      Video des Salons
+      Video des {{ veranstaltung.art_veranstaltung }}s
     {% else %}
-      Salon-Livestream
+      {{ veranstaltung.art_veranstaltung }}-Livestream
     {% endif %}
   </h2>
 </div>
