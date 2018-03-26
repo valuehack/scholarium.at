@@ -16,7 +16,7 @@ from userena.utils import generate_sha1
 from django.core.validators import RegexValidator
 import random
 from django_countries.fields import CountryField
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from seite.models import Grundklasse
 
@@ -153,14 +153,14 @@ class ScholariumProfile(UserenaBaseProfile):
                                 unique=True,
                                 verbose_name=_('user'),
                                 related_name='my_profile')
-    stufe_choices = [(0, 'Interessent'),
+    stufe_choices = [(0, 'Interessent'),  # TODO: Delete.
                      (1, 'Gast'),
                      (2, 'Teilnehmer'),
                      (3, 'Scholar'),
                      (4, 'Partner'),
                      (5, 'Beirat'),
                      (6, 'Patron')]
-    stufe = models.IntegerField(
+    stufe = models.IntegerField(  # TODO: Delete.
         choices=stufe_choices,
         default=0)
     anrede = models.CharField(
@@ -192,8 +192,8 @@ class ScholariumProfile(UserenaBaseProfile):
     anredename = models.CharField(
         max_length=30,
         null=True, blank=True)
-    letzte_zahlung = models.DateField(null=True, blank=True)
-    datum_ablauf = models.DateField(null=True, blank=True)
+    letzte_zahlung = models.DateField(null=True, blank=True)  # TODO: Delete.
+    datum_ablauf = models.DateField(null=True, blank=True)  # TODO: Delete.
     alt_id = models.SmallIntegerField(
         default=0, editable=False)
     alt_notiz = models.CharField(
@@ -210,6 +210,18 @@ class ScholariumProfile(UserenaBaseProfile):
     alt_registration_ip = models.GenericIPAddressField(
         editable=False, null=True)
 
+    def get_unterstuetzungen(self):
+        '''Gibt alle bisherigen Unterstützungen zurück.'''
+        return Unterstuetzung.objects.filter(user=self).order_by('-datum')
+
+    def get_ablauf(self):
+        '''Gibt das Ablaufdatum der letzten Unterstützung zurück.'''
+        u = self.get_unterstuetzungen()
+        if u:
+            return u[0].get_ablauf()
+        else:
+            return False
+
     def get_Status(self):
         status = [
             (0, "Kein Unterstützer"),
@@ -217,10 +229,10 @@ class ScholariumProfile(UserenaBaseProfile):
             (2, "30 Tage bis Ablauf"),
             (3, "Aktiv")
         ]
-        if self.datum_ablauf is None:
+        if self.get_ablauf is None:
             return status[0]
         else:
-            verbleibend = (self.datum_ablauf - datetime.now().date()).days
+            verbleibend = (self.get_ablauf - datetime.now().date()).days
             if self.stufe == 0:
                 return status[0]
             elif verbleibend < 0:
@@ -247,6 +259,24 @@ class ScholariumProfile(UserenaBaseProfile):
     class Meta():
         verbose_name = 'Nutzerprofil'
         verbose_name_plural = 'Nutzerprofile'
+
+
+class Stufe(Grundklasse):
+    betrag = models.IntegerField()
+    inhalt = models.TextField()
+
+
+class Unterstuetzung(Grundklasse):
+    DEFAULT_DURATION = timedelta(days=365)
+    
+    user = models.ForeignKey(ScholariumProfile, on_delete=models.CASCADE)
+    stufe = models.ForeignKey(Stufe, on_delete=models.PROTECT)
+    datum = models.DateField(default=date.today())
+    zahlungsmethode = models.CharField(blank=True)
+    
+    def get_ablauf(self):
+        '''Gibt Ablaufdatum der Unterstützung zurück.'''
+        return self.datum + self.DEFAULT_DURATION
 
 
 class Mitwirkende(models.Model):

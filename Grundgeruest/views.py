@@ -278,7 +278,6 @@ def paypal_bestaetigung(request):
 
 def upgrade_nutzer(request, datendict):
     ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
-    # FIXME: Höhere Stufe kann durch kleinere verlängert werden! Unterstützungsmodel implementieren stattdesssen!
     if request.user.is_authenticated():
         nutzer = request.user
     else:
