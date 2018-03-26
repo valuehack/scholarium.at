@@ -11,7 +11,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from userena.mail import send_mail as sendmail_von_userena
 
-from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende
+from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende, Unterstuetzung, Stufe
 from Produkte.models import Spendenstufe, Kauf
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
@@ -279,16 +279,19 @@ def paypal_bestaetigung(request):
 def upgrade_nutzer(request, datendict):
     ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
     if request.user.is_authenticated():
-        nutzer = request.user
+        profile = request.user.my_profile
     else:
-        nutzer = Nutzer.objects.get(email=datendict['email'])
-    if nutzer.my_profile.stufe < int(datendict['stufe']):
-        nutzer.my_profile.stufe = int(datendict['stufe'])
-    nutzer.my_profile.guthaben_aufladen(int(datendict['betrag']))
-    today = datetime.now().date()
-    nutzer.my_profile.letzte_zahlung = today
-    nutzer.my_profile.datum_ablauf = today + timedelta(days=365)
-    nutzer.my_profile.save()
+        profile = Nutzer.objects.get(email=datendict['email']).my_profile
+
+    unterstuetzung = Unterstuetzung(user=profile,
+                                    stufe=Stufe.objects.get(pk=datendict['stufe']),
+                                    datum=date.today(),
+                                    zahlungsmethode=datendict['zahlungsweise'])
+    unterstuetzung.save()
+
+    profile.guthaben_aufladen(int(datendict['betrag']))
+    profile.save()
+
     messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
     return HttpResponseRedirect(reverse('Grundgeruest:index'))
 

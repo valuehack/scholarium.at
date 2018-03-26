@@ -212,15 +212,22 @@ class ScholariumProfile(UserenaBaseProfile):
 
     def get_unterstuetzungen(self):
         '''Gibt alle bisherigen Unterstützungen zurück.'''
-        return Unterstuetzung.objects.filter(user=self).order_by('-datum')
+        return Unterstuetzung.objects.filter(user=self)
+
+    def get_active(self):
+        '''Gibt höchste aktive Unterstützung zurück'''
+        active = [u for u in self.get_unterstuetzungen() if u.get_ablauf() >= date.today()]
+        return active.order_by('-stufe__betrag')[0] if active else None
+
+    def get_stufe(self):  # TODO: Wahrscheinlich unnötig, sollte wohl weg.
+        '''Gibt HÖCHSTE aktive Stufe zurück.'''
+        active = self.get_active()
+        return active.stufe if active else None
 
     def get_ablauf(self):
-        '''Gibt das Ablaufdatum der letzten Unterstützung zurück.'''
-        u = self.get_unterstuetzungen()
-        if u:
-            return u[0].get_ablauf()
-        else:
-            return False
+        '''Gibt das Ablaufdatum der NEUSTEN Unterstützung zurück.'''
+        u = self.get_unterstuetzungen().order_by('-datum')
+        return u[0].get_ablauf() if u else None
 
     def get_Status(self):
         status = [
@@ -229,9 +236,7 @@ class ScholariumProfile(UserenaBaseProfile):
             (2, "30 Tage bis Ablauf"),
             (3, "Aktiv")
         ]
-        if self.get_ablauf is None:
-            return status[0]
-        else:
+        if self.get_ablauf:
             verbleibend = (self.get_ablauf - datetime.now().date()).days
             if self.stufe == 0:
                 return status[0]
@@ -241,6 +246,8 @@ class ScholariumProfile(UserenaBaseProfile):
                 return status[2]
             else:
                 return status[3]
+        else:
+            return status[0]
 
     def guthaben_aufladen(self, betrag):
         """ wird spaeter nuetzlich, wenn hier mehr als die eine Zeile^^ """
