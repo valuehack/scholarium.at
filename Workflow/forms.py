@@ -43,6 +43,7 @@ class CSVForm(forms.Form):
         ('land', 'Land'),
         ('firma', 'Firma'),
         ('plz', 'Postleitzahl'),
+        ('datum_ablauf', 'Ablaufsdatum')
     ]
     state_fields = [
         ('abgelaufen', 'abgelaufen'),
