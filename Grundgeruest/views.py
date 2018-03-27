@@ -7,11 +7,10 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.sites.models import Site
-
 from django.template.loader import render_to_string
 from userena.mail import send_mail as sendmail_von_userena
 
-from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende, Unterstuetzung, Stufe
+from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende, Unterstuetzung
 from Produkte.models import Spendenstufe, Kauf
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
@@ -284,7 +283,7 @@ def upgrade_nutzer(request, datendict):
         profile = Nutzer.objects.get(email=datendict['email']).my_profile
 
     unterstuetzung = Unterstuetzung(profil=profile,
-                                    stufe=Stufe.objects.get(pk=datendict['stufe']),
+                                    stufe=Spendenstufe.objects.get(pk=datendict['stufe']),
                                     datum=date.today(),
                                     zahlungsmethode=datendict['zahlungsweise'])
     unterstuetzung.save()
@@ -584,7 +583,7 @@ def profile_edit(request, username, edit_profile_form=ProfilEditFormular,
 
             if success_url:
                 # Send a signal that the profile has changed
-                userena_signals.profile_change.send(sender=None,  # Missing userena_signals import?
+                userena_signals.profile_change.send(sender=None,  # TODO: Missing userena_signals import?
                                                     user=user)
                 redirect_to = success_url
             else:

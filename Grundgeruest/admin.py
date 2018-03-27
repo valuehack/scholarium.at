@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from guardian.admin import GuardedModelAdmin
 from userena.models import UserenaSignup
 
-from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unterstuetzung, Stufe
+from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unterstuetzung
 
 # Register your models here.
 
@@ -58,7 +58,6 @@ class UnterstuetzungAdmin(admin.ModelAdmin):
 admin.site.register(Hauptpunkt, HauptpunktAdmin)
 admin.site.register(Unterpunkt)
 admin.site.register(Mitwirkende)
-admin.site.register(Stufe)
 admin.site.register(Unterstuetzung, UnterstuetzungAdmin)
 
 
