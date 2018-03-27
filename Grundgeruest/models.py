@@ -19,6 +19,7 @@ from django_countries.fields import CountryField
 from datetime import datetime, date, timedelta
 
 from seite.models import Grundklasse
+from Produkte.models import Spendenstufe
 
 
 class Menuepunkt(Grundklasse):
@@ -216,11 +217,11 @@ class ScholariumProfile(UserenaBaseProfile):
 
     def get_aktiv(self):
         '''Gibt HÖCHSTE aktive Unterstützung zurück'''
-        stufen = self.get_unterstuetzungen().order_by('-stufe__betrag')
+        stufen = self.get_unterstuetzungen().order_by('-stufe__spendenbeitrag')
         aktiv = [u for u in stufen if u.get_ablauf() >= date.today()]
         return aktiv[0] if aktiv else None
 
-    def get_stufe(self):  # TODO: Wahrscheinlich unnötig, sollte wohl weg.
+    def get_stufe(self):
         '''Gibt HÖCHSTE aktive Stufe zurück.'''
         aktiv = self.get_aktiv()
         return aktiv.stufe if aktiv else None
@@ -239,9 +240,7 @@ class ScholariumProfile(UserenaBaseProfile):
         ]
         if self.get_ablauf():
             verbleibend = (self.get_ablauf() - datetime.now().date()).days
-            if self.stufe == 0:
-                return status[0]
-            elif verbleibend < 0:
+            if verbleibend < 0:
                 return status[1]
             elif verbleibend < 30:
                 return status[2]
@@ -269,32 +268,20 @@ class ScholariumProfile(UserenaBaseProfile):
         verbose_name_plural = 'Nutzerprofile'
 
 
-class Stufe(Grundklasse):
-    id = models.IntegerField(primary_key=True)
-    betrag = models.IntegerField()
-    inhalt = models.TextField()
-    
-    class Meta:
-        verbose_name_plural = 'Stufen'
-    
-    def __str__(self):
-        return '%s: %s (%d)' % (self.id, self.bezeichnung, self.betrag)
-
-
 class Unterstuetzung(models.Model):
     DEFAULT_DURATION = timedelta(days=365)
-    
+
     profil = models.ForeignKey(ScholariumProfile, on_delete=models.CASCADE)
-    stufe = models.ForeignKey(Stufe, on_delete=models.PROTECT)
+    stufe = models.ForeignKey(Spendenstufe, on_delete=models.PROTECT)
     datum = models.DateField(default=date.today())
     zahlungsmethode = models.CharField(blank=True, max_length=100)
-    
+
     class Meta:
         verbose_name_plural = 'Unterstuetzungen'
-        
+
     def __str__(self):
         return '%s %s: %s (%s)' % (self.profil.user.first_name, self.profil.user.last_name, self.stufe.bezeichnung, self.datum)
-    
+
     def get_ablauf(self):
         '''Gibt Ablaufdatum der Unterstützung zurück.'''
         return self.datum + self.DEFAULT_DURATION

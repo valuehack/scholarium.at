@@ -364,10 +364,11 @@ class Kauf(models.Model):
         verbose_name_plural = 'Käufe'
 
 
-class Spendenstufe(Grundklasse):
+class Spendenstufe(Grundklasse):  # TODO: Not a product. Should be moved to Grundgeruest!
+    id = models.IntegerField(primary_key=True)
     spendenbeitrag = models.SmallIntegerField()
     beschreibung = models.TextField()
-    gegenwert1 = models.TextField(null=True, blank=True)
+    gegenwert1 = models.TextField(null=True, blank=True)  # TODO: Markdown stattdessen.
     gegenwert2 = models.TextField(null=True, blank=True)
     gegenwert3 = models.TextField(null=True, blank=True)
     gegenwert4 = models.TextField(null=True, blank=True)
@@ -376,6 +377,9 @@ class Spendenstufe(Grundklasse):
 
     class Meta:
         verbose_name_plural = "Spendenstufen"
+
+    def __str__(self):
+        return '%s: %s (%d)' % (self.id, self.bezeichnung, self.spendenbeitrag)
 
     def gegenwerte_html(self):
         gegenwerte = []
