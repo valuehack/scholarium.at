@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from guardian.admin import GuardedModelAdmin
 from userena.models import UserenaSignup
 
-from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende
+from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unterstuetzung, Stufe
 
 # Register your models here.
 
@@ -27,9 +27,16 @@ class HauptpunktAdmin(admin.ModelAdmin):
     inlines = [UnterpunktInline]
 
 
+class UnterstuetzungAdmin(admin.ModelAdmin):
+    model = Unterstuetzung
+    search_fields = ['profil__user__email']
+
+
 admin.site.register(Hauptpunkt, HauptpunktAdmin)
 admin.site.register(Unterpunkt)
 admin.site.register(Mitwirkende)
+admin.site.register(Stufe)
+admin.site.register(Unterstuetzung, UnterstuetzungAdmin)
 
 
 # von userena.admin kopiert und angepasst

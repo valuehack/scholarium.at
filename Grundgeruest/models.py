@@ -212,17 +212,18 @@ class ScholariumProfile(UserenaBaseProfile):
 
     def get_unterstuetzungen(self):
         '''Gibt alle bisherigen Unterstützungen zurück.'''
-        return Unterstuetzung.objects.filter(user=self)
+        return Unterstuetzung.objects.filter(profil=self)
 
-    def get_active(self):
-        '''Gibt höchste aktive Unterstützung zurück'''
-        active = [u for u in self.get_unterstuetzungen() if u.get_ablauf() >= date.today()]
-        return active.order_by('-stufe__betrag')[0] if active else None
+    def get_aktiv(self):
+        '''Gibt HÖCHSTE aktive Unterstützung zurück'''
+        stufen = self.get_unterstuetzungen().order_by('-stufe__betrag')
+        aktiv = [u for u in stufen if u.get_ablauf() >= date.today()]
+        return aktiv[0] if aktiv else None
 
     def get_stufe(self):  # TODO: Wahrscheinlich unnötig, sollte wohl weg.
         '''Gibt HÖCHSTE aktive Stufe zurück.'''
-        active = self.get_active()
-        return active.stufe if active else None
+        aktiv = self.get_aktiv()
+        return aktiv.stufe if aktiv else None
 
     def get_ablauf(self):
         '''Gibt das Ablaufdatum der NEUSTEN Unterstützung zurück.'''
@@ -236,8 +237,8 @@ class ScholariumProfile(UserenaBaseProfile):
             (2, "30 Tage bis Ablauf"),
             (3, "Aktiv")
         ]
-        if self.get_ablauf:
-            verbleibend = (self.get_ablauf - datetime.now().date()).days
+        if self.get_ablauf():
+            verbleibend = (self.get_ablauf() - datetime.now().date()).days
             if self.stufe == 0:
                 return status[0]
             elif verbleibend < 0:
@@ -269,17 +270,30 @@ class ScholariumProfile(UserenaBaseProfile):
 
 
 class Stufe(Grundklasse):
+    id = models.IntegerField(primary_key=True)
     betrag = models.IntegerField()
     inhalt = models.TextField()
+    
+    class Meta:
+        verbose_name_plural = 'Stufen'
+    
+    def __str__(self):
+        return '%s: %s (%d)' % (self.id, self.bezeichnung, self.betrag)
 
 
-class Unterstuetzung(Grundklasse):
+class Unterstuetzung(models.Model):
     DEFAULT_DURATION = timedelta(days=365)
     
-    user = models.ForeignKey(ScholariumProfile, on_delete=models.CASCADE)
+    profil = models.ForeignKey(ScholariumProfile, on_delete=models.CASCADE)
     stufe = models.ForeignKey(Stufe, on_delete=models.PROTECT)
     datum = models.DateField(default=date.today())
-    zahlungsmethode = models.CharField(blank=True)
+    zahlungsmethode = models.CharField(blank=True, max_length=100)
+    
+    class Meta:
+        verbose_name_plural = 'Unterstuetzungen'
+        
+    def __str__(self):
+        return '%s %s: %s (%s)' % (self.profil.user.first_name, self.profil.user.last_name, self.stufe.bezeichnung, self.datum)
     
     def get_ablauf(self):
         '''Gibt Ablaufdatum der Unterstützung zurück.'''
