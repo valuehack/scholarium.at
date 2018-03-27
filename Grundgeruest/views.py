@@ -283,7 +283,7 @@ def upgrade_nutzer(request, datendict):
     else:
         profile = Nutzer.objects.get(email=datendict['email']).my_profile
 
-    unterstuetzung = Unterstuetzung(user=profile,
+    unterstuetzung = Unterstuetzung(profil=profile,
                                     stufe=Stufe.objects.get(pk=datendict['stufe']),
                                     datum=date.today(),
                                     zahlungsmethode=datendict['zahlungsweise'])
@@ -349,7 +349,7 @@ def zahlen(request):
             pass  # TODO: Übertragen, von wo User gekommen sind
         elif 'state' in request.POST:
             return nutzer_upgrade()
-        elif 'bestaetigung' in request.POST:
+        elif 'bestaetigung' in request.POST:  # TODO: Zahlnug und Betrag überprüfen.
             Nachricht.nutzer_gezahlt(Nutzer.objects.get(email=request.POST['email']).pk, request.POST['betrag'],
                                      {'b': 'Bar', 'u': 'Überweisung'}[request.POST['zahlungsweise']])
             return nutzer_upgrade()
