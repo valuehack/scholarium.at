@@ -6,12 +6,11 @@ from userena.models import UserenaSignup
 
 from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unterstuetzung
 
-# Register your models here.
-
 
 class ProfileAdmin(admin.ModelAdmin):
     list_filter = ['land']
-    search_fields = ['user__email']
+    search_fields = ['user__email', 'user']
+    list_display = ['anrede', 'user', 'guthaben', 'get_Status', 'get_aktiv', 'get_ablauf']
 
 
 admin.site.register(ScholariumProfile, ProfileAdmin)
@@ -29,7 +28,10 @@ class HauptpunktAdmin(admin.ModelAdmin):
 
 class UnterstuetzungAdmin(admin.ModelAdmin):
     model = Unterstuetzung
-    search_fields = ['profil__user__email']
+    search_fields = ['profil__user__email',
+                     'profile__user']
+    list_display = ('stufe', 'profil', 'datum', 'zahlungsmethode')
+    list_filter = ['datum', 'stufe']
 
 
 admin.site.register(Hauptpunkt, HauptpunktAdmin)

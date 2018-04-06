@@ -146,7 +146,7 @@ class Nutzer(AbstractUser):
         super(Nutzer, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'Nutzer {}'.format(self.email)
+        return '{} {} ({})'.format(self.first_name, self.last_name, self.email)
 
 
 class ScholariumProfile(UserenaBaseProfile):
