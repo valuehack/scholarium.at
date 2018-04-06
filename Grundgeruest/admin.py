@@ -10,7 +10,7 @@ from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unte
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_filter = ('stufe', 'land')
+    list_filter = ['land']
     search_fields = ['user__email']
 
 

@@ -9,7 +9,7 @@
 
 <div class="profil">
   <h1>Profil</h1>
-    {% if request.user.my_profile.datum_ablauf %} <p>Ihr Unterst&uuml;tzer-Zugang l&auml;uft noch bis zum {{ request.user.my_profile.datum_ablauf }}<br><br>
+    {% if request.user.my_profile.get_ablauf %} <p>Ihr Unterst&uuml;tzer-Zugang l&auml;uft noch bis zum {{ request.user.my_profile.get_ablauf }}<br><br>
     (Verl&auml;ngerung um ein Jahr nach Spendeneingang.)<br><br>
     <a href="/spende">&rarr; Unterst&uuml;tzung erneuern.</a>
   </p> {% endif %}

@@ -1,5 +1,5 @@
 from django import template
-from Produkte.models import Kauf
+from Produkte.models import Kauf, Spendenstufe
 from Grundgeruest.models import ScholariumProfile
 
 register = template.Library()
@@ -14,7 +14,7 @@ def choice_value(key, field, formular):
 
 @register.simple_tag
 def stufenname(stufe):
-    return dict(ScholariumProfile.stufe_choices)[int(stufe)]
+    return Spendenstufe.objects.get(pk=int(stufe)).bezeichnung
 
 @register.simple_tag
 def preis(produkt, art=0):
