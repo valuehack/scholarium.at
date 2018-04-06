@@ -273,7 +273,7 @@ class Unterstuetzung(models.Model):
 
     profil = models.ForeignKey(ScholariumProfile, on_delete=models.CASCADE)
     stufe = models.ForeignKey(Spendenstufe, on_delete=models.PROTECT)
-    datum = models.DateField(default=date.today())
+    datum = models.DateField(default=date.today)
     zahlungsmethode = models.CharField(blank=True, max_length=100)
 
     class Meta:
