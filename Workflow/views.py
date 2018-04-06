@@ -96,12 +96,14 @@ def csv_export(request):
     Generates csv-files with selected filters. (i.e. for manual import to Sendgrid)
     """
     values = request.POST.getlist('values')
+    stufen = request.POST.getlist('stufen')
+    states = request.POST.getlist('states')
 
     formatted_date = datetime.now().strftime('%d-%m-%Y_%H-%M')
-    csv_filename = '{0}_{1}_{2}_{3}.csv'.format('+'.join(request.POST.getlist('stufen')),
+    csv_filename = '{0}_{1}_{2}_{3}.csv'.format('+'.join(stufen),
                                                 formatted_date,
-                                                '+'.join(request.POST.getlist('values')),
-                                                '+'.join(request.POST.getlist('states')))
+                                                '+'.join(values),
+                                                '+'.join(states))
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = \
@@ -109,15 +111,26 @@ def csv_export(request):
 
     writer = csv.writer(response)
 
-    # Filter for selected tiers
-    profiles = ScholariumProfile.objects.filter(stufe__in=request.POST.getlist('stufen'))
+    profiles = ScholariumProfile.objects.all()  # Not using Queryset filtering because of model functions.
 
-    states = request.POST.getlist('states')
-    if 'abgelaufen' not in states:
-        profiles = profiles.filter(datum_ablauf__gte=date.today())
+    profile_list = []
+    for profile in profiles:
+        # Filter for seleceted tier
+        if profile.get_stufe():
+            print(profile.get_stufe().pk)
+        stufe = profile.get_stufe().pk if profile.get_stufe() else 0
+        if stufe not in [int(x) for x in stufen]:
+            continue
 
-    if 'aktiv' not in states:
-        profiles = profiles.filter(datum_ablauf__lt=date.today())
+        # Filter for aktiv/abgelaufen if existent
+        ablauf = profile.get_ablauf()
+        if ablauf:
+            if 'abgelaufen' not in states and ablauf < date.today():
+                continue
+            if 'aktiv' not in states and ablauf >= date.today():
+                continue
+
+        profile_list.append(profile)
 
     # Split Nutzer values from Scholariumprofil values, because getattr() can't handle nested values
     user_values = []
@@ -130,7 +143,7 @@ def csv_export(request):
             profile_values.append(i)
 
     writer.writerow(user_values + profile_values)  # header-row
-    for profile in profiles:
+    for profile in profile_list:
         writer.writerow([getattr(profile.user, value) for value in user_values] + [getattr(profile, value) for value in profile_values])
 
     return response

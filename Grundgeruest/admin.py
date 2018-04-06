@@ -9,7 +9,7 @@ from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unte
 # Register your models here.
 
 
-class StufenPlusUnterstuetzerListFilter(admin.SimpleListFilter):
+class StufenPlusUnterstuetzerListFilter(admin.SimpleListFilter):  # Nicht in Benutzung, Unterstützung.stufe ist nicht mehr möglich.
     """
     This filter extends the common list_filter = ('stufe') by the option
     "Unterstützer (alle)", i.e. stufe > 0.
@@ -33,7 +33,7 @@ class StufenPlusUnterstuetzerListFilter(admin.SimpleListFilter):
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_filter = (StufenPlusUnterstuetzerListFilter, 'land')
+    list_filter = ['land']
     search_fields = ['user__email']
 
 

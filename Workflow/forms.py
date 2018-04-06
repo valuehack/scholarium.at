@@ -1,5 +1,6 @@
 from django import forms
 from Grundgeruest.models import ScholariumProfile
+from Produkte.models import Spendenstufe
 
 
 class Rechnung2PdfForm(forms.Form):
@@ -49,6 +50,8 @@ class CSVForm(forms.Form):
         ('abgelaufen', 'abgelaufen'),
         ('aktiv', 'aktiv'),
     ]
+    stufe_choices = [('0', 'Interessent')] + [(s.pk, s.bezeichnung) for s in Spendenstufe.objects.all()]
+
     values = forms.MultipleChoiceField(fields, widget=forms.CheckboxSelectMultiple)
-    stufen = forms.MultipleChoiceField(ScholariumProfile.stufe_choices, widget=forms.CheckboxSelectMultiple)
+    stufen = forms.MultipleChoiceField(stufe_choices, widget=forms.CheckboxSelectMultiple)
     states = forms.MultipleChoiceField(state_fields, widget=forms.CheckboxSelectMultiple)
