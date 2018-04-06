@@ -28,7 +28,7 @@
       >{{ user.first_name }} {{ user.last_name }}
     </li>
     <li class="dropdown_header dropdown_level"
-      >{{ user.my_profile.get_stufe_display }}
+      >{{ user.my_profile.get_stufe.bezeichnung }}
     </li>
     <li><a href="{% url 'userena_profile_detail' user.username %}">Profil</a></li>
     <li><a href="{% url 'gast_spende' %}">Unterstützen</a></li>
