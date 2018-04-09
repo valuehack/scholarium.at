@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'easycart',
     'django_countries',
     'django_cron',
+    'google_analytics',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -241,3 +242,7 @@ CRON_CLASSES = [
 
 # Release period in days
 RELEASE_PERIOD = 6
+
+GOOGLE_ANALYTICS = {
+    'google_analytics_id': 'UA-117190689-1',
+}
