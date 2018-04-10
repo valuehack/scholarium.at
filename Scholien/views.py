@@ -11,6 +11,7 @@ from django.conf import settings
 import os
 
 from django.shortcuts import render
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from Scholien.models import Artikel
 from datetime import date
 
@@ -33,14 +34,27 @@ def liste_artikel(request):
     # Articles that have been published
     art_pub = Artikel.objects.filter(datum_publizieren__isnull=False, datum_publizieren__lte=date.today())
     art_pub = art_pub.order_by('-datum_publizieren')
+    paginator = Paginator(art_pub, 5)
     # Articles that will be published on a specific date
     art_fut = Artikel.objects.filter(datum_publizieren__gt=date.today())
     art_fut = art_fut.order_by('-datum_publizieren')
 
+    page = request.GET.get('seite')
+    
+    try:
+        art_pub = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        art_pub = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        art_pub = paginator.page(paginator.num_pages)
+    
     context = {
         'art_null': art_null,
         'art_pub': art_pub,
         'art_fut': art_fut,
+        'paginator': paginator,
     }
     return render(request, 'Scholien/artikel.html', context)
 
