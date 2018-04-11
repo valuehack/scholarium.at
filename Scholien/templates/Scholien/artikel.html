@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Scholien{% endblock %}
+
+{% block content %}
+  {% if request.user.my_profile.get_Status.0 <= 1 %}
+    <article class="blog">
+      <p style="font-style: italic;">
+        Mit Scholion bezeichnete man ursprünglich eine Randnotiz, die Gelehrte in den Büchern anbrachten, die ihre ständigen Wegbegleiter waren. Heute sind die Scholien die Randnotizen von Rahim Taghizadegan, die Erkenntnisgewinne im Rahmen des <em style="font-style: normal;">scholarium</em> dokumentieren: der tiefgehenden Reflexion und praktischen Überprüfung der Möglichkeiten, unter erschwerten Bedingungen noch Werte zu schaffen, Realität von Illusion zu unterscheiden und Sinn zu finden. Um alle Scholien in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}"> beehren Sie uns bitte als Gast</a>.
+      </p>
+      <a class="blog_linkbutton" href="{% url 'gast_spende' %}">Unterstützen & Zugang erhalten</a>
+    </article>
+  {% elif request.user.is_staff %}
+    <div class="separator">
+      <h2>Unveröffentlichte Artikel</h2>
+    </div>
+    <div class="veranstaltungen">
+      {% include 'Scholien/liste_artikel.html' with liste_artikel=art_null %}
+      {% include 'Scholien/liste_artikel.html' with liste_artikel=art_fut %}
+    </div>
+    <div class="separator">
+      <h2>Veröffentlichte Artikel</h2>
+    </div>
+  {% endif %}
+  <div class="veranstaltungen">
+    {% include 'Scholien/liste_artikel.html' with liste_artikel=art_pub %}
+  </div>
+  {% include "paginationsleiste.html" %}
+{% endblock content %}

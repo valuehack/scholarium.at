@@ -220,7 +220,8 @@ class DetailMitMenue(MenueMixin, DetailView):
 
 def index(request):
     if request.user.is_authenticated():
-        liste_artikel = Artikel.objects.exclude(datum_publizieren=None).order_by('-datum_publizieren')[:4]
+        liste_artikel = Artikel.objects.filter(datum_publizieren__isnull=False, datum_publizieren__lte=date.today())
+        liste_artikel = liste_artikel.order_by('-datum_publizieren')[:4]
         alle_veranstaltungen = Veranstaltung.objects.order_by('datum')
         veranstaltungen = [v for v in alle_veranstaltungen if v.ist_zukunft()][-3:]
         medien = [v for v in alle_veranstaltungen if v.ob_aufzeichnung][-3:]

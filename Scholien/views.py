@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
-from Grundgeruest.views import DetailMitMenue, ListeMitMenue, TemplateMitMenue, ListeArtikel
+from Grundgeruest.views import DetailMitMenue, ListeMitMenue, TemplateMitMenue
 from seite.settings import BASE_DIR, MEDIA_ROOT
 from Grundgeruest.models import Nutzer
 from . import models
@@ -10,33 +10,53 @@ import sqlite3 as lite
 from django.conf import settings
 import os
 
+from django.shortcuts import render
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from Scholien.models import Artikel
+from datetime import date
+
 
 def liste_artikel(request):
-    """ Gibt Übersichtsseite mit Artikeln aus; oder, wenn GET-Daten da
-    sind, ein Detail-view zu dem Artikel (Rückwärtskompatibilität!) """
 
     slug = request.GET.get('q')
-    if slug:  # erst prüfen, ob was da ist
+    if slug:
         return ein_artikel(request, slug)
 
-    # nur wenn kein 'q' im GET, wird Liste ausgegeben:
-    if request.user.is_authenticated() and request.user.my_profile.get_Status()[0] >= 2:
-        return ListeArtikel.as_view(
-            model=models.Artikel,
-            template_name='Scholien/liste_artikel.html',
-            context_object_name='liste_artikel',
-            paginate_by=5)(request, page=request.GET.get('seite'))
-    elif request.user.is_authenticated():
-        return ListeArtikel.as_view(
-            template_name='Gast/scholien_angemeldet.html',
-            model=models.Artikel,
-            context_object_name='liste_artikel',
-            paginate_by=5)(request, page=request.GET.get('seite'))
-    else:
+    # Introduction for non-members
+    if not request.user.is_authenticated():
         return TemplateMitMenue.as_view(
             template_name='Gast/scholien.html',
             url_hier='/scholien',
             )(request)
+
+    # Articles without publication date
+    art_null = Artikel.objects.filter(datum_publizieren__isnull=True)
+    # Articles that have been published
+    art_pub = Artikel.objects.filter(datum_publizieren__isnull=False, datum_publizieren__lte=date.today())
+    art_pub = art_pub.order_by('-datum_publizieren')
+    paginator = Paginator(art_pub, 5)
+    # Articles that will be published on a specific date
+    art_fut = Artikel.objects.filter(datum_publizieren__gt=date.today())
+    art_fut = art_fut.order_by('-datum_publizieren')
+
+    page = request.GET.get('seite')
+    
+    try:
+        art_pub = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        art_pub = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        art_pub = paginator.page(paginator.num_pages)
+    
+    context = {
+        'art_null': art_null,
+        'art_pub': art_pub,
+        'art_fut': art_fut,
+        'paginator': paginator,
+    }
+    return render(request, 'Scholien/artikel.html', context)
 
 
 def liste_buechlein(request):
