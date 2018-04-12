@@ -14,8 +14,8 @@
       <input class="inputbutton" type="submit" value="Teilnehmerliste drucken"/>
     </form>
   {% endif %}
-  {% ob_livestream_zeigen veranstaltung request.user.my_profile as ob_zeigen %}
-  {% if ob_zeigen %}
+  {% ob_video_zeigen veranstaltung request.user.my_profile as ob_zeigen %}
+  {% if ob_zeigen and veranstaltung.link %}
     {% include "Veranstaltungen/livestream.html" %}
   {% endif %}
   {% if veranstaltung.ob_chat_anzeigen and ob_zeigen and not veranstaltung.ist_vergangen %}
