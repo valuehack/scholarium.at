@@ -1,6 +1,11 @@
+amqp==1.4.9
+anyjson==0.3.3
 appdirs==1.4.3
 asn1crypto==0.23.0
 bcrypt==3.1.3
+beautifulsoup4==4.6.0
+billiard==3.3.0.23
+celery==3.1.26.post2
 certifi==2017.7.27.1
 cffi==1.9.1
 chardet==3.0.4
@@ -8,11 +13,13 @@ chargebee==2.3.7
 cryptography==2.0.3
 decorator==4.1.2
 Django==1.11.6
+django-celery==3.2.2
 django-common-helpers==0.9.1
 django-countries==4.5
 django-cron==0.5.0
 django-easycart==0.4.0
 django-extensions==1.7.5
+django-google-analytics-app==4.3.0
 django-guardian==1.4.9
 django-userena==2.0.1
 docutils==0.13.1
@@ -25,6 +32,7 @@ ipdb==0.10.3
 ipython==6.2.1
 ipython-genutils==0.2.0
 jedi==0.11.0
+kombu==3.0.37
 lxml==4.0.0
 mysql-connector==2.1.4
 oauthlib==2.0.4

@@ -27,6 +27,7 @@ from Produkte.models import Spendenstufe
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^djga/', include('google_analytics.urls')),
     url(r'^fragen/',
         TemplateMitMenue.as_view(
             template_name='Gast/fragen.html'),
