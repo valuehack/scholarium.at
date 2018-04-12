@@ -129,9 +129,10 @@ def publish():
     Neuer Post alle 6 Tage. Nach Priorität sortieren.
     '''
     from Scholien.models import Artikel
-    
+
     artikel_pub = Artikel.objects.all().order_by('-datum_publizieren')
     last = (datetime.date.today() - artikel_pub[0].datum_publizieren).days
+    message = ''
 
     # Check, ob Beitrag in letzten Tagen
     if last >= settings.RELEASE_PERIOD:
@@ -142,14 +143,16 @@ def publish():
         if artikel_p:
             neu = artikel_p[0]
         elif artikel_np:
-            print('Kein Artikel mit Priorität gefunden.')
+            message = 'Kein Artikel mit Priorität gefunden.'
             neu = artikel_np[0]
         else:
-            print('Kein neuen Artikel gefunden.')
+            message = 'Kein neuen Artikel gefunden.'
 
         if neu:
             neu.datum_publizieren = datetime.date.today()
             neu.save()
-            print('%s publiziert.' % neu)
+            message = '%s publiziert.' % neu
     else:
-        print('Letzter Artikel bereits vor %d Tagen veröffentlicht.' % last)
+        message = 'Letzter Artikel bereits vor %d Tagen veröffentlicht.' % last
+
+    return message
