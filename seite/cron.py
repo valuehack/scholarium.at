@@ -3,7 +3,7 @@ from Workflow.utils import trelloToSQL, publish
 
 '''
 Add to crontab:
-*/5 * * * * cd /home/scholarium/scholarium_production && source venv/bin/activate && python manage.py runcrons
+*/5 * * * * "$(command -v bash)" -c 'cd /home/scholarium/scholarium_production && source venv/bin/activate && python manage.py runcrons'
 TODO: Check if log output is created.
 '''
 
@@ -25,4 +25,4 @@ class cron_publish(CronJobBase):
     code = 'Publish article Cronjob'
 
     def do(self):
-        publish()
+        return publish()
