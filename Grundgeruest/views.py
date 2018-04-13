@@ -165,10 +165,13 @@ def erstelle_liste_menue(user=None):
              {'bezeichnung': 'Büchlein', 'slug': 'scholienbuechlein'}
              ]),
             ({'bezeichnung': 'Salons', 'slug': 'salons'}, [
+             {'bezeichnung': 'Aufzeichnungen', 'slug': 'salons#medien'}
              ]),
             ({'bezeichnung': 'Seminare', 'slug': 'seminare'}, [
+             {'bezeichnung': 'Aufzeichnungen', 'slug': 'seminare#medien'}
              ]),
             ({'bezeichnung': 'Vortrag', 'slug': 'vortrag'}, [
+             {'bezeichnung': 'Aufzeichnungen', 'slug': 'vortrag#medien'}
              ]),
             ({'bezeichnung': 'Bücher', 'slug': 'buecher'}, [
              ]),

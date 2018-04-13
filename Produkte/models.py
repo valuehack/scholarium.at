@@ -243,10 +243,13 @@ class Kauf(models.Model):
         um die Tabelle an der richtigen Zeile auszulesen
         """
         model_name, obj_pk, art = Kauf.tupel_aus_pk(pk)
-        objekt = ContentType.objects.get(
-            model=model_name).get_object_for_this_type(
-            pk=obj_pk)
-        return objekt
+        try:
+            objekt = ContentType.objects.get(
+                model=model_name).get_object_for_this_type(
+                pk=obj_pk)
+            return objekt
+        except:
+            return None
 
     @staticmethod
     def obj_zu_pk(objekt, art=0):
@@ -350,8 +353,9 @@ class Kauf(models.Model):
 
     def __str__(self):
         objekt, art = self.objekt_ausgeben(mit_art=True)
+        nutzer = self.nutzer.user.__str__() if self.nutzer else None
         text = '{} hat am {} gekauft: {}x {}'.format(
-            self.nutzer.user.__str__(),
+            nutzer,
             self.zeit.strftime('%x, %H:%M'),
             self.menge,
             objekt.__str__())
