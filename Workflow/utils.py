@@ -17,7 +17,7 @@ html_path = os.path.join(base_dir, "HTML")
 
 def markdown_to_html(markdown):
     # codecs.decode(markdown)
-    text = "---\nbibliography: {}\nreference-section-title: Literatur\n---\n\n{}\n\n".format(bib, markdown)
+    text = "---\nbibliography: {}\n---\n\n{}\n\n## Literatur".format(bib, markdown)
 
     # to html
     md = text
@@ -42,7 +42,7 @@ def markdown_to_html(markdown):
 
     # Trennungszeichen
     p = re.compile(r"<p>&lt;&lt;&lt;</p>")
-    split = re.split(p, html)
+    split = re.split(p, split[0])
     public = split[0]
 
     # lstrip entfernt mögliche Absätze am Anfang.
