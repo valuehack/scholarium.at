@@ -17,13 +17,13 @@ html_path = os.path.join(base_dir, "HTML")
 
 def markdown_to_html(markdown):
     # codecs.decode(markdown)
-    text = "---\nbibliography: {}\n---\n\n{}\n\n## Literatur".format(bib, markdown)
+    text = "---\nbibliography: {}\nreference-section-title: Literatur\n---\n\n{}\n\n".format(bib, markdown)
 
     # to html
     md = text
     extra_args = []
     filters = ['pandoc-citeproc']
-    html = pypandoc.convert(md, 'html', format='md',  extra_args=extra_args, filters=filters)
+    html = pypandoc.convert(md, 'html', format='md', extra_args=extra_args, filters=filters)
 
     # blockquotes mit class versehen
     p = re.compile("<blockquote>")
