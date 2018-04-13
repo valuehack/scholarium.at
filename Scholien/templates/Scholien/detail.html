@@ -17,6 +17,10 @@
     {% else %}
       <a href="{% url 'gast_spende' %}">Um den Artikel in voller Länge lesen zu können, werden Sie Unterstützer.</a>
     {% endif %}
+    {% if scholie.literatur %}
+      <h2 id="Literatur">Literatur</h2>
+      {{ scholie.literatur }}
+    {% endif %} 
     <p style="text-align: right;">
       <a href="{% url 'Scholien:index' %}">zurück zu den Scholienartikeln</a>
     </p>

@@ -33,6 +33,12 @@ def markdown_to_html(markdown):
     p = re.compile("--")
     html = p.sub("&ndash;", html)
 
+    # Literaturverzeichnis
+    p = re.compile(r'<h2.*Literatur</h2>')
+    literatur = re.split(p, html)[1]
+    if not literatur:
+        print('Keine Literatur gefunden.')
+
     # Trennungszeichen
     p = re.compile(r"<p>&lt;&lt;&lt;</p>")
     split = re.split(p, html)
@@ -42,7 +48,7 @@ def markdown_to_html(markdown):
     private = split[1].lstrip() if len(split) > 1 else ""
     if not private:
         print('Keinen privaten Teil gefunden.')
-    return public, private
+    return public, private, literatur
 
 
 # TODO: Beide Funktionen zusammenfassen.
