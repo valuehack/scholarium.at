@@ -54,7 +54,7 @@ class MarkdownArtikel(Grundklasse):
             raise ValidationError('Artikel-slug existiert bereits.')
         else:
             art = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt,
-                                         inhalt_nur_fuer_angemeldet=inhalt_angemeldet, inhalt2=inhalt2, litertur=literatur, prioritaet=self.prioritaet)
+                                         inhalt_nur_fuer_angemeldet=inhalt_angemeldet, inhalt2=inhalt2, literatur=literatur, prioritaet=self.prioritaet)
             self.artikel = art
         art.save()
         print('%s erfolgreich gespeichert.' % self.bezeichnung)
