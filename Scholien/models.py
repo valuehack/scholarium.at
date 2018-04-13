@@ -18,6 +18,7 @@ from Workflow.utils import markdown_to_html
 class Artikel(Grundklasse):
     inhalt = models.TextField()
     inhalt_nur_fuer_angemeldet = models.TextField(null=True, blank=True)
+    inhalt2 = models.TextField(null=True, blank=True)
     literatur = models.TextField(null=True, blank=True)
     datum_publizieren = models.DateField(null=True, blank=True)
     prioritaet = models.PositiveSmallIntegerField(default=0)
@@ -39,20 +40,21 @@ class MarkdownArtikel(Grundklasse):
         ordering = ['-zeit_erstellt']
 
     def artikel_erstellen(self):
-        inhalt, inhalt_angemeldet, literatur = markdown_to_html(self.text)
+        inhalt, inhalt_angemeldet, inhalt2, literatur = markdown_to_html(self.text)
         if self.artikel:
             art = self.artikel
             art.slug = self.slug
             art.bezeichnung = self.bezeichnung
             art.inhalt = inhalt
             art.inhalt_nur_fuer_angemeldet = inhalt_angemeldet
+            art.inhalt2 = inhalt2
             art.literatur = literatur
             art.prioritaet = self.prioritaet
         elif Artikel.objects.filter(slug=self.slug).exists():
             raise ValidationError('Artikel-slug existiert bereits.')
         else:
             art = Artikel.objects.create(slug=self.slug, bezeichnung=self.bezeichnung, inhalt=inhalt,
-                                         inhalt_nur_fuer_angemeldet=inhalt_angemeldet, litertur=literatur, prioritaet=self.prioritaet)
+                                         inhalt_nur_fuer_angemeldet=inhalt_angemeldet, inhalt2=inhalt2, litertur=literatur, prioritaet=self.prioritaet)
             self.artikel = art
         art.save()
         print('%s erfolgreich gespeichert.' % self.bezeichnung)

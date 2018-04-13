@@ -47,9 +47,10 @@ def markdown_to_html(markdown):
 
     # lstrip entfernt mögliche Absätze am Anfang.
     private = split[1].lstrip() if len(split) > 1 else ""
+    public2 = split[2].lstrip() if len(split) > 2 else ""
     if not private:
         print('Keinen privaten Teil gefunden.')
-    return public, private, literatur
+    return public, private, public2, literatur
 
 
 # TODO: Beide Funktionen zusammenfassen.
