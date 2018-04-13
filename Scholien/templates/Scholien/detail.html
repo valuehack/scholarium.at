@@ -19,7 +19,7 @@
     {% endif %}
     {% if scholie.literatur %}
       <h2 id="Literatur">Literatur</h2>
-      {{ scholie.literatur }}
+      {{ scholie.literatur|safe }}
     {% endif %} 
     <p style="text-align: right;">
       <a href="{% url 'Scholien:index' %}">zurück zu den Scholienartikeln</a>
