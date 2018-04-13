@@ -11,10 +11,12 @@
         <img style="margin: 2em;" src="{% if band.bild %}{{ band.bild.url }}{% endif %}">
       </div>
       <div class="veranstaltung" style="margin-top: 0;">
+        {% if forloop.counter is not 1 %}
+        <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
+        {% endif %}
         <div>Scholie</div>
         <h1><a href='{{ band.slug }}'>{{ band.bezeichnung }}</a></h1>
         <p>{{ band.beschreibung | safe }}</p>
-        <p class="linie"><img src="{% static 'img/linie.png' %}" alt='linie'></p>
       </div>
     </div>
     {% endfor %}
