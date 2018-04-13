@@ -35,7 +35,8 @@ def markdown_to_html(markdown):
 
     # Literaturverzeichnis
     p = re.compile(r'<h2.*Literatur</h2>')
-    literatur = re.split(p, html)[1]
+    split = re.split(p, html)
+    literatur = split[1] if len(split) > 1 else ""
     if not literatur:
         print('Keine Literatur gefunden.')
 
