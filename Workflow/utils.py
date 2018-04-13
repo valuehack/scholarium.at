@@ -23,7 +23,7 @@ def markdown_to_html(markdown):
     md = text
     extra_args = []
     filters = ['pandoc-citeproc']
-    html = pypandoc.convert(md, 'html', format='md',  extra_args=extra_args, filters=filters)
+    html = pypandoc.convert(md, 'html', format='md', extra_args=extra_args, filters=filters)
 
     # blockquotes mit class versehen
     p = re.compile("<blockquote>")
@@ -33,16 +33,24 @@ def markdown_to_html(markdown):
     p = re.compile("--")
     html = p.sub("&ndash;", html)
 
+    # Literaturverzeichnis
+    p = re.compile(r'<h2.*Literatur</h2>')
+    split = re.split(p, html)
+    literatur = split[1].lstrip() if len(split) > 1 else ""
+    if not literatur:
+        print('Keine Literatur gefunden.')
+
     # Trennungszeichen
     p = re.compile(r"<p>&lt;&lt;&lt;</p>")
-    split = re.split(p, html)
+    split = re.split(p, split[0])
     public = split[0]
 
     # lstrip entfernt mögliche Absätze am Anfang.
     private = split[1].lstrip() if len(split) > 1 else ""
+    public2 = split[2].lstrip() if len(split) > 2 else ""
     if not private:
         print('Keinen privaten Teil gefunden.')
-    return public, private
+    return public, private, public2, literatur
 
 
 # TODO: Beide Funktionen zusammenfassen.
