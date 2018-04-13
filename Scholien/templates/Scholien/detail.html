@@ -13,9 +13,9 @@
     {% if request.user.my_profile.get_Status.0 >= 2 %}
       {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
     {% elif request.user.my_profile.get_Status.0 >= 1 %}
-      <a href="{% url 'gast_spende' %}">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, erneuern Sie bitte Ihre Unterstützung</a>
+      <p style="font-style: italic;">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}">erneuern Sie bitte Ihre Unterstützung</a></p>
     {% else %}
-      <a href="{% url 'gast_spende' %}">Um den Artikel in voller Länge lesen zu können, werden Sie Unterstützer.</a>
+      <p style="font-style: italic;">Um den Artikel in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}">werden Sie Unterstützer.</a></p>
     {% endif %}
     {% if scholie.literatur %}
       <h2 id="Literatur">Literatur</h2>
