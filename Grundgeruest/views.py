@@ -282,14 +282,10 @@ def upgrade_nutzer(request, datendict):
     else:
         profile = Nutzer.objects.get(email=datendict['email']).my_profile
 
-    unterstuetzung = Unterstuetzung(profil=profile,
-                                    stufe=Spendenstufe.objects.get(pk=datendict['stufe']),
-                                    datum=date.today(),
-                                    zahlungsmethode=datendict['zahlungsweise'])
-    unterstuetzung.save()
-
-    profile.guthaben_aufladen(int(datendict['betrag']))
-    profile.save()
+    Unterstuetzung.objects.create(profil=profile,
+                                  stufe=Spendenstufe.objects.get(pk=datendict['stufe']),
+                                  datum=date.today(),
+                                  zahlungsmethode=datendict['zahlungsweise'])
 
     messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
     return HttpResponseRedirect(reverse('Grundgeruest:index'))
@@ -368,7 +364,7 @@ def zahlen(request):
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
     if request.user.is_authenticated:
-        default_stufe = request.user.my_profile.get_stufe() or 1  # also 1 falls sie 0 war
+        default_stufe = request.user.my_profile.get_stufe().pk or 1  # also 1 falls sie 0 war
     else:
         default_stufe = 1
     default_betrag = Spendenstufe.objects.get(pk=default_stufe).spendenbeitrag

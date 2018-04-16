@@ -279,7 +279,12 @@ class Unterstuetzung(models.Model):
 
     class Meta:
         verbose_name_plural = 'Unterstuetzungen'
-
+        
+    def save(self, *args, **kwargs):
+        self.profil.guthaben_aufladen(self.stufe.spendenbeitrag)
+        self.profil.save()
+        super(Unterstuetzung, self).save(*args, **kwargs)
+        
     def __str__(self):
         return '%s %s: %s (%s)' % (self.profil.user.first_name, self.profil.user.last_name, self.stufe.bezeichnung, self.datum)
 
