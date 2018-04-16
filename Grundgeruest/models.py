@@ -287,7 +287,7 @@ class Unterstuetzung(models.Model):
         super(Unterstuetzung, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '%s %s: %s (%s)' % (self.profil.user.first_name, self.profil.user.last_name, self.stufe.bezeichnung, self.datum)
+        return '%s: %s (%s)' % (self.profil.user.get_full_name(), self.stufe.bezeichnung, self.datum)
 
     def get_ablauf(self):
         '''Gibt Ablaufdatum der Unterstützung zurück.'''
