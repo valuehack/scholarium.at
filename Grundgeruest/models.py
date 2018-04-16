@@ -275,6 +275,7 @@ class Unterstuetzung(models.Model):
     stufe = models.ForeignKey(Spendenstufe, on_delete=models.PROTECT)
     datum = models.DateField(default=date.today)
     zahlungsmethode = models.CharField(blank=True, max_length=100)
+    ueberprueft = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'Unterstuetzungen'
