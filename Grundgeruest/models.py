@@ -211,13 +211,9 @@ class ScholariumProfile(UserenaBaseProfile):
     alt_registration_ip = models.GenericIPAddressField(
         editable=False, null=True)
 
-    def get_unterstuetzungen(self):
-        '''Gibt alle bisherigen Unterstützungen zurück.'''
-        return Unterstuetzung.objects.filter(profil=self)
-
     def get_aktiv(self):
         '''Gibt HÖCHSTE aktive Unterstützung zurück'''
-        stufen = self.get_unterstuetzungen().order_by('-stufe__spendenbeitrag')
+        stufen = self.unterstuetzung_set.all().order_by('-stufe__spendenbeitrag')
         aktiv = [u for u in stufen if u.get_ablauf() >= date.today()]
         return aktiv[0] if aktiv else None
 
@@ -228,7 +224,7 @@ class ScholariumProfile(UserenaBaseProfile):
 
     def get_ablauf(self):
         '''Gibt das Ablaufdatum der NEUSTEN Unterstützung zurück.'''
-        u = self.get_unterstuetzungen().order_by('-datum')
+        u = self.unterstuetzung_set.all().order_by('-datum')
         return u[0].get_ablauf() if u else None
 
     def get_Status(self):
