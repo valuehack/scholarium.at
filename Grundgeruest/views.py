@@ -364,7 +364,8 @@ def zahlen(request):
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
     if request.user.is_authenticated:
-        default_stufe = request.user.my_profile.get_stufe().pk or 1  # also 1 falls sie 0 war
+        s = request.user.my_profile.get_stufe()
+        default_stufe = s.pk if s else 1
     else:
         default_stufe = 1
     default_betrag = Spendenstufe.objects.get(pk=default_stufe).spendenbeitrag
