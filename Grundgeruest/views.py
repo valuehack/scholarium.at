@@ -243,7 +243,7 @@ def index(request):
             )(request)
 
 
-def paypal_bestaetigung(request):
+def paypal_bestaetigung(request):  # Ungenutzt
     # from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
     # access_token = anfrage_token()
     # zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
@@ -342,13 +342,13 @@ def zahlen(request):
     context = {}
 
     if request.method == 'POST':
-        pprint.pprint(request.POST)
+        # pprint.pprint(request.POST)
 
         if 'von_spende' in request.POST:  # falls POST von unangemeldet, keine Fehlermeldungen:
             pass  # TODO: Übertragen, von wo User gekommen sind
         elif 'state' in request.POST:
             return nutzer_upgrade()
-        elif 'bestaetigung' in request.POST:  # TODO: Zahlnug und Betrag überprüfen.
+        elif 'bestaetigung' in request.POST:
             Nachricht.nutzer_gezahlt(Nutzer.objects.get(email=request.POST['email']).pk, request.POST['betrag'],
                                      {'b': 'Bar', 'u': 'Überweisung'}[request.POST['zahlungsweise']])
             return nutzer_upgrade()
