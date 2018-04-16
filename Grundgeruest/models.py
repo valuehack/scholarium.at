@@ -204,8 +204,6 @@ class ScholariumProfile(UserenaBaseProfile):
         default=0, null=True, editable=False)
     alt_mahnstufe = models.SmallIntegerField(
         default=0, null=True, editable=False)
-    alt_auslaufend = models.SmallIntegerField(
-        default=0, null=True, editable=True, verbose_name='auslaufend')
     alt_gave_credits = models.SmallIntegerField(
         default=0, null=True, editable=False)
     alt_registration_ip = models.GenericIPAddressField(
@@ -272,6 +270,7 @@ class Unterstuetzung(models.Model):
     datum = models.DateField(default=date.today)
     zahlungsmethode = models.CharField(blank=True, max_length=100)
     ueberprueft = models.BooleanField(default=False)
+    notiz = models.TextField(blank=True)
 
     class Meta:
         verbose_name_plural = 'Unterstuetzungen'
