@@ -13,16 +13,17 @@
     {% if scholie.inhalt_nur_fuer_angemeldet %}
       {% if request.user.my_profile.get_Status.0 >= 2 %}
         {{ scholie.inhalt_nur_fuer_angemeldet|safe }}
-      {% elif request.user.my_profile.get_Status.0 >= 1 %}
-        <p style="text-align: center; font-size: 20pt; margin-top: 2em;">- VERTRAULICH -</p>
-        <p style="text-align: center;">{{ scholie.inhalt_nur_fuer_angemeldet|wordcount }} Wörter</p>
-        <p style="font-style: italic;">Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}">erneuern Sie bitte Ihre Unterstützung</a></p>
-        <p style="text-align: center; font-size: 20pt; margin-bottom: 2em;">----------------</p>
       {% else %}
         <p style="text-align: center; font-size: 20pt; margin-top: 2em;">- VERTRAULICH -</p>
         <p style="text-align: center;">{{ scholie.inhalt_nur_fuer_angemeldet|wordcount }} Wörter</p>
-        <p style="font-style: italic;">Um den Artikel in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}">werden Sie Unterstützer.</a></p>
-        <p style="text-align: center; font-size: 20pt; margin-bottom: 2em;">- VERTRAULICH -</p>
+        <p style="font-style: italic;">
+          {% if request.user.my_profile.get_Status.0 >= 1 %}
+            Ihre letzte Unterstützung liegt leider länger als ein Jahr zurück. Um alle Scholien wieder in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}">erneuern Sie bitte Ihre Unterstützung</a>
+          {% else %}
+            Um den Artikel in voller Länge lesen zu können, <a href="{% url 'gast_spende' %}">werden Sie Unterstützer.</a>
+          {% endif %}
+        </p>
+        <p style="text-align: center; font-size: 20pt; margin-bottom: 2em;">----------------</p>
       {% endif %}
     {% endif %}
     {% if scholie.inhalt2 %}
