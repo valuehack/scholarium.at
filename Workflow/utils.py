@@ -31,7 +31,7 @@ def buffer(scholie):
         payload = ids + data
 
         r = requests.post('https://api.bufferapp.com/1/updates/create.json', data=payload)
-    except NameError:
+    except AttributeError:
         return 'Buffer values missing in settings.'
     return 'Buffer response: %s' % r
 
