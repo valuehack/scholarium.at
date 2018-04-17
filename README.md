@@ -34,10 +34,8 @@ pandoc-citeproc >= -1.10.0.0.
 pandoc-citeproc muss from source kompiliert werden. (Stand: 2016-11-22 auf Ubuntu)
 
 
-### TrelloToSql
+### Artikelerstellung
 |Syntax                     |Funktion                   |
 |---------------------------|---------------------------|
 `<<<`                       |Trennung des privaten Teils|
 `[@title: page]`            |Literaturreferenz erstellen|
-`§§ [article slug or tags]` |Individuelle Artikel-Tags (nur Trello Import)|
-`§§! [article slug or tags]`|Artikel mit hoher Priorität (nur Trello Import)|
