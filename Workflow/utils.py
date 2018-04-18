@@ -5,14 +5,35 @@ import os
 from trello import TrelloClient
 from slugify import slugify
 import datetime
+import requests
 
+from django.urls import reverse
 from django.conf import settings
 from django.db import IntegrityError
+from django.contrib.sites.models import Site
 
 base_dir = os.path.join(settings.MEDIA_ROOT, 'Schriften')
 bib = os.path.join(base_dir, "scholarium.bib")
 md_path = os.path.join(base_dir, "Markdown")
 html_path = os.path.join(base_dir, "HTML")
+
+
+def buffer(scholie):
+    try:
+        link = 'https://%s%s' % (Site.objects.get(pk=settings.SITE_ID).domain,
+                                 reverse('Scholien:artikel_detail', args=[scholie.slug]))
+        data = [
+            ('access_token', settings.BUFFER_ACCESS_TOKEN),
+            ('text', 'Neue Scholie:'),
+            ('media[link]', link)
+        ]
+        ids = [('profile_ids[]', id) for id in settings.BUFFER_SITE_IDS]
+        payload = ids + data
+
+        r = requests.post('https://api.bufferapp.com/1/updates/create.json', data=payload)
+    except AttributeError:
+        return 'Buffer values missing in settings.'
+    return 'Buffer response: %s' % r
 
 
 def markdown_to_html(markdown):
@@ -159,7 +180,8 @@ def publish():
         if neu:
             neu.datum_publizieren = datetime.date.today()
             neu.save()
-            message = '%s publiziert.' % neu
+            r = buffer(neu)
+            message = '%s publiziert. %s' % (neu, r)
     else:
         message = 'Letzter Artikel bereits vor %d Tagen veröffentlicht.' % last
 
