@@ -9,10 +9,18 @@
 
 <div class="profil">
   <h1>Profil</h1>
-    {% if request.user.my_profile.get_ablauf %} <p>Ihr Unterst&uuml;tzer-Zugang l&auml;uft noch bis zum {{ request.user.my_profile.get_ablauf }}<br><br>
-    (Verl&auml;ngerung um ein Jahr nach Spendeneingang.)<br><br>
+  {% if request.user.my_profile.get_ablauf %} 
+  <p>
+    {% if request.user.my_profile.get_aktiv %}
+      Ihr Unterst&uuml;tzer-Zugang l&auml;uft noch bis zum {{ request.user.my_profile.get_ablauf }}.
+      <br><br>(Verl&auml;ngerung um ein Jahr nach Spendeneingang.)
+    {% else %}
+      Ihr Unterst&uuml;tzer-Zugang ist am {{ request.user.my_profile.get_ablauf }} abglaufen.
+    {% endif %}
+    <br><br>
     <a href="/spende">&rarr; Unterst&uuml;tzung erneuern.</a>
-  </p> {% endif %}
+  </p> 
+  {% endif %}
 </div>
 
 <div class="separator">
