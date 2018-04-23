@@ -52,7 +52,8 @@ class HauptpunktAdmin(admin.ModelAdmin):
 class UnterstuetzungAdmin(admin.ModelAdmin):
     model = Unterstuetzung
     search_fields = ['profil__user__email',
-                     'profile__user']
+                     'profil__user__first_name',
+                     'profil__user__last_name']
     list_display = ('stufe', 'profil', 'datum', 'zahlungsmethode')
     list_filter = ['datum', 'stufe']
 
