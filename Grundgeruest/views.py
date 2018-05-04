@@ -401,7 +401,7 @@ def getWebProfile():
         # "temporary": "true",
         "presentation": {
             "brand_name": "scholarium",
-            "logo_image": "https://" + Site.objects.get(pk=settings.SITE_ID).domain + static('scholarium_et.jpg'),
+            "logo_image": "https://" + Site.objects.get(pk=settings.SITE_ID).domain + static('img/scholarium_et.jpg'),
             "locale_code": "AT"
         },
         "input_fields": {
