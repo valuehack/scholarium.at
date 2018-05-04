@@ -38,6 +38,7 @@ class Nachricht():
 
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
+        print('start')
         nutzer = Nutzer.objects.get(pk=nutzer_pk)
         text = '''Hallo Georg!
 
@@ -47,6 +48,7 @@ email: %s, id: %s, username: %s
  * Zahlung:
 Betrag: %s, Zahlungsart: %s, aktuelle Zeit: %s
 ''' % (nutzer.email, nutzer_pk, nutzer.username, betrag, zahlart, str(datetime.now()).split('.')[0])
+
         send_mail(
             subject='[website] Nutzer hat gezahlt',
             message=text,
@@ -238,57 +240,19 @@ def index(request):
                 'buecher': buecher
             })(request)
     else:
-        return TemplateMitMenue.as_view(
-            template_name='Gast/startseite_gast.html'
-            )(request)
+        return TemplateMitMenue.as_view(template_name='Gast/startseite_gast.html')(request)
 
 
-def paypal_bestaetigung(request):  # Ungenutzt
-    # from Grundgeruest.paypal import anfrage_token, fuehre_payment_aus, pruefe_payment
-    # access_token = anfrage_token()
-    # zahlung = pruefe_payment(request.GET.get('paymentID'), access_token)
-    # (der 'state' der Antwort wird nicht genutzt, da wir kein reproduzierbares Muster gefunden haben)
-
-    paypalrestsdk.configure({
-        "mode": settings.PAYPAL_MODE,
-        "client_id": settings.PAYPAL_CLIENT_ID,
-        "client_secret": settings.PAYPAL_CLIENT_SECRET})
-
-    if 'paymentID' in request.GET:
-        payment = paypalrestsdk.Payment.find(request.GET['paymentID'])
-        pprint.pprint(payment)
-        if payment.state == 'approved':
-            betrag = int(float(payment.to_dict()['transactions'][0]['amount']['total']))
-            stufe = Spendenstufe.objects.get(spendenbeitrag=betrag).pk
-            if request.user.is_authenticated:
-                pk = request.user.pk
-                email = request.user.email
-            else:
-                pk = request.session['neuer_nutzer_pk']
-                email = Nutzer.objects.get(pk=pk).email
-            datendict = {'betrag': betrag, 'stufe': stufe, 'email': email}
-            upgrade_nutzer(request, datendict)
-            Nachricht.nutzer_gezahlt(pk, betrag, 'PayPal')
-
-            return HttpResponseRedirect("/spende/zahlung/")
-            # messages.error(request, 'Transaktion nicht bestätigt.')
-            # return JsonResponse({"Status der paypal-Zahlung": "nicht erfolgreich"})
-
-
-def upgrade_nutzer(request, datendict):
+def upgrade_nutzer(profile, stufe, zahlungsmethode=None):
     ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
-    if request.user.is_authenticated():
-        profile = request.user.my_profile
-    else:
-        profile = Nutzer.objects.get(email=datendict['email']).my_profile
+    payment_choices = dict(ZahlungFormular.payment_choices)
 
-    Unterstuetzung.objects.create(profil=profile,
-                                  stufe=Spendenstufe.objects.get(pk=datendict['stufe']),
+    Unterstuetzung.objects.create(profil=profile, stufe=stufe,
                                   datum=date.today(),
-                                  zahlungsmethode=datendict['zahlungsweise'])
+                                  zahlungsmethode=zahlungsmethode)
 
-    messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
-    return HttpResponseRedirect(reverse('Grundgeruest:index'))
+    Nachricht.nutzer_gezahlt(profile.pk, stufe.spendenbeitrag,
+                             payment_choices.get(zahlungsmethode))
 
 
 def zahlen(request):
@@ -331,23 +295,23 @@ def zahlen(request):
         profil.save()
         return nutzer
 
-    def nutzer_upgrade():
-        return upgrade_nutzer(request, request.POST)
+    def nutzer_upgrade(stufe_pk, zahlungsmethode=None):
+        profile = request.user.my_profile
+        stufe = Spendenstufe.objects.get(pk=stufe_pk)
+
+        upgrade_nutzer(profile, stufe, zahlungsmethode)
+
+        messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
+        return HttpResponseRedirect(reverse('Grundgeruest:index'))
 
     formular = formular_init()
     context = {}
 
     if request.method == 'POST':
-        # pprint.pprint(request.POST)
-
-        if 'von_spende' in request.POST:  # falls POST von unangemeldet, keine Fehlermeldungen:
-            pass  # TODO: Übertragen, von wo User gekommen sind
-        elif 'state' in request.POST:
-            return nutzer_upgrade()
+        if 'von_spende' in request.POST:
+            pass
         elif 'bestaetigung' in request.POST:
-            Nachricht.nutzer_gezahlt(Nutzer.objects.get(email=request.POST['email']).pk, request.POST['betrag'],
-                                     {'b': 'Bar', 'u': 'Überweisung'}[request.POST['zahlungsweise']])
-            return nutzer_upgrade()
+            return nutzer_upgrade(request.POST['stufe'], request.POST['zahlungsweise'])
         else:  # dann POST von hier, also Daten verarbeiten:
             formular = ZahlungFormular(request.POST)
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
@@ -355,12 +319,38 @@ def zahlen(request):
                 if nutzerdaten_speichern() == 'zu_login':  # dann gibt's redirect, sonst wird schlicht gespeichert
                     return HttpResponseRedirect('/nutzer/anmelden/?next=/spende/zahlung/')
                 if request.POST['zahlungsweise'] == 'p':
-                    context.update({'sichtbar': True})
+                    paypalrestsdk.configure({
+                        "mode": settings.PAYPAL_MODE,
+                        "client_id": settings.PAYPAL_CLIENT_ID,
+                        "client_secret": settings.PAYPAL_CLIENT_SECRET})
+                    # context.update({'sichtbar': True})
+                    return zahlungsabwicklung_paypal(request)
                 else:
                     return zahlungsabwicklung_rest(request, formular)
             else:
                 print('Bitte korrigieren Sie die Fehler im Formular')
                 messages.error(request, 'Formular ungültig.')
+
+    # Check for Paypal confirmation
+    payment_id = request.GET.get('paymentId')
+    if payment_id:  # TODO: Check if approved
+        if request.session.get('payment_id') == payment_id:
+            paypalrestsdk.configure({
+                "mode": settings.PAYPAL_MODE,
+                "client_id": settings.PAYPAL_CLIENT_ID,
+                "client_secret": settings.PAYPAL_CLIENT_SECRET})
+            payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
+            if payment.execute({"payer_id": request.GET['PayerID']}):
+                return nutzer_upgrade(payment.transactions[0].item_list.items[0].sku, zahlungsmethode='p')
+            elif payment.error['name'] == 'PAYMENT_ALREADY_DONE':
+                messages.info(request, 'Zahlung bereits abgeschlossen. Sollten Sie ihr Upgrade nicht erhalten haben, wenden Sie sich bitte an info@scholarium.at')
+            else:
+                print(payment.error)
+                messages.error(request, 'Ein unerwarteter Fehler ist aufgetreten. Bitte entschuldigen Sie die Unannehmlichkeit und wenden Sie sich an info@scholarium.at')
+        else:
+            messages.error(request, 'Session abgelaufen. Bitte probieren Sie es erneut.')
+            print(request.session['payment_id'], payment_id)
+            return HttpResponseRedirect(reverse('gast_spende'))
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
     if request.user.is_authenticated:
@@ -384,7 +374,13 @@ def zahlen(request):
 
 
 def zahlungsabwicklung_paypal(request):
-    pass
+    webprofile = getWebProfile()
+    stufe = Spendenstufe.objects.get(pk=request.POST.get('stufe') or 1)
+    zahlung = paypalZahlungErstellen(stufe, webprofile)
+    request.session['payment_id'] = zahlung.id
+    # Redirect the user to given approval url
+    approval_url = next((p.href for p in zahlung.links if p.rel == 'approval_url'))
+    return HttpResponseRedirect(approval_url)
 
 
 def zahlungsabwicklung_rest(request, formular):
@@ -395,104 +391,70 @@ def zahlungsabwicklung_rest(request, formular):
     return render(request, 'Produkte/zahlung_bestaetigen.html', context)
 
 
-class paypal_von_merlin():
-    '''
-    Provisorisch verschoben. Nicht verwendete Implementierung der PayPal API.
-    '''
+def getWebProfile():
+    # Gets Paypal Web Profile
+    wpn = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
 
-    def getWebProfile():
-        # Gets Paypal Web Profile
-        wpn = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
+    web_profile = paypalrestsdk.WebProfile({
+        "name": wpn,
+        # "temporary": "true",
+        "presentation": {
+            "brand_name": "scholarium",
+            "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
+            "locale_code": "AT"
+        },
+        "input_fields": {
+            "allow_note": True,
+            "no_shipping": 1,
+            "address_override": 1
+        },
+        "flow_config": {
+            "landing_page_type": "login",
+            "bank_txn_pending_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+            "user_action": "commit"
+        }})
 
-        web_profile = paypalrestsdk.WebProfile({
-            "name": wpn,
-            # "temporary": "true",
-            "presentation": {
-                "brand_name": "scholarium",
-                "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
-                "locale_code": "AT"
-            },
-            "input_fields": {
-                "allow_note": True,
-                "no_shipping": 1,
-                "address_override": 1
-            },
-            "flow_config": {
-                "landing_page_type": "login",
-                "bank_txn_pending_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
-                "user_action": "commit"
-            }})
+    if web_profile.create():
+        print("Web Profile[%s] created successfully" % (web_profile.id))
+        return web_profile
+    else:
+        print(web_profile.error)
+        return None
 
-        if web_profile.create():
-            print("Web Profile[%s] created successfully" % (web_profile.id))
-            return web_profile
-        else:
-            print(web_profile.error)
-            return None
 
-    def paypalZahlungErstellen(stufe):
-        payment = paypalrestsdk.Payment({
-            "intent": "sale",
-            "experience_profile_id": web_profile.id,
-            "payer": {
-                "payment_method": "paypal"},
-            "redirect_urls": {
-                "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
-                # TODO: Alte POST Daten(Ausgewählte Stufe) wieder übergeben.
-                "cancel_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
-            # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
-            "transactions": [{
-                "payee": {
-                    "email": "info@scholarium.at",
-                    "payee_display_metadata": {
-                        "brand_name": "scholarium"}},
-                "item_list": {
-                    "items": [{
-                        "name": str(stufe),
-                        "sku": stufe.id,
-                        "price": request.POST['betrag'],
-                        "currency": "EUR",
-                        "quantity": 1}]},
-                "amount": {
-                    "total": request.POST['betrag'],
-                    "currency": "EUR"},
-                "description": stufe.beschreibung}]})
+def paypalZahlungErstellen(stufe, web_profile):
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "experience_profile_id": web_profile.id,
+        "payer": {
+            "payment_method": "paypal"},
+        "redirect_urls": {
+            "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+            "cancel_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
+        # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
+        "transactions": [{
+            "payee": {
+                "email": "info@scholarium.at",
+                "payee_display_metadata": {
+                    "brand_name": "scholarium"}},
+            "item_list": {
+                "items": [{
+                    "name": stufe.bezeichnung,
+                    "sku": stufe.pk,
+                    "price": stufe.spendenbeitrag,
+                    "currency": "EUR",
+                    "quantity": 1}]},
+            "amount": {
+                "total": stufe.spendenbeitrag,
+                "currency": "EUR"},
+            "description": stufe.beschreibung}]})
 
-        if payment.create():
-            print("Payment[%s] created successfully" % (payment.id))
-            pprint.pprint(payment)
-            return payment
-        else:
-            print(payment.error)
-            return None
-
-    def weiterleiten_zu_confirm():
-        paypalrestsdk.configure({
-            "mode": settings.PAYPAL_MODE,
-            "client_id": settings.PAYPAL_CLIENT_ID,
-            "client_secret": settings.PAYPAL_CLIENT_SECRET})
-
-        web_profile = getWebProfile()
-        payment = paypalZahlungErstellen(stufe)
-
-        # Redirect the user to given approval url
-        approval_url = next((p.href for p in payment.links if p.rel == 'approval_url'))
-        return HttpResponseRedirect(approval_url)
-
-    def empfage_user_nach_approval():
-        if request.GET.get('paymentId'):
-            payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
-            pprint.pprint(payment)
-            if payment.state == 'approved':
-                if payment.execute({"payer_id": request.GET['PayerID']}):
-                    print("Payment executed successfully")
-                    nutzerErstellen()
-                    messages.success(request, ('Herzlichen Glückwunsch, Sie sind nun %s' % payment.item))
-                    HttpResponseRedirect(reverse('Grundgeruest:index'))
-                    print(payment.error)
-            else:
-                pass
-                messages.error(request, 'Transaktion nicht bestätigt.')
+    if payment.create():
+        print("Payment[%s] created successfully" % (payment.id))
+        return payment
+    else:
+        print(payment.error)
+        return None
 
 
 def anmelden(request, *args, **kwargs):

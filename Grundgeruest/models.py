@@ -268,9 +268,9 @@ class Unterstuetzung(models.Model):
     profil = models.ForeignKey(ScholariumProfile, on_delete=models.CASCADE)
     stufe = models.ForeignKey(Spendenstufe, on_delete=models.PROTECT)
     datum = models.DateField(default=date.today)
-    zahlungsmethode = models.CharField(blank=True, max_length=100)
+    zahlungsmethode = models.CharField(blank=True, null=True, max_length=100)
     ueberprueft = models.BooleanField(default=False)
-    notiz = models.TextField(blank=True)
+    notiz = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Unterstuetzungen'
