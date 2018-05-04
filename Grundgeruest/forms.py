@@ -26,17 +26,17 @@ class Anmeldeformular(SignupForm):
 
 
 class ZahlungFormular(forms.ModelForm):
+    payment_choices = [
+        ('u', 'Überweisung'),
+        ('p', 'PayPal'),
+        ('b', 'Bar'),
+    ]
     email = forms.EmailField()
     vorname = forms.CharField(required=False)
     nachname = forms.CharField(required=False)
     zahlungsweise = forms.ChoiceField(
         widget=forms.RadioSelect,
-        choices=[
-            ('u', 'Überweisung'),
-            ('p', 'PayPal'),
-            ('b', 'Bar'),
-            # ('g', 'GoCardless')
-        ])
+        choices=payment_choices)
 
     class Meta:
         model = ScholariumProfile
