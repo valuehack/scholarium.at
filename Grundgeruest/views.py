@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from userena.mail import send_mail as sendmail_von_userena
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende, Unterstuetzung
 from Produkte.models import Spendenstufe, Kauf
@@ -400,7 +401,7 @@ def getWebProfile():
         # "temporary": "true",
         "presentation": {
             "brand_name": "scholarium",
-            "logo_image": "https://drive.google.com/open?id=0B4pA_9bw5MghZEVuQmJGaS1FSFU",
+            "logo_image": "https://" + Site.objects.get(pk=settings.SITE_ID).domain + static('scholarium_et.jpg'),
             "locale_code": "AT"
         },
         "input_fields": {
@@ -410,7 +411,7 @@ def getWebProfile():
         },
         "flow_config": {
             "landing_page_type": "login",
-            "bank_txn_pending_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+            "bank_txn_pending_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
             "user_action": "commit"
         }})
 
@@ -429,8 +430,8 @@ def paypalZahlungErstellen(stufe, web_profile):
         "payer": {
             "payment_method": "paypal"},
         "redirect_urls": {
-            "return_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
-            "cancel_url": 'http://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
+            "return_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
+            "cancel_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
         # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
         "transactions": [{
             "payee": {
