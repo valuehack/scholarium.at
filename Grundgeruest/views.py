@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from userena.mail import send_mail as sendmail_von_userena
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
-from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende, Unterstuetzung
+from .models import Nutzer, GanzesMenue, Hauptpunkt, Unterpunkt, Mitwirkende, Unterstuetzung, ScholariumProfile
 from Produkte.models import Spendenstufe, Kauf
 from Scholien.models import Artikel
 from Veranstaltungen.models import Veranstaltung
@@ -20,9 +20,10 @@ from .forms import ZahlungFormular, ProfilEditFormular
 from datetime import date, timedelta, datetime
 from django.core.mail import send_mail
 import paypalrestsdk
-import pprint
+from pprint import pprint
 import string
 import random  # was missing. Doesn't matter?
+import requests
 
 # profile_edit aus userena.views kopiert, um Initialisierung der Nutzer-Daten
 # (Felder auf Nutzer heißen anders als userena erwartet) zu ändern
@@ -39,7 +40,6 @@ class Nachricht():
 
     @classmethod
     def nutzer_gezahlt(cls, nutzer_pk, betrag, zahlart):
-        print('start')
         nutzer = Nutzer.objects.get(pk=nutzer_pk)
         text = '''Hallo Georg!
 
@@ -244,19 +244,17 @@ def index(request):
         return TemplateMitMenue.as_view(template_name='Gast/startseite_gast.html')(request)
 
 
-def upgrade_nutzer(profile, stufe, zahlungsmethode=None):
-    ''' Setzt die neue Unterstützerstufe nach erfolgreicher Zahlung.'''
+def upgrade_mail(profile, stufe, zahlungsmethode=None):
     payment_choices = dict(ZahlungFormular.payment_choices)
-
-    Unterstuetzung.objects.create(profil=profile, stufe=stufe,
-                                  datum=date.today(),
-                                  zahlungsmethode=zahlungsmethode)
-
     Nachricht.nutzer_gezahlt(profile.pk, stufe.spendenbeitrag,
                              payment_choices.get(zahlungsmethode))
 
 
 def zahlen(request):
+    def upgrade_redirect():
+        messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
+        return HttpResponseRedirect(reverse('Grundgeruest:index'))
+
     def formular_init():
         if request.user.is_authenticated():
             formular = ZahlungFormular(instance=request.user.my_profile,
@@ -296,23 +294,21 @@ def zahlen(request):
         profil.save()
         return nutzer
 
-    def nutzer_upgrade(stufe_pk, zahlungsmethode=None):
-        profile = request.user.my_profile
-        stufe = Spendenstufe.objects.get(pk=stufe_pk)
-
-        upgrade_nutzer(profile, stufe, zahlungsmethode)
-
-        messages.success(request, 'Vielen Dank für Ihre Unterstützung!')
-        return HttpResponseRedirect(reverse('Grundgeruest:index'))
-
     formular = formular_init()
     context = {}
 
     if request.method == 'POST':
+        pprint(request.POST)
         if 'von_spende' in request.POST:
             pass
-        elif 'bestaetigung' in request.POST:
-            return nutzer_upgrade(request.POST['stufe'], request.POST['zahlungsweise'])
+        elif 'bestaetigung' in request.POST:  # TODO: Besseres Überprüfungssytem
+            stufe = Spendenstufe.objects.get(pk=request.POST['stufe'])
+            Unterstuetzung.objects.create(
+                profil=request.user.my_profile,
+                stufe=stufe,
+                zahlungsmethode=request.POST['zw'])
+            upgrade_mail(request.user.my_profile, stufe, zahlungsmethode=request.POST['zw'])
+            return upgrade_redirect()
         else:  # dann POST von hier, also Daten verarbeiten:
             formular = ZahlungFormular(request.POST)
             # und falls alle Eingaben gültig sind, Daten verarbeiten:
@@ -324,17 +320,46 @@ def zahlen(request):
                         "mode": settings.PAYPAL_MODE,
                         "client_id": settings.PAYPAL_CLIENT_ID,
                         "client_secret": settings.PAYPAL_CLIENT_SECRET})
-                    # context.update({'sichtbar': True})
                     return zahlungsabwicklung_paypal(request)
+                elif request.POST['zahlungsweise'] == 'c':
+                    return zahlungsabwicklung_crypto(request)
                 else:
                     return zahlungsabwicklung_rest(request, formular)
             else:
                 print('Bitte korrigieren Sie die Fehler im Formular')
                 messages.error(request, 'Formular ungültig.')
 
+    # Check for Globee confirmation
+    if request.GET.get('globee') == 'success':
+        payment_id = request.session.get('payment_id')
+        if not payment_id:
+            messages.error(request, 'Ihre Sitzung ist abgelaufen. Sollte ihre Zahlung nicht funktioniert haben wenden Sie sich bitte an info@scholarium.at')
+        else:
+            headers = {
+                'Accept': 'application/json',
+                'X-AUTH-KEY': settings.GLOBEE_API_KEY}
+            payment = requests.get('https://globee.com/payment-api/v1/payment-request/%s' % payment_id, headers=headers).json()
+            if payment.get('success') is not True:
+                messages.error(request, 'Etwas ist schief gelaufen. Bitte laden sie die Webseite erneut. Sollte dies wiederholt auftreten wenden Sie sich bitte an info@scholarium.at')
+            else:
+                status = payment['data'].get('status')
+                if status == 'confirmed' or status == 'paid':
+                    stufe = Spendenstufe.objects.get(pk=payment['data']['custom_payment_id'])
+                    unterstuetzung = Unterstuetzung.objects.get_or_create(
+                        zahlung_id=payment_id,
+                        defaults={
+                            'profil': request.user.my_profile,
+                            'stufe': stufe,
+                            'zahlungsmethode': 'c'})
+                    if unterstuetzung[1]:
+                        upgrade_mail(request.user.my_profile, stufe, zahlungsmethode='c')
+                        return upgrade_redirect()
+                    else:
+                        messages.info(request, 'Zahlung bereits abgeschlossen. Sollten Sie ihr Upgrade nicht erhalten haben, wenden Sie sich bitte an info@scholarium.at')
+
     # Check for Paypal confirmation
-    payment_id = request.GET.get('paymentId')
-    if payment_id:  # TODO: Check if approved
+    if request.GET.get('paypal') == 'success':
+        payment_id = request.GET.get('paymentId')
         if request.session.get('payment_id') == payment_id:
             paypalrestsdk.configure({
                 "mode": settings.PAYPAL_MODE,
@@ -342,7 +367,15 @@ def zahlen(request):
                 "client_secret": settings.PAYPAL_CLIENT_SECRET})
             payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
             if payment.execute({"payer_id": request.GET['PayerID']}):
-                return nutzer_upgrade(payment.transactions[0].item_list.items[0].sku, zahlungsmethode='p')
+                stufe = Spendenstufe.objects.get(pk=payment.transactions[0].item_list.items[0].sku)
+                Unterstuetzung.objects.create(
+                    profil=request.user.my_profile,
+                    stufe=stufe,
+                    zahlung_id=payment_id,
+                    zahlungsmethode='p'
+                )
+                upgrade_mail(request.user.my_profile, stufe, zahlungsmethode='p')
+                return upgrade_redirect()
             elif payment.error['name'] == 'PAYMENT_ALREADY_DONE':
                 messages.info(request, 'Zahlung bereits abgeschlossen. Sollten Sie ihr Upgrade nicht erhalten haben, wenden Sie sich bitte an info@scholarium.at')
             else:
@@ -352,6 +385,7 @@ def zahlen(request):
             messages.error(request, 'Session abgelaufen. Bitte probieren Sie es erneut.')
             print(request.session['payment_id'], payment_id)
             return HttpResponseRedirect(reverse('gast_spende'))
+
 
     # ob's GET war oder vor_spende, suche Daten um auf sich selbst zu POSTen
     if request.user.is_authenticated:
@@ -382,6 +416,35 @@ def zahlungsabwicklung_paypal(request):
     # Redirect the user to given approval url
     approval_url = next((p.href for p in zahlung.links if p.rel == 'approval_url'))
     return HttpResponseRedirect(approval_url)
+
+
+def zahlungsabwicklung_crypto(request):
+    stufe = Spendenstufe.objects.get(pk=request.POST.get('stufe') or 1)
+
+    headers = {
+        'Accept': 'application/json',
+        'X-AUTH-KEY': settings.GLOBEE_API_KEY,
+    }
+    payload = {
+        'total': stufe.spendenbeitrag,
+        'currency': 'EUR',
+        'custom_payment_id': stufe.pk,
+        # 'callback_data': request.user.username,
+        'customer[name]': '%s %s' % (request.user.first_name, request.user.last_name),
+        'customer[email]': request.user.email,
+        'success_url': 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung') + '?globee=success',
+        'cancel_url': 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende') + '?globee=cancel',
+        'notification_email': 'mb@scholarium.at',
+        # 'ipn_url': 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung')
+    }
+    response = requests.post('https://globee.com/payment-api/v1/payment-request', headers=headers, data=payload).json()
+    
+    if response.get('success') is True:
+        request.session['payment_id'] = response['data']['id']
+        return HttpResponseRedirect(response['data']['redirect_url'])
+    else:
+        messages.error(request, 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder wenden Sie sich an info@scholarium.at')
+        return HttpResponseRedirect(reverse('gast_zahlung'))
 
 
 def zahlungsabwicklung_rest(request, formular):
@@ -430,9 +493,8 @@ def paypalZahlungErstellen(stufe, web_profile):
         "payer": {
             "payment_method": "paypal"},
         "redirect_urls": {
-            "return_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung'),
-            "cancel_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende')},
-        # "note_to_payer": "Bei Fragen wenden Sie sich bitte an info@scholarium.at.",
+            "return_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_zahlung') + '?paypal=success',
+            "cancel_url": 'https://' + Site.objects.get(pk=settings.SITE_ID).domain + reverse('gast_spende') + '?paypal=cancel'},
         "transactions": [{
             "payee": {
                 "email": "info@scholarium.at",

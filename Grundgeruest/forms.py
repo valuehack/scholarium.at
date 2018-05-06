@@ -30,6 +30,7 @@ class ZahlungFormular(forms.ModelForm):
         ('u', 'Überweisung'),
         ('p', 'PayPal'),
         ('b', 'Bar'),
+        ('c', 'Crypto')
     ]
     email = forms.EmailField()
     vorname = forms.CharField(required=False)

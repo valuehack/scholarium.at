@@ -270,6 +270,7 @@ class Unterstuetzung(models.Model):
     datum = models.DateField(default=date.today)
     zahlungsmethode = models.CharField(blank=True, null=True, max_length=100)
     ueberprueft = models.BooleanField(default=False)
+    zahlung_id = models.CharField(max_length=200, blank=True, null=True, unique=True)
     notiz = models.TextField(blank=True, null=True)
 
     class Meta:
