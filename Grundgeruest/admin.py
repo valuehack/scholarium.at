@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from guardian.admin import GuardedModelAdmin
 from userena.models import UserenaSignup
+from .forms import ZahlungFormular
 
 from .models import Hauptpunkt, Unterpunkt, ScholariumProfile, Mitwirkende, Unterstuetzung
 
@@ -30,10 +31,23 @@ class StufenPlusUnterstuetzerListFilter(admin.SimpleListFilter):  # Nicht in Ben
                     return queryset.filter(stufe__exact=stufe_nr)
 
 
+class UnterstuetzungInline(admin.TabularInline):
+    model = Unterstuetzung
+    ordering = ['-datum']
+    readonly_fields = ['ablauf', 'methode']
+
+    def ablauf(self, obj):
+        return obj.get_ablauf()
+
+    def methode(self, obj):
+        return dict(ZahlungFormular.payment_choices).get(obj.zahlungsmethode) or obj.zahlungsmethode
+
+
 class ProfileAdmin(admin.ModelAdmin):
     list_filter = ['land']
     search_fields = ['user__email', 'user__first_name', 'user__last_name']
     list_display = ['anrede', 'user', 'guthaben', 'get_Status', 'get_aktiv', 'get_ablauf']
+    inlines = [UnterstuetzungInline]
 
 
 admin.site.register(ScholariumProfile, ProfileAdmin)

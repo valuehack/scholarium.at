@@ -163,7 +163,8 @@ class ScholariumProfile(UserenaBaseProfile):
                      (6, 'Patron')]
     stufe = models.IntegerField(  # TODO: Delete.
         choices=stufe_choices,
-        default=0)
+        default=0,
+        editable=False)
     anrede = models.CharField(
         max_length=4,
         choices=[('Herr', 'Herr'), ('Frau', 'Frau')],
@@ -193,8 +194,8 @@ class ScholariumProfile(UserenaBaseProfile):
     anredename = models.CharField(
         max_length=30,
         null=True, blank=True)
-    letzte_zahlung = models.DateField(null=True, blank=True)  # TODO: Delete.
-    datum_ablauf = models.DateField(null=True, blank=True)  # TODO: Delete.
+    letzte_zahlung = models.DateField(null=True, blank=True, editable=False)  # TODO: Delete.
+    datum_ablauf = models.DateField(null=True, blank=True, editable=False)  # TODO: Delete.
     alt_id = models.SmallIntegerField(
         default=0, editable=False)
     alt_notiz = models.CharField(
