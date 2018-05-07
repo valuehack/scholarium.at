@@ -81,9 +81,6 @@ urlpatterns = [
         TemplateMitMenue.as_view(
             template_name='Gast/englisch.html'),
         name='gast_englisch'),
-    url(r'^geheim_db$',
-        db_runterladen,
-        name='bitte_bald_loeschen'),
     url(r'^nimda/', include('Workflow.urls')),
     url(r'^', include('Grundgeruest.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -126,7 +126,7 @@ USERENA_REGISTER_PROFILE = False
 LOGIN_URL = '/nutzer/anmelden/'
 LOGOUT_URL = '/nutzer/abmelden/'
 
-SITE_ID = 2  # für localhost in der ursprünglichen DB
+SITE_ID = 3  # für localhost in der ursprünglichen DB
 
 # easycart-specific settings
 
@@ -246,3 +246,6 @@ RELEASE_PERIOD = 6
 GOOGLE_ANALYTICS = {
     'google_analytics_id': 'UA-117190689-1',
 }
+
+# Globee Testnet
+GLOBEE_API_KEY = 'VBZ5ToRfBPHtiBwrsr6k8xVjRHH5UBQP'
