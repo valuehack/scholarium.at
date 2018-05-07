@@ -35,6 +35,7 @@ class UnterstuetzungInline(admin.TabularInline):
     model = Unterstuetzung
     ordering = ['-datum']
     readonly_fields = ['ablauf', 'methode']
+    extra = 0
 
     def ablauf(self, obj):
         return obj.get_ablauf()
