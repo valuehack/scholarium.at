@@ -246,7 +246,7 @@ def index(request):
 
 def upgrade_mail(profile, stufe, zahlungsmethode=None):
     payment_choices = dict(ZahlungFormular.payment_choices)
-    Nachricht.nutzer_gezahlt(profile.pk, stufe.spendenbeitrag,
+    Nachricht.nutzer_gezahlt(profile.user.pk, stufe.spendenbeitrag,
                              payment_choices.get(zahlungsmethode))
 
 
