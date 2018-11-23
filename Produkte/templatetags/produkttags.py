@@ -44,6 +44,12 @@ def ware_model(ware):
 def art_aus_pk(pk):
     return Kauf.tupel_aus_pk(pk)[2]
 
+
+@register.simple_tag
+def stufe_notwendig(preis):
+    return Spendenstufe.objects.filter(spendenbeitrag__gte=preis).order_by('spendenbeitrag')[0]
+
+
 @register.simple_tag
 def max_anzahl_zu_liste(produkt, art=0):
     """ gibt Liste der Anzahlen 1..max zurück, falls das Produkt beschränkt

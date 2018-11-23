@@ -15,7 +15,19 @@
         {% endif %}
       {% endfor %}
       {% if not request.user.is_authenticated %}
-        <a class="blog_linkbutton" style="padding: 2ex 2ex 0 2ex" href="/nutzer/anmelden/?next={{ veranstaltung.get_absolute_url }}">  Zur Buchung bitte hier anmelden  </a>
+        {% if 'teilnahme' in veranstaltung.arten_liste and veranstaltung.art_veranstaltung.slug == 'seminar' %}
+          {% preis veranstaltung 'teilnahme' as preis %}
+          {% stufe_notwendig preis as stufe %}
+          <form action="{% url 'gast_zahlung' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="betrag" value="{{ stufe.spendenbeitrag }}">
+            <input type="hidden" name="stufe" value="{{ stufe.id }}">
+            <input type="hidden" name="von_spende" value="irgendwas">
+            <input type="submit" class="pay_option_box_inputbutton" style="width: auto;" value="Unterstützen Sie uns als {{ stufe.bezeichnung }} ({{ stufe.spendenbeitrag }}€) zur Buchung">
+          </form>
+        {% else %}
+          <a class="blog_linkbutton" style="padding: 2ex 2ex 0 2ex" href="/nutzer/anmelden/?next={{ veranstaltung.get_absolute_url }}">  Zur Buchung bitte hier anmelden  </a>
+        {% endif %}
       {% endif %}
     </div>
   </div>
